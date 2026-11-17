@@ -82,11 +82,9 @@ final class SafeBoxEscortLiveAuthorization {
         if (metadata == null || readiness == null || context == null) {
             return false;
         }
-        SafeVaultReadinessResolver.RowReadiness current =
-                SafetyDepositBoxService.applyStaffingReadiness(metadata, readiness);
         SafeBoxEscortTarget target = context.target();
         return SafeBoxEscortContextResolver.matchesReadyVault(
-                current, target.bankId(), target.vaultId());
+                readiness, target.bankId(), target.vaultId());
     }
 
     private static SafeBoxEscortAuthorizationSnapshot.Assignment assignment(

@@ -29,6 +29,8 @@ import net.austizz.ultimatebankingsystem.block.entity.custom.GlassCounterDisplay
 import net.austizz.ultimatebankingsystem.block.entity.custom.ModularWallDisplayBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShopSellingTableBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShopTerminalBlockEntity;
+import net.austizz.ultimatebankingsystem.block.entity.custom.VendingMachineBlockEntity;
+import net.austizz.ultimatebankingsystem.block.custom.VendingMachineBlock;
 import net.austizz.ultimatebankingsystem.command.UBSCommands;
 import net.austizz.ultimatebankingsystem.entity.custom.BankTellerEntity;
 import net.austizz.ultimatebankingsystem.events.BalanceChangedEvent;
@@ -38,9 +40,11 @@ import net.austizz.ultimatebankingsystem.heist.DallasMaskService;
 import net.austizz.ultimatebankingsystem.heist.HeistInteractionService;
 import net.austizz.ultimatebankingsystem.heist.HeistPlanningService;
 import net.austizz.ultimatebankingsystem.heist.HeistService;
+import net.austizz.ultimatebankingsystem.menu.VendingMachineStockMenu;
 import net.austizz.ultimatebankingsystem.npc.BankTellerService;
 import net.austizz.ultimatebankingsystem.npc.ShopCashierInteractionManager;
 import net.austizz.ultimatebankingsystem.payments.CreditCardService;
+import net.austizz.ultimatebankingsystem.payments.SmartphonePaymentService;
 import net.austizz.ultimatebankingsystem.payments.WalletBankingCashService;
 import net.austizz.ultimatebankingsystem.payrequest.PayRequestManager;
 import net.austizz.ultimatebankingsystem.pickpocket.PickpocketService;
@@ -63,6 +67,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
@@ -82,6 +87,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -125,9 +131,8 @@ import java.util.function.Consumer;
  * </ul>
  */
 public final class ModPayloads {
-    private static final int OWNER_PC_DESKTOP_ACTION_RESPONSE_MAX_CHARS = 32_000;
 
-    private static final UUID ATM_TERMINAL_ID = UUID.nameUUIDFromBytes(
+    public static final UUID ATM_TERMINAL_ID = UUID.nameUUIDFromBytes(
             "ultimatebankingsystem:atm-terminal".getBytes(StandardCharsets.UTF_8));
 
     private ModPayloads() {}
@@ -135,8 +140,49 @@ public final class ModPayloads {
     public static void register(final RegisterPayloadHandlersEvent event) {
         UltimateBankingSystem.LOGGER.info("[UBS] Registering network payloads");
         final PayloadRegistrar registrar = event.registrar("1");
+        registrar.playToClient(AtmViewResultPayload.TYPE, AtmViewResultPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleAtmViewResult", payload)));
+        registrar.playToServer(AtmDepositFeedPayload.TYPE, AtmDepositFeedPayload.STREAM_CODEC,
+                net.austizz.ultimatebankingsystem.payments.AtmSessionService::handleFeed);
+        registrar.playToClient(AtmDepositStockPayload.TYPE, AtmDepositStockPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleAtmDepositStock", payload)));
+        registrar.playToServer(AtmCardRequestPayload.TYPE, AtmCardRequestPayload.STREAM_CODEC,
+                net.austizz.ultimatebankingsystem.payments.AtmCardInsertionService::handle);
+        registrar.playToServer(AtmDispenserPayload.TYPE, AtmDispenserPayload.STREAM_CODEC, (payload, context) -> context.enqueueWork(() -> {
+            if (!(context.player() instanceof net.minecraft.server.level.ServerPlayer player)) return;
+            var pos = payload.atm();
+            if (payload.action().equals("VIEW_CLOSE")) { net.austizz.ultimatebankingsystem.payments.AtmTerminalService.close(player); return; }
+            if (!player.level().hasChunkAt(pos) || !player.isAlive() || player.isSpectator()
+                    || player.distanceToSqr(net.minecraft.world.phys.Vec3.atCenterOf(pos)) > 64) return;
+            var hit = player.level().clip(new net.minecraft.world.level.ClipContext(player.getEyePosition(),
+                    net.minecraft.world.phys.Vec3.atLowerCornerOf(pos).add(.5, 1.25, .5),
+                    net.minecraft.world.level.ClipContext.Block.OUTLINE, net.minecraft.world.level.ClipContext.Fluid.NONE, player));
+            if (hit.getType() != net.minecraft.world.phys.HitResult.Type.MISS
+                    && !net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock.origin(hit.getBlockPos(),player.level().getBlockState(hit.getBlockPos())).equals(pos)) return;
+            if (player.level().getBlockEntity(pos) instanceof net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity atm) {
+                if (payload.action().equals("VIEW_OPEN")) {
+                    boolean accepted = net.austizz.ultimatebankingsystem.payments.AtmTerminalService.claim(player, atm);
+                    PacketDistributor.sendToPlayer(player, new AtmViewResultPayload(pos, accepted));
+                } else {
+                    atm.dispenserAction(player, payload.action());
+                    if (payload.action().equals("VIEW_PING") && atm.isViewer(player) && atm.deposit().feedingScreen())
+                        net.austizz.ultimatebankingsystem.payments.AtmSessionService.sendDepositStock(player, pos);
+                }
+            }
+        }));
+        registrar.playToServer(AtmActionRequestPayload.TYPE, AtmActionRequestPayload.STREAM_CODEC,
+                net.austizz.ultimatebankingsystem.payments.AtmSessionService::handle);
+        registrar.playToClient(AtmActionResultPayload.TYPE, AtmActionResultPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleAtmActionResult", payload)));
+        registrar.playToServer(AtmPinRequestPayload.TYPE, AtmPinRequestPayload.STREAM_CODEC,
+                net.austizz.ultimatebankingsystem.payments.AtmPinService::handle);
+        registrar.playToClient(AtmPinResultPayload.TYPE, AtmPinResultPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleAtmPinResult", payload)));
+        registrar.playToClient(AtmCardResultPayload.TYPE, AtmCardResultPayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleAtmCardResult", payload)));
 
         // --- Register payloads below this line ---
+        registrar.playToClient(WikiOpenPayload.TYPE, WikiOpenPayload.STREAM_CODEC, ModPayloads::handleWikiOpen);
         registrar.playToServer(OpenATMPayload.TYPE, OpenATMPayload.STREAM_CODEC, ModPayloads::handleOpenATM);
         registrar.playToClient(AccountListPayload.TYPE, AccountListPayload.STREAM_CODEC, ModPayloads::handleAccountList);
         registrar.playToClient(BankTellerOpenPayload.TYPE, BankTellerOpenPayload.STREAM_CODEC, ModPayloads::handleBankTellerOpen);
@@ -147,6 +193,10 @@ public final class ModPayloads {
         registrar.playToClient(ShopTerminalOpenPayload.TYPE, ShopTerminalOpenPayload.STREAM_CODEC, ModPayloads::handleShopTerminalOpen);
         registrar.playToServer(ShopTerminalSavePayload.TYPE, ShopTerminalSavePayload.STREAM_CODEC, ModPayloads::handleShopTerminalSave);
         registrar.playToClient(ShopTerminalSaveResponsePayload.TYPE, ShopTerminalSaveResponsePayload.STREAM_CODEC, ModPayloads::handleShopTerminalSaveResponse);
+        registrar.playToServer(VendingMachineUsePayload.TYPE, VendingMachineUsePayload.STREAM_CODEC, ModPayloads::handleVendingMachineUse);
+        registrar.playToClient(VendingMachineOpenPayload.TYPE, VendingMachineOpenPayload.STREAM_CODEC, ModPayloads::handleVendingMachineOpen);
+        registrar.playToServer(VendingMachineActionPayload.TYPE, VendingMachineActionPayload.STREAM_CODEC, ModPayloads::handleVendingMachineAction);
+        registrar.playToClient(VendingMachineActionResponsePayload.TYPE, VendingMachineActionResponsePayload.STREAM_CODEC, ModPayloads::handleVendingMachineActionResponse);
         registrar.playToClient(AccessVerifierOpenPayload.TYPE, AccessVerifierOpenPayload.STREAM_CODEC, ModPayloads::handleAccessVerifierOpen);
         registrar.playToServer(AccessVerifierActionPayload.TYPE, AccessVerifierActionPayload.STREAM_CODEC, ModPayloads::handleAccessVerifierAction);
         registrar.playToClient(RfidScannerOpenPayload.TYPE, RfidScannerOpenPayload.STREAM_CODEC, ModPayloads::handleRfidScannerOpen);
@@ -333,6 +383,10 @@ public final class ModPayloads {
 
     private static void handleUiNotification(UiNotificationPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleUiNotification", payload));
+    }
+
+    private static void handleWikiOpen(WikiOpenPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleWikiOpen", payload));
     }
 
     private static void handleShopSetupObjective(ShopSetupObjectivePayload payload, IPayloadContext context) {
@@ -562,7 +616,7 @@ public final class ModPayloads {
         BigDecimal defaultLimit = account.getConfiguredWithdrawalLimit();
         BigDecimal effectiveLimit = account.getEffectiveWithdrawalLimit(gameTime);
         BigDecimal temporaryLimit = account.getTemporaryWithdrawalLimitIfActive(gameTime);
-        BigDecimal dailyLimit = account.getConfiguredDailyWithdrawalLimit();
+        BigDecimal dailyLimit = account.getEffectiveDailyWithdrawalLimit();
         BigDecimal dailyWithdrawn = account.getDailyWithdrawnAmount();
         AtmWithdrawalPolicy.Input policyInput = buildAtmWithdrawalPolicyInput(
                 centralBank, bank, account, BigDecimal.ZERO, gameTime);
@@ -594,7 +648,7 @@ public final class ModPayloads {
         );
     }
 
-    private static AtmWithdrawalPolicy.Input buildAtmWithdrawalPolicyInput(CentralBank centralBank,
+    public static AtmWithdrawalPolicy.Input buildAtmWithdrawalPolicyInput(CentralBank centralBank,
                                                                            Bank bank,
                                                                            AccountHolder account,
                                                                            BigDecimal requested,
@@ -605,9 +659,9 @@ public final class ModPayloads {
         CompoundTag metadata = centralBank == null || bank == null
                 ? null
                 : centralBank.getOrCreateBankMetadata(bank.getBankId());
-        BigDecimal bankSingle = positiveMetadataLimit(metadata, "limitSingle", globalSingle);
-        BigDecimal bankPlayerDaily = positiveMetadataLimit(metadata, "limitDailyPlayer", globalPlayerDaily);
-        BigDecimal bankDaily = positiveMetadataLimit(metadata, "limitDailyBank", globalBankDaily);
+        BigDecimal bankSingle = positiveMetadataLimit(metadata, "limitSingle", globalSingle).min(globalSingle);
+        BigDecimal bankPlayerDaily = positiveMetadataLimit(metadata, "limitDailyPlayer", globalPlayerDaily).min(globalPlayerDaily);
+        BigDecimal bankDaily = positiveMetadataLimit(metadata, "limitDailyBank", globalBankDaily).min(globalBankDaily);
         BigDecimal bankDailyUsed = bank == null ? BigDecimal.ZERO : bank.getBankAccounts().values().stream()
                 .filter(java.util.Objects::nonNull)
                 .map(AccountHolder::getDailyOutgoingTransactionVolume)
@@ -617,7 +671,7 @@ public final class ModPayloads {
                 requested,
                 account.getBalance(),
                 account.getEffectiveWithdrawalLimit(gameTime),
-                account.getConfiguredDailyWithdrawalLimit(),
+                account.getEffectiveDailyWithdrawalLimit(),
                 account.getDailyWithdrawnAmount(),
                 bankSingle,
                 bankPlayerDaily,
@@ -642,6 +696,558 @@ public final class ModPayloads {
     }
 
     // ─── Shop Terminal ─────────────────────────────────────────────────
+
+    // ─── Vending Machine ────────────────────────────────────────────────
+
+    private static void handleVendingMachineUse(VendingMachineUsePayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player) || payload == null) {
+                return;
+            }
+            var server = player.getServer();
+            if (server == null) {
+                return;
+            }
+            ServerLevel level = resolveServerLevel(server, payload.dimensionId());
+            if (level == null || player.level() != level) {
+                return;
+            }
+            BlockPos clickedPos = new BlockPos(payload.x(), payload.y(), payload.z());
+            BlockState clickedState = level.getBlockState(clickedPos);
+            if (!VendingMachineBlock.isMachineState(clickedState)) {
+                return;
+            }
+            BlockPos lowerPos = VendingMachineBlock.lowerPos(clickedPos, clickedState);
+            if (player.distanceToSqr(lowerPos.getX() + 0.5D, lowerPos.getY() + 1.0D, lowerPos.getZ() + 0.5D) > 100.0D) {
+                return;
+            }
+            if (!(level.getBlockEntity(lowerPos) instanceof VendingMachineBlockEntity machine)) {
+                return;
+            }
+            if (payload.configureAction() && !machine.canConfigure(player)) {
+                sendVendingResponse(player, false, "Only the machine owner or an operator can configure this vending machine.");
+                return;
+            }
+            if (payload.configureAction() && machine.getOwnerUuid() == null) {
+                machine.setOwner(player.getUUID(), player.getName().getString());
+            }
+            PacketDistributor.sendToPlayer(player, buildVendingMachineOpenPayload(
+                    level, lowerPos, machine, player, payload.configureAction()));
+        });
+    }
+
+    private static void handleVendingMachineOpen(VendingMachineOpenPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleVendingMachineOpen", payload));
+    }
+
+    private static void handleVendingMachineActionResponse(VendingMachineActionResponsePayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> ClientPayloadInvoker.invoke("handleVendingMachineActionResponse", payload));
+    }
+
+    private static void handleVendingMachineAction(VendingMachineActionPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (!(context.player() instanceof ServerPlayer player) || payload == null) {
+                return;
+            }
+            var server = player.getServer();
+            if (server == null) {
+                return;
+            }
+            ServerLevel level = resolveServerLevel(server, payload.dimensionId());
+            if (level == null || player.level() != level) {
+                return;
+            }
+            BlockPos pos = new BlockPos(payload.x(), payload.y(), payload.z());
+            if (!(level.getBlockState(pos).is(ModBlocks.VENDING_MACHINE.get())
+                    || level.getBlockState(pos).is(ModBlocks.CREATIVE_VENDING_MACHINE.get()))) {
+                return;
+            }
+            if (player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D) > 100.0D
+                    || !(level.getBlockEntity(pos) instanceof VendingMachineBlockEntity machine)) {
+                return;
+            }
+
+            String action = payload.action() == null ? "" : payload.action().trim().toLowerCase(Locale.ROOT);
+            boolean managementAction = switch (action) {
+                case "set_item", "set_item_inventory", "set_price", "restock", "withdraw_stock", "show_stock",
+                        "take_stock", "clear_slot", "set_account", "collect_cash" -> true;
+                default -> false;
+            };
+            boolean configureView = managementAction && machine.canConfigure(player);
+            if (managementAction && !configureView) {
+                sendVendingResponse(player, false, "Only the machine owner or an operator can configure this vending machine.");
+                return;
+            }
+
+            VendingActionResult result;
+            switch (action) {
+                case "buy" -> result = processVendingPurchase(server, level, pos, machine, player, payload.slot(), payload.value());
+                case "set_item" -> result = setVendingDisplayItem(machine, player, payload.slot());
+                case "set_item_inventory" -> result = setVendingDisplayItemFromInventory(machine, player, payload.slot(), payload.value());
+                case "set_price" -> result = setVendingPrice(machine, payload.slot(), payload.value());
+                case "restock" -> result = restockVendingDisplay(machine, player, payload.slot());
+                case "withdraw_stock" -> result = withdrawVendingStock(machine, player, payload.slot());
+                case "show_stock" -> result = showVendingStock(machine, payload.slot());
+                case "take_stock" -> result = takeVendingStock(machine, player, payload.slot(), payload.value());
+                case "clear_slot" -> result = clearVendingDisplay(machine, payload.slot());
+                case "set_account" -> result = setVendingSettlementAccount(server, machine, payload.value());
+                case "collect_cash" -> result = collectVendingCash(machine, player);
+                case "refresh" -> result = VendingActionResult.ok("Vending machine refreshed.");
+                default -> result = VendingActionResult.fail("Unknown vending machine action.");
+            }
+
+            sendVendingResponse(player, result.success(), result.message());
+            if (result.success() && "show_stock".equals(action)) {
+                openVendingMachineStockMenu(player, pos, machine, payload.slot());
+            } else {
+                PacketDistributor.sendToPlayer(player, buildVendingMachineOpenPayload(
+                        level, pos, machine, player, configureView));
+            }
+            if (result.success()) {
+                PacketDistributor.sendToPlayer(player, UBSCommands.buildHudStatePayload(
+                        BankManager.getCentralBank(server), player.getUUID()));
+            }
+        });
+    }
+
+    private static VendingActionResult setVendingDisplayItem(VendingMachineBlockEntity machine,
+                                                              ServerPlayer player,
+                                                              int slot) {
+        if (slot < 0 || slot >= VendingMachineBlockEntity.DISPLAY_SLOT_COUNT) {
+            return VendingActionResult.fail("Choose a valid display slot.");
+        }
+        ItemStack held = player.getMainHandItem();
+        if (held.isEmpty()) {
+            return VendingActionResult.fail("Hold the item you want to display in your main hand.");
+        }
+        if (!machine.setDisplayItem(slot, held)) {
+            return VendingActionResult.fail("Withdraw the current stock before changing this display item.");
+        }
+        return VendingActionResult.ok("Display slot " + (slot + 1) + " is now configured for " + held.getHoverName().getString() + ".");
+    }
+
+    private static VendingActionResult setVendingDisplayItemFromInventory(VendingMachineBlockEntity machine,
+                                                                            ServerPlayer player,
+                                                                            int slot,
+                                                                            String rawInventorySlot) {
+        int inventorySlot;
+        try {
+            inventorySlot = Integer.parseInt(rawInventorySlot == null ? "" : rawInventorySlot.trim());
+        } catch (NumberFormatException ignored) {
+            return VendingActionResult.fail("Choose an item from your inventory first.");
+        }
+        if (slot < 0 || slot >= VendingMachineBlockEntity.DISPLAY_SLOT_COUNT) {
+            return VendingActionResult.fail("Choose a valid display slot.");
+        }
+        if (inventorySlot < 0 || inventorySlot >= player.getInventory().items.size()) {
+            return VendingActionResult.fail("That inventory slot is no longer available.");
+        }
+        ItemStack source = player.getInventory().getItem(inventorySlot);
+        if (source.isEmpty()) {
+            return VendingActionResult.fail("That inventory slot is empty. Choose another stack.");
+        }
+        if (machine.isCreativeMachine()) {
+            return machine.setDisplayItem(slot, source)
+                    ? VendingActionResult.ok("Display slot " + (slot + 1) + " is now configured for "
+                    + source.getHoverName().getString() + ". Creative stock is infinite; your inventory was not changed.")
+                    : VendingActionResult.fail("The current display item cannot be replaced while stock is stored.");
+        }
+
+        int available = countMatchingInventoryItems(player, source);
+        int moved = machine.setDisplayItemFromInventory(player, slot, inventorySlot);
+        if (moved < 0) {
+            return VendingActionResult.fail("Withdraw the current stock before changing this display item.");
+        }
+        if (moved == 0) {
+            return VendingActionResult.fail("The stock compartment is full; no inventory items were moved.");
+        }
+        int remaining = Math.max(0, available - moved);
+        String capacityNote = remaining == 0
+                ? ""
+                : " " + remaining + " remained in your inventory because the stock compartment is full.";
+        return VendingActionResult.ok("Moved " + moved + " " + source.getHoverName().getString()
+                + " item(s) into display slot " + (slot + 1) + "." + capacityNote);
+    }
+
+    private static VendingActionResult setVendingPrice(VendingMachineBlockEntity machine, int slot, String rawPrice) {
+        long price;
+        try {
+            price = Long.parseLong(rawPrice == null ? "" : rawPrice.trim());
+        } catch (NumberFormatException ignored) {
+            return VendingActionResult.fail("Enter a whole-dollar price between $1 and $" + VendingMachineBlockEntity.MAX_PRICE_DOLLARS + ".");
+        }
+        if (!machine.setPriceDollars(slot, price)) {
+            return VendingActionResult.fail("Price must be between $1 and $" + VendingMachineBlockEntity.MAX_PRICE_DOLLARS + ".");
+        }
+        return VendingActionResult.ok("Price updated to $" + price + ".");
+    }
+
+    private static VendingActionResult restockVendingDisplay(VendingMachineBlockEntity machine,
+                                                               ServerPlayer player,
+                                                               int slot) {
+        if (machine.getDisplayItem(slot).isEmpty()) {
+            return VendingActionResult.fail("Configure this display slot before restocking it.");
+        }
+        if (machine.isCreativeMachine()) {
+            return VendingActionResult.ok("Creative vending machines have infinite stock.");
+        }
+        int inserted = machine.restockFromHeldItem(player, slot);
+        return inserted <= 0
+                ? VendingActionResult.fail("Hold the configured item in your main hand. The stock chest may also be full.")
+                : VendingActionResult.ok("Restocked " + inserted + " item(s) in display slot " + (slot + 1) + ".");
+    }
+
+    private static VendingActionResult withdrawVendingStock(VendingMachineBlockEntity machine,
+                                                              ServerPlayer player,
+                                                              int slot) {
+        List<ItemStack> stacks = machine.collectStock(slot);
+        if (stacks.isEmpty()) {
+            return VendingActionResult.fail("This display slot has no stored stock.");
+        }
+        for (ItemStack stack : stacks) {
+            if (!player.getInventory().add(stack)) {
+                player.drop(stack, false);
+            }
+        }
+        player.getInventory().setChanged();
+        return VendingActionResult.ok("Stock withdrawn from display slot " + (slot + 1) + ".");
+    }
+
+    private static VendingActionResult showVendingStock(VendingMachineBlockEntity machine, int slot) {
+        if (slot < 0 || slot >= VendingMachineBlockEntity.DISPLAY_SLOT_COUNT) {
+            return VendingActionResult.fail("Choose a valid display slot.");
+        }
+        if (machine.getDisplayItem(slot).isEmpty()) {
+            return VendingActionResult.fail("Configure this display slot before viewing stock.");
+        }
+        return VendingActionResult.ok("Opening stock for display slot " + (slot + 1) + ".");
+    }
+
+    private static VendingActionResult takeVendingStock(VendingMachineBlockEntity machine,
+                                                          ServerPlayer player,
+                                                          int displaySlot,
+                                                          String rawStorageSlot) {
+        int storageSlot;
+        try {
+            storageSlot = Integer.parseInt(rawStorageSlot == null ? "" : rawStorageSlot.trim());
+        } catch (NumberFormatException ignored) {
+            return VendingActionResult.fail("Choose a stock stack first.");
+        }
+        if (displaySlot < 0 || displaySlot >= VendingMachineBlockEntity.DISPLAY_SLOT_COUNT
+                || storageSlot < 0 || storageSlot >= VendingMachineBlockEntity.STORAGE_SLOTS_PER_DISPLAY) {
+            return VendingActionResult.fail("That stock slot is no longer available.");
+        }
+        ItemStack stored = machine.getStockSnapshot(displaySlot).get(storageSlot);
+        if (stored.isEmpty()) {
+            return VendingActionResult.fail("That stock slot is empty.");
+        }
+        if (!canAddStackToPlayerInventory(player, stored)) {
+            return VendingActionResult.fail("Make room in your inventory before taking this stack.");
+        }
+        ItemStack extracted = machine.takeStockStack(displaySlot, storageSlot);
+        if (extracted.isEmpty()) {
+            return VendingActionResult.fail("That stock stack is no longer available.");
+        }
+        if (!player.getInventory().add(extracted)) {
+            machine.insertStock(displaySlot, extracted);
+            return VendingActionResult.fail("Your inventory changed and could not accept this stack.");
+        }
+        player.getInventory().setChanged();
+        return VendingActionResult.ok("Moved " + extracted.getCount() + " "
+                + extracted.getHoverName().getString() + " to your inventory.");
+    }
+
+    private static VendingActionResult clearVendingDisplay(VendingMachineBlockEntity machine, int slot) {
+        if (!machine.clearDisplayItem(slot)) {
+            return VendingActionResult.fail("Withdraw all stock from this display slot before clearing it.");
+        }
+        return VendingActionResult.ok("Display slot " + (slot + 1) + " cleared.");
+    }
+
+    private static VendingActionResult setVendingSettlementAccount(net.minecraft.server.MinecraftServer server,
+                                                                    VendingMachineBlockEntity machine,
+                                                                    String rawAccountId) {
+        UUID accountId;
+        try {
+            accountId = UUID.fromString(rawAccountId == null ? "" : rawAccountId.trim());
+        } catch (IllegalArgumentException ignored) {
+            return VendingActionResult.fail("Choose one of the owner's accounts.");
+        }
+        var centralBank = BankManager.getCentralBank(server);
+        AccountHolder account = centralBank == null ? null : centralBank.SearchForAccountByAccountId(accountId);
+        if (account == null || machine.getOwnerUuid() == null || !machine.getOwnerUuid().equals(account.getPlayerUUID())) {
+            return VendingActionResult.fail("That account is not owned by the vending machine owner.");
+        }
+        machine.setSettlementAccountId(accountId);
+        return VendingActionResult.ok("Settlement account updated.");
+    }
+
+    private static VendingActionResult collectVendingCash(VendingMachineBlockEntity machine, ServerPlayer player) {
+        List<ItemStack> stacks = machine.collectCash();
+        if (stacks.isEmpty()) {
+            return VendingActionResult.fail("The cash vault is empty.");
+        }
+        for (ItemStack stack : stacks) {
+            if (!player.getInventory().add(stack)) {
+                player.drop(stack, false);
+            }
+        }
+        player.getInventory().setChanged();
+        return VendingActionResult.ok("Cash collected from the vending machine.");
+    }
+
+    private static VendingActionResult processVendingPurchase(net.minecraft.server.MinecraftServer server,
+                                                              ServerLevel level,
+                                                              BlockPos pos,
+                                                              VendingMachineBlockEntity machine,
+                                                              ServerPlayer player,
+                                                              int slot,
+                                                              String requestedPaymentMethod) {
+        ItemStack display = machine.getDisplayItem(slot);
+        if (display.isEmpty()) {
+            return VendingActionResult.fail("This display slot is empty.");
+        }
+        long price = machine.getPriceDollars(slot);
+        if (price <= 0L || price > VendingMachineBlockEntity.MAX_PRICE_DOLLARS) {
+            return VendingActionResult.fail("This display slot has an invalid price.");
+        }
+        if (!canAddOneToPlayerInventory(player, display)) {
+            return VendingActionResult.fail("Your inventory is full.");
+        }
+
+        ItemStack reserved = machine.takeOneForSale(slot);
+        if (reserved.isEmpty()) {
+            return VendingActionResult.fail("This display is out of stock.");
+        }
+
+        VendingPaymentResult payment = takeVendingPayment(server, machine, player, price, requestedPaymentMethod,
+                "vending@" + level.dimension().location() + ":" + pos.getX() + "," + pos.getY() + "," + pos.getZ()
+                        + ":" + player.getUUID() + ":" + level.getGameTime());
+        if (!payment.success()) {
+            machine.returnStock(slot, reserved);
+            return VendingActionResult.fail(payment.message());
+        }
+
+        if (!player.getInventory().add(reserved)) {
+            // Capacity is checked above; retain the item rather than losing it if another inventory hook intervenes.
+            machine.returnStock(slot, reserved);
+            return VendingActionResult.fail("Your inventory changed and could not accept the item.");
+        }
+        player.getInventory().setChanged();
+        machine.addSale(price);
+        return VendingActionResult.ok("Purchased " + display.getHoverName().getString() + " for $" + price + ".");
+    }
+
+    private static VendingPaymentResult takeVendingPayment(net.minecraft.server.MinecraftServer server,
+                                                            VendingMachineBlockEntity machine,
+                                                            ServerPlayer player,
+                                                            long price,
+                                                            String requestedPaymentMethod,
+                                                            String reference) {
+        String method = requestedPaymentMethod == null ? "AUTO" : requestedPaymentMethod.trim().toUpperCase(Locale.ROOT);
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) {
+            return VendingPaymentResult.fail("Bank data is unavailable.");
+        }
+
+        CreditCardService.HeldCardLookup cardLookup = CreditCardService.findHeldCard(centralBank, player);
+        AccountHolder phoneAccount = SmartphonePaymentService.resolveTapAccount(player, centralBank);
+        if ("AUTO".equals(method)) {
+            method = cardLookup.hasCard() ? "CARD" : phoneAccount != null ? "MOBILE" : "CASH";
+        }
+
+        if ("CASH".equals(method)) {
+            if (price > Integer.MAX_VALUE / 100L) {
+                return VendingPaymentResult.fail("This price is too high for physical cash.");
+            }
+            int cents = (int) (price * 100L);
+            int[] plan = DollarBills.findCashDepositPlan(cents, DollarBills.getAvailableCashCounts(player));
+            if (plan == null) {
+                return VendingPaymentResult.fail("You do not have exact physical cash for this purchase.");
+            }
+            if (!machine.canAcceptCashPlan(plan)) {
+                notifyCashVaultFull(server, machine, player);
+                return VendingPaymentResult.fail("This machine's cash vault is full. The owner has been notified.");
+            }
+            DollarBills.removeCash(player, plan);
+            if (!machine.acceptCashPlan(plan)) {
+                DollarBills.giveCash(player, plan);
+                return VendingPaymentResult.fail("The cash vault could not accept that payment.");
+            }
+            return VendingPaymentResult.ok("Cash accepted.");
+        }
+
+        AccountHolder payer;
+        if ("CARD".equals(method)) {
+            if (!cardLookup.hasCard()) {
+                return VendingPaymentResult.fail("Hold a valid UBS credit card.");
+            }
+            if (!cardLookup.validation().valid()) {
+                return VendingPaymentResult.fail("Credit card rejected: " + cardLookup.validation().message());
+            }
+            payer = centralBank.SearchForAccountByAccountId(cardLookup.validation().accountId());
+        } else if ("MOBILE".equals(method)) {
+            payer = phoneAccount;
+            if (payer == null) {
+                return VendingPaymentResult.fail(SmartphonePaymentService.unavailableMessage(player));
+            }
+        } else {
+            return VendingPaymentResult.fail("Choose Auto, Cash, Card, or Mobile payment.");
+        }
+        if (payer == null || !player.getUUID().equals(payer.getPlayerUUID())) {
+            return VendingPaymentResult.fail("The selected payment account is unavailable.");
+        }
+
+        if (machine.isCreativeMachine()) {
+            if (!payer.RemoveBalance(BigDecimal.valueOf(price))) {
+                return VendingPaymentResult.fail("Payment declined: insufficient funds or account restrictions.");
+            }
+            payer.addTransaction(new UserTransaction(
+                    payer.getAccountUUID(),
+                    UUID.nameUUIDFromBytes("ultimatebankingsystem:creative-vending-sink".getBytes(StandardCharsets.UTF_8)),
+                    BigDecimal.valueOf(price),
+                    LocalDateTime.now(),
+                    "VENDING_CREATIVE_VOID:" + reference
+            ));
+            BankManager.markDirty();
+            return VendingPaymentResult.ok("Payment accepted. Creative-machine proceeds are voided.");
+        }
+
+        UUID merchantId = machine.getSettlementAccountId();
+        AccountHolder merchant = merchantId == null ? null : centralBank.SearchForAccountByAccountId(merchantId);
+        if (merchant == null || machine.getOwnerUuid() == null || !machine.getOwnerUuid().equals(merchant.getPlayerUUID())) {
+            return VendingPaymentResult.fail("This machine has no valid owner settlement account configured.");
+        }
+        var result = UltimateBankingApiProvider.get().shopPurchase(
+                payer.getAccountUUID(), merchant.getAccountUUID(), price, "Vending Machine", reference);
+        return result.success()
+                ? VendingPaymentResult.ok("Payment accepted.")
+                : VendingPaymentResult.fail("Payment declined: " + result.reason());
+    }
+
+    private static void notifyCashVaultFull(net.minecraft.server.MinecraftServer server,
+                                            VendingMachineBlockEntity machine,
+                                            ServerPlayer buyer) {
+        UUID ownerId = machine.getOwnerUuid();
+        if (ownerId == null || ownerId.equals(buyer.getUUID())) {
+            return;
+        }
+        ServerPlayer owner = server.getPlayerList().getPlayer(ownerId);
+        if (owner == null) {
+            return;
+        }
+        String message = "Vending machine cash vault is full; a cash purchase was declined.";
+        owner.sendSystemMessage(moneyLiteral("§e" + message));
+        ServerActionAlert.send(owner, "Vending Machine", message,
+                DeliveryAlertPayload.AlertTone.WARNING, 5600);
+    }
+
+    private static boolean canAddOneToPlayerInventory(ServerPlayer player, ItemStack template) {
+        for (ItemStack existing : player.getInventory().items) {
+            if (existing.isEmpty()) {
+                return true;
+            }
+            if (ItemStack.isSameItemSameComponents(existing, template)
+                    && existing.getCount() < Math.min(existing.getMaxStackSize(), player.getInventory().getMaxStackSize())) {
+                return true;
+            }
+        }
+        for (ItemStack existing : player.getInventory().offhand) {
+            if (existing.isEmpty()) {
+                return true;
+            }
+            if (ItemStack.isSameItemSameComponents(existing, template)
+                    && existing.getCount() < Math.min(existing.getMaxStackSize(), player.getInventory().getMaxStackSize())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean canAddStackToPlayerInventory(ServerPlayer player, ItemStack incoming) {
+        if (incoming == null || incoming.isEmpty()) {
+            return true;
+        }
+        int remaining = incoming.getCount();
+        int inventoryLimit = player.getInventory().getMaxStackSize();
+        for (ItemStack existing : player.getInventory().items) {
+            if (existing.isEmpty()) {
+                remaining -= Math.min(incoming.getMaxStackSize(), inventoryLimit);
+            } else if (ItemStack.isSameItemSameComponents(existing, incoming)) {
+                int limit = Math.min(existing.getMaxStackSize(), inventoryLimit);
+                remaining -= Math.max(0, limit - existing.getCount());
+            }
+            if (remaining <= 0) {
+                return true;
+            }
+        }
+        for (ItemStack existing : player.getInventory().offhand) {
+            if (existing.isEmpty()) {
+                remaining -= Math.min(incoming.getMaxStackSize(), inventoryLimit);
+            } else if (ItemStack.isSameItemSameComponents(existing, incoming)) {
+                int limit = Math.min(existing.getMaxStackSize(), inventoryLimit);
+                remaining -= Math.max(0, limit - existing.getCount());
+            }
+            if (remaining <= 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int countMatchingInventoryItems(ServerPlayer player, ItemStack target) {
+        int total = 0;
+        for (ItemStack stack : player.getInventory().items) {
+            if (ItemStack.isSameItemSameComponents(target, stack)) {
+                total += stack.getCount();
+            }
+        }
+        return total;
+    }
+
+    private static void sendVendingResponse(ServerPlayer player, boolean success, String message) {
+        PacketDistributor.sendToPlayer(player, new VendingMachineActionResponsePayload(success, message == null ? "" : message));
+    }
+
+    private static void openVendingMachineStockMenu(ServerPlayer player,
+                                                     BlockPos pos,
+                                                     VendingMachineBlockEntity machine,
+                                                     int displaySlot) {
+        ItemStack displayItem = machine.getDisplayItem(displaySlot);
+        player.openMenu(
+                new SimpleMenuProvider(
+                        (containerId, inventory, ignored) ->
+                                new VendingMachineStockMenu(containerId, inventory, machine, displaySlot),
+                        Component.literal("Vending Machine Stock")
+                ),
+                buffer -> {
+                    buffer.writeBlockPos(pos);
+                    buffer.writeVarInt(displaySlot);
+                    buffer.writeBoolean(machine.isCreativeMachine());
+                    ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, displayItem);
+                }
+        );
+    }
+
+    private record VendingActionResult(boolean success, String message) {
+        private static VendingActionResult ok(String message) {
+            return new VendingActionResult(true, message);
+        }
+
+        private static VendingActionResult fail(String message) {
+            return new VendingActionResult(false, message);
+        }
+    }
+
+    private record VendingPaymentResult(boolean success, String message) {
+        private static VendingPaymentResult ok(String message) {
+            return new VendingPaymentResult(true, message);
+        }
+
+        private static VendingPaymentResult fail(String message) {
+            return new VendingPaymentResult(false, message);
+        }
+    }
 
     private static void handleShopTerminalUse(ShopTerminalUsePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
@@ -2009,7 +2615,7 @@ public final class ModPayloads {
         }
         String safeAction = action == null ? "" : action;
         String safeMessage = message == null ? "" : message;
-        if (safeMessage.length() > OWNER_PC_DESKTOP_ACTION_RESPONSE_MAX_CHARS) {
+        if (safeMessage.length() > OwnerPcDesktopActionResponsePayload.MAX_MESSAGE_CHARS) {
             safeMessage = safeAction.trim().equalsIgnoreCase("ORDER_BOARD_REPORT")
                     ? "Order Board\nOrder Board response exceeded the network string limit (" + safeMessage.length()
                     + " chars). The server refused the oversized payload instead of crashing; clear stale/demo rows or narrow the report and refresh."
@@ -2309,118 +2915,141 @@ public final class ModPayloads {
     private static void handleWithdrawRequest(WithdrawRequestPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             var player = (net.minecraft.server.level.ServerPlayer) context.player();
-            var server = player.getServer();
-            var centralBank = BankManager.getCentralBank(server);
-            if (centralBank == null) return;
-
-            BigDecimal amount;
-            try {
-                amount = new BigDecimal(payload.amount());
-            } catch (NumberFormatException e) {
-                sendWithdrawResponse(player, null, false, "0", "Invalid amount format.");
-                return;
-            }
-
-            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                sendWithdrawResponse(player, null, false, "0", "Amount must be greater than zero.");
-                return;
-            }
-
-            int withdrawCents = parseAmountToCents(amount);
-            if (withdrawCents <= 0) {
-                sendWithdrawResponse(player, null, false, "0", "Amount must be a positive value with up to 2 decimals.");
-                return;
-            }
-            BigDecimal withdrawAmount = BigDecimal.valueOf(withdrawCents, 2);
-
-            AccountHolder account = centralBank.SearchForAccountByAccountId(payload.accountId());
-            if (account == null) {
-                sendWithdrawResponse(player, null, false, "0", "Account not found.");
-                return;
-            }
-
-            if (!account.getPlayerUUID().equals(player.getUUID())) {
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(), "You do not own this account.");
-                return;
-            }
-
-            if (account.isFrozen()) {
-                sendWithdrawResponse(
-                        player,
-                        account,
-                        false,
-                        account.getBalance().toPlainString(),
-                        AccountAccessMessages.frozen("ATM withdrawal", account)
-                );
-                return;
-            }
-
-            long gameTime = currentOverworldGameTime(server);
-            Bank bank = centralBank.getBank(account.getBankId());
-            AtmWithdrawalPolicy.Decision withdrawalDecision = AtmWithdrawalPolicy.evaluate(
-                    buildAtmWithdrawalPolicyInput(centralBank, bank, account, withdrawAmount, gameTime));
-            if (!withdrawalDecision.allowed()) {
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(),
-                        withdrawalDenialMessage(withdrawalDecision));
-                return;
-            }
-
-            if (withdrawCents % 100 != 0) {
-                sendWithdrawResponse(
-                        player,
-                        account,
-                        false,
-                        account.getBalance().toPlainString(),
-                        "ATM dispenses bills only. Use a bank teller for coins."
-                );
-                return;
-            }
-
-            int withdrawDollars = withdrawCents / 100;
-            int[] withdrawPlan = DollarBills.buildWithdrawPlan(withdrawDollars);
-            if (withdrawPlan == null) {
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(),
-                        "ATM could not dispense the requested bill combination.");
-                return;
-            }
-            WalletBankingCashService.CashStorage cashStorage = WalletBankingCashService.resolve(player);
-            if (!cashStorage.canAdd(withdrawPlan)) {
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(),
-                        "The held wallet cannot hold this withdrawal.");
-                return;
-            }
-
-            boolean success = account.RemoveBalance(withdrawAmount);
-            if (!success) {
-                UltimateBankingSystem.LOGGER.info("[UBS] Withdraw ${} from account {} — success: {}",
-                    payload.amount(), payload.accountId(), false);
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(), "Insufficient funds.");
-                return;
-            }
-
-            account.registerDailyWithdrawal(withdrawAmount);
-
-            if (!cashStorage.add(player, withdrawPlan)) {
-                account.AddBalance(withdrawAmount);
-                account.rollbackDailyWithdrawal(withdrawAmount);
-                sendWithdrawResponse(player, account, false, account.getBalance().toPlainString(),
-                        "ATM could not store the withdrawal in " + cashStorage.label() + ".");
-                return;
-            }
-
-            account.addTransaction(new UserTransaction(
-                payload.accountId(),
-                ATM_TERMINAL_ID,
-                withdrawAmount,
-                LocalDateTime.now(),
-                "ATM Cash Withdrawal"
-            ));
-            UltimateBankingSystem.LOGGER.info(
-                "[UBS] Withdraw ${} from account {} — dispensed [{}] — success: {}",
-                withdrawAmount.toPlainString(), payload.accountId(), DollarBills.formatPlan(withdrawPlan), true);
-
-            sendWithdrawResponse(player, account, true, account.getBalance().toPlainString(), "");
+            executeAtmWithdrawal(player, payload, response -> PacketDistributor.sendToPlayer(player, response));
         });
+    }
+
+    public static void executeAtmWithdrawal(net.minecraft.server.level.ServerPlayer player, WithdrawRequestPayload payload,
+            java.util.function.Consumer<WithdrawResponsePayload> reply) {
+        executeAtmWithdrawal(player, payload, reply, null);
+    }
+
+    public static void executeAtmWithdrawal(net.minecraft.server.level.ServerPlayer player, WithdrawRequestPayload payload,
+            java.util.function.Consumer<WithdrawResponsePayload> reply,
+            net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity dispenser) {
+        executeAtmWithdrawal(player, payload, reply, dispenser, null, false);
+    }
+
+    public static void executeAtmWithdrawal(net.minecraft.server.level.ServerPlayer player, WithdrawRequestPayload payload,
+            java.util.function.Consumer<WithdrawResponsePayload> reply,
+            net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity dispenser, int[] selectedPlan, boolean checkOnly) {
+        var server = player.getServer();
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) { sendWithdrawResponse(reply, null, false, "0", "Banking data unavailable."); return; }
+
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(payload.amount());
+        } catch (NumberFormatException e) {
+            sendWithdrawResponse(reply, null, false, "0", "Invalid amount format.");
+            return;
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            sendWithdrawResponse(reply, null, false, "0", "Amount must be greater than zero.");
+            return;
+        }
+
+        int withdrawCents = parseAmountToCents(amount);
+        if (withdrawCents <= 0) {
+            sendWithdrawResponse(reply, null, false, "0", "Amount must be a positive value with up to 2 decimals.");
+            return;
+        }
+        BigDecimal withdrawAmount = BigDecimal.valueOf(withdrawCents, 2);
+
+        AccountHolder account = centralBank.SearchForAccountByAccountId(payload.accountId());
+        if (account == null) {
+            sendWithdrawResponse(reply, null, false, "0", "Account not found.");
+            return;
+        }
+
+        if (!account.getPlayerUUID().equals(player.getUUID())
+                && !net.austizz.ultimatebankingsystem.payments.AtmSessionService.authorizes(player, account.getAccountUUID(), dispenser)) {
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(), "You do not own this account.");
+            return;
+        }
+
+        if (account.isFrozen()) {
+            sendWithdrawResponse(reply,
+                    account,
+                    false,
+                    account.getBalance().toPlainString(),
+                    AccountAccessMessages.frozen("ATM withdrawal", account)
+            );
+            return;
+        }
+
+        long gameTime = currentOverworldGameTime(server);
+        Bank bank = centralBank.getBank(account.getBankId());
+        AtmWithdrawalPolicy.Decision withdrawalDecision = AtmWithdrawalPolicy.evaluate(
+                buildAtmWithdrawalPolicyInput(centralBank, bank, account, withdrawAmount, gameTime));
+        if (!withdrawalDecision.allowed()) {
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(),
+                    withdrawalDenialMessage(withdrawalDecision));
+            return;
+        }
+
+        if (withdrawCents % 100 != 0) {
+            sendWithdrawResponse(reply,
+                    account,
+                    false,
+                    account.getBalance().toPlainString(),
+                    "ATM dispenses bills only. Use a bank teller for coins."
+            );
+            return;
+        }
+
+        int withdrawDollars = withdrawCents / 100;
+        int[] withdrawPlan = selectedPlan == null ? DollarBills.buildWithdrawPlan(withdrawDollars) : selectedPlan.clone();
+        if (withdrawPlan == null || withdrawPlan.length != DollarBills.DENOMINATIONS_DESC.length
+                || java.util.Arrays.stream(withdrawPlan).anyMatch(count -> count < 0)
+                || DollarBills.totalCashValueCentsLong(withdrawPlan) != withdrawCents) {
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(),
+                    "ATM could not dispense the requested bill combination.");
+            return;
+        }
+        WalletBankingCashService.CashStorage cashStorage = WalletBankingCashService.resolve(player);
+        if (dispenser == null ? !cashStorage.canAdd(withdrawPlan) : !dispenser.canReserve()) {
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(),
+                    "The held wallet cannot hold this withdrawal.");
+            return;
+        }
+
+        if (checkOnly) {
+            sendWithdrawResponse(reply, account, true, account.getBalance().toPlainString(), "");
+            return;
+        }
+        boolean success = account.RemoveBalance(withdrawAmount);
+        if (!success) {
+            UltimateBankingSystem.LOGGER.info("[UBS] Withdraw ${} from account {} — success: {}",
+                payload.amount(), payload.accountId(), false);
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(), "Insufficient funds.");
+            return;
+        }
+
+        account.registerDailyWithdrawal(withdrawAmount);
+
+        if (!(dispenser == null ? cashStorage.add(player, withdrawPlan) : dispenser.reserveCash(player, withdrawPlan, withdrawDollars))) {
+            account.AddBalance(withdrawAmount);
+            account.rollbackDailyWithdrawal(withdrawAmount);
+            sendWithdrawResponse(reply, account, false, account.getBalance().toPlainString(),
+                    "ATM could not store the withdrawal in " + cashStorage.label() + ".");
+            return;
+        }
+
+        account.addTransaction(new UserTransaction(
+            payload.accountId(),
+            ATM_TERMINAL_ID,
+            withdrawAmount,
+            LocalDateTime.now(),
+            "ATM Cash Withdrawal"
+        ));
+        if (dispenser != null) dispenser.prepareReceipt(player, false, withdrawDollars * 100L);
+        UltimateBankingSystem.LOGGER.info(
+            "[UBS] Withdraw ${} from account {} — dispensed [{}] — success: {}",
+            withdrawAmount.toPlainString(), payload.accountId(), DollarBills.formatPlan(withdrawPlan), true);
+
+        sendWithdrawResponse(reply, account, true, account.getBalance().toPlainString(), "");
     }
 
     private static String withdrawalDenialMessage(AtmWithdrawalPolicy.Decision decision) {
@@ -2451,107 +3080,108 @@ public final class ModPayloads {
     private static void handleDepositRequest(DepositRequestPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             var player = (net.minecraft.server.level.ServerPlayer) context.player();
-            var server = player.getServer();
-            var centralBank = BankManager.getCentralBank(server);
-            if (centralBank == null) return;
-
-            AccountHolder account = centralBank.SearchForAccountByAccountId(payload.accountId());
-            if (account == null) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, "0", "Account not found."));
-                return;
-            }
-
-            if (!account.getPlayerUUID().equals(player.getUUID())) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(), "You do not own this account."));
-                return;
-            }
-
-            if (account.isFrozen()) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(),
-                        AccountAccessMessages.frozen("ATM deposit", account)));
-                return;
-            }
-
-            WalletBankingCashService.CashStorage cashStorage = WalletBankingCashService.resolve(player);
-            int[] availableCash = cashStorage.availableCounts(player);
-            long availableTotalCentsLong = DollarBills.totalCashValueCentsLong(availableCash);
-            int availableTotalCents = (int) Math.min(availableTotalCentsLong, Integer.MAX_VALUE);
-            int depositCents;
-            if ("ALL".equalsIgnoreCase(payload.amount().trim())) {
-                depositCents = availableTotalCents;
-            } else {
-                BigDecimal amount;
-                try {
-                    amount = new BigDecimal(payload.amount());
-                } catch (NumberFormatException e) {
-                    PacketDistributor.sendToPlayer(player,
-                        new DepositResponsePayload(false, account.getBalance().toPlainString(), "Invalid amount format."));
-                    return;
-                }
-                if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                    PacketDistributor.sendToPlayer(player,
-                        new DepositResponsePayload(false, account.getBalance().toPlainString(), "Amount must be greater than zero."));
-                    return;
-                }
-                depositCents = parseAmountToCents(amount);
-            }
-            if (depositCents <= 0) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(),
-                        availableTotalCents <= 0
-                            ? "No depositable cash was found in the held wallet or inventory."
-                            : "Amount must be a positive value with up to 2 decimals."));
-                return;
-            }
-            BigDecimal depositAmount = BigDecimal.valueOf(depositCents, 2);
-            if (availableTotalCentsLong < depositCents) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(),
-                        "Not enough " + cashStorage.label() + ". You have $"
-                                + DollarBills.formatCents(availableTotalCents) + "."));
-                return;
-            }
-
-            int[] depositPlan = DollarBills.findCashDepositPlan(depositCents, availableCash);
-            if (depositPlan == null) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(),
-                        "Cannot form that exact amount with your current bills and coins."));
-                return;
-            }
-
-            if (!cashStorage.remove(player, depositPlan)) {
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(),
-                        "Cash changed before the deposit could finish."));
-                return;
-            }
-            boolean success = account.AddBalance(depositAmount);
-
-            UltimateBankingSystem.LOGGER.info("[UBS] Deposit ${} to account {} — success: {}",
-                depositAmount.toPlainString(), payload.accountId(), success);
-
-            if (success) {
-                account.addTransaction(new UserTransaction(
-                    ATM_TERMINAL_ID,
-                    payload.accountId(),
-                    depositAmount,
-                    LocalDateTime.now(),
-                    "ATM Cash Deposit"
-                ));
-                UltimateBankingSystem.LOGGER.info("[UBS] Deposit cash consumed [{}] from player {}",
-                    DollarBills.formatCashPlan(depositPlan), player.getName().getString());
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(true, account.getBalance().toPlainString(), ""));
-            } else {
-                cashStorage.add(player, depositPlan);
-                PacketDistributor.sendToPlayer(player,
-                    new DepositResponsePayload(false, account.getBalance().toPlainString(), "Deposit failed."));
-            }
+            executeAtmDeposit(player, payload, response -> PacketDistributor.sendToPlayer(player, response));
         });
+    }
+
+    public static void executeAtmDeposit(net.minecraft.server.level.ServerPlayer player, DepositRequestPayload payload,
+            java.util.function.Consumer<DepositResponsePayload> reply) {
+        executeAtmDeposit(player, payload, reply, null);
+    }
+
+    public static void executeAtmDeposit(net.minecraft.server.level.ServerPlayer player, DepositRequestPayload payload,
+            java.util.function.Consumer<DepositResponsePayload> reply,
+            net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity terminal) {
+        var server = player.getServer();
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) { reply.accept(new DepositResponsePayload(false, "0", "Banking data unavailable.")); return; }
+
+        AccountHolder account = centralBank.SearchForAccountByAccountId(payload.accountId());
+        if (account == null) {
+            reply.accept(new DepositResponsePayload(false, "0", "Account not found."));
+            return;
+        }
+
+        if (!account.getPlayerUUID().equals(player.getUUID())
+                && !net.austizz.ultimatebankingsystem.payments.AtmSessionService.authorizes(player, account.getAccountUUID(), terminal)) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(), "You do not own this account."));
+            return;
+        }
+
+        if (account.isFrozen()) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(),
+                    AccountAccessMessages.frozen("ATM deposit", account)));
+            return;
+        }
+
+        WalletBankingCashService.CashStorage cashStorage = WalletBankingCashService.resolve(player);
+        int[] availableCash = cashStorage.availableCounts(player);
+        long availableTotalCentsLong = DollarBills.totalCashValueCentsLong(availableCash);
+        int availableTotalCents = (int) Math.min(availableTotalCentsLong, Integer.MAX_VALUE);
+        int depositCents;
+        if ("ALL".equalsIgnoreCase(payload.amount().trim())) {
+            depositCents = availableTotalCents;
+        } else {
+            BigDecimal amount;
+            try {
+                amount = new BigDecimal(payload.amount());
+            } catch (NumberFormatException e) {
+                reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(), "Invalid amount format."));
+                return;
+            }
+            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+                reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(), "Amount must be greater than zero."));
+                return;
+            }
+            depositCents = parseAmountToCents(amount);
+        }
+        if (depositCents <= 0) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(),
+                    availableTotalCents <= 0
+                        ? "No depositable cash was found in the held wallet or inventory."
+                        : "Amount must be a positive value with up to 2 decimals."));
+            return;
+        }
+        BigDecimal depositAmount = BigDecimal.valueOf(depositCents, 2);
+        if (availableTotalCentsLong < depositCents) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(),
+                    "Not enough " + cashStorage.label() + ". You have $"
+                            + DollarBills.formatCents(availableTotalCents) + "."));
+            return;
+        }
+
+        int[] depositPlan = DollarBills.findCashDepositPlan(depositCents, availableCash);
+        if (depositPlan == null) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(),
+                    "Cannot form that exact amount with your current bills and coins."));
+            return;
+        }
+
+        if (!cashStorage.remove(player, depositPlan)) {
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(),
+                    "Cash changed before the deposit could finish."));
+            return;
+        }
+        boolean success = account.AddBalance(depositAmount);
+
+        UltimateBankingSystem.LOGGER.info("[UBS] Deposit ${} to account {} — success: {}",
+            depositAmount.toPlainString(), payload.accountId(), success);
+
+        if (success) {
+            account.addTransaction(new UserTransaction(
+                ATM_TERMINAL_ID,
+                payload.accountId(),
+                depositAmount,
+                LocalDateTime.now(),
+                "ATM Cash Deposit"
+            ));
+            UltimateBankingSystem.LOGGER.info("[UBS] Deposit cash consumed [{}] from player {}",
+                DollarBills.formatCashPlan(depositPlan), player.getName().getString());
+            reply.accept(new DepositResponsePayload(true, account.getBalance().toPlainString(), ""));
+        } else {
+            cashStorage.add(player, depositPlan);
+            reply.accept(new DepositResponsePayload(false, account.getBalance().toPlainString(), "Deposit failed."));
+        }
     }
 
     private static void handleDepositResponse(DepositResponsePayload payload, IPayloadContext context) {
@@ -2784,7 +3414,7 @@ public final class ModPayloads {
 
             if (!account.setTemporaryWithdrawalLimit(customLimit, currentOverworldGameTime(server))) {
                 sendTemporaryLimitResponse(player, account, server, false,
-                        "Custom limit must be a whole dollar amount greater than zero.");
+                        "Custom limit must be a positive whole dollar amount within the server maximum.");
                 return;
             }
 
@@ -2856,84 +3486,87 @@ public final class ModPayloads {
     }
 
     private static void handlePayRequestCreate(PayRequestCreatePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            var requester = (ServerPlayer) context.player();
-            var server = requester.getServer();
-            var centralBank = BankManager.getCentralBank(server);
-            if (centralBank == null) {
-                return;
-            }
+        context.enqueueWork(() -> executePayRequestCreate((ServerPlayer) context.player(), payload,
+                result -> PacketDistributor.sendToPlayer((ServerPlayer) context.player(), result)));
+    }
 
-            AccountHolder selected = centralBank.SearchForAccountByAccountId(payload.accountId());
-            if (selected == null || !selected.getPlayerUUID().equals(requester.getUUID())) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "Account mismatch."));
-                return;
-            }
+    public static void executePayRequestCreate(ServerPlayer requester, PayRequestCreatePayload payload,
+            java.util.function.Consumer<PayRequestCreateResponsePayload> reply) {
+        var server = requester.getServer();
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) {
+            return;
+        }
 
-            String targetPlayerName = payload.targetPlayerName() == null ? "" : payload.targetPlayerName().trim();
-            if (targetPlayerName.isEmpty()) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "Enter a target player name."));
-                return;
-            }
+        AccountHolder selected = centralBank.SearchForAccountByAccountId(payload.accountId());
+        if (selected == null || !selected.getPlayerUUID().equals(requester.getUUID())) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "Account mismatch."));
+            return;
+        }
 
-            ServerPlayer payer = server.getPlayerList().getPlayerByName(targetPlayerName);
-            if (payer == null) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "Player is not online."));
-                return;
-            }
+        String targetPlayerName = payload.targetPlayerName() == null ? "" : payload.targetPlayerName().trim();
+        if (targetPlayerName.isEmpty()) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "Enter a target player name."));
+            return;
+        }
 
-            if (payer.getUUID().equals(requester.getUUID())) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "You cannot request money from yourself."));
-                return;
-            }
+        ServerPlayer payer = server.getPlayerList().getPlayerByName(targetPlayerName);
+        if (payer == null) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "Player is not online."));
+            return;
+        }
 
-            BigDecimal amount;
+        if (payer.getUUID().equals(requester.getUUID())) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "You cannot request money from yourself."));
+            return;
+        }
+
+        BigDecimal amount;
+        try {
+            amount = new BigDecimal(payload.amount() == null ? "" : payload.amount().trim());
+        } catch (NumberFormatException ex) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "Invalid amount."));
+            return;
+        }
+
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            reply.accept(new PayRequestCreateResponsePayload(false, "Amount must be greater than zero."));
+            return;
+        }
+
+        String destinationRaw = payload.destinationAccountId() == null ? "" : payload.destinationAccountId().trim();
+        AccountHolder destination;
+        if (destinationRaw.isBlank()) {
+            destination = findPreferredReceiverAccount(centralBank, requester.getUUID());
+        } else {
             try {
-                amount = new BigDecimal(payload.amount() == null ? "" : payload.amount().trim());
-            } catch (NumberFormatException ex) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "Invalid amount."));
-                return;
+                destination = findAccountForPlayer(centralBank, requester.getUUID(), UUID.fromString(destinationRaw));
+            } catch (IllegalArgumentException ex) {
+                destination = null;
             }
+        }
 
-            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(false, "Amount must be greater than zero."));
-                return;
-            }
-
-            String destinationRaw = payload.destinationAccountId() == null ? "" : payload.destinationAccountId().trim();
-            AccountHolder destination;
-            if (destinationRaw.isBlank()) {
-                destination = findPreferredReceiverAccount(centralBank, requester.getUUID());
-            } else {
-                try {
-                    destination = findAccountForPlayer(centralBank, requester.getUUID(), UUID.fromString(destinationRaw));
-                } catch (IllegalArgumentException ex) {
-                    destination = null;
-                }
-            }
-
-            if (destination == null) {
-                PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(
-                        false,
-                        "No valid destination account. Set primary or choose an account."
-                ));
-                return;
-            }
-
-            PayRequestManager.PayRequest request = PayRequestManager.createRequest(
-                    requester.getUUID(),
-                    payer.getUUID(),
-                    destination.getAccountUUID(),
-                    amount
-            );
-
-            sendPayRequestPromptChat(payer, requester, request, centralBank);
-
-            PacketDistributor.sendToPlayer(requester, new PayRequestCreateResponsePayload(
-                    true,
-                    "Pay request sent to " + payer.getName().getString() + ". Destination: " + accountLabel(destination)
+        if (destination == null) {
+            reply.accept(new PayRequestCreateResponsePayload(
+                    false,
+                    "No valid destination account. Set primary or choose an account."
             ));
-        });
+            return;
+        }
+
+        PayRequestManager.PayRequest request = PayRequestManager.createRequest(
+                requester.getUUID(),
+                payer.getUUID(),
+                destination.getAccountUUID(),
+                amount
+        );
+
+        sendPayRequestPromptChat(payer, requester, request, centralBank);
+
+        reply.accept(new PayRequestCreateResponsePayload(
+                true,
+                "Pay request sent to " + payer.getName().getString() + ". Destination: " + accountLabel(destination)
+        ));
     }
 
     private static void handlePayRequestCreateResponse(PayRequestCreateResponsePayload payload, IPayloadContext context) {
@@ -2980,132 +3613,189 @@ public final class ModPayloads {
     }
 
     private static void handlePayRequestAction(PayRequestActionPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            var player = (net.minecraft.server.level.ServerPlayer) context.player();
-            var server = player.getServer();
-            var centralBank = BankManager.getCentralBank(server);
-            if (centralBank == null) {
-                return;
-            }
+        context.enqueueWork(() -> executePayRequestAction((ServerPlayer) context.player(), payload,
+                result -> PacketDistributor.sendToPlayer((ServerPlayer) context.player(), result)));
+    }
 
-            AccountHolder selected = centralBank.SearchForAccountByAccountId(payload.accountId());
-            if (selected == null || !selected.getPlayerUUID().equals(player.getUUID())) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Account mismatch."));
-                return;
-            }
+    public static void executePayRequestAction(ServerPlayer player, PayRequestActionPayload payload,
+            java.util.function.Consumer<PayRequestActionResponsePayload> reply) {
+        var server = player.getServer();
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) {
+            return;
+        }
 
-            PayRequestManager.PayRequest request = PayRequestManager.getRequest(payload.requestId());
-            if (request == null) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Pay request expired or missing."));
-                return;
-            }
-            if (!request.getPayerUUID().equals(player.getUUID())) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "This request is not for you."));
-                return;
-            }
-            if (request.getStatus() != PayRequestManager.Status.PENDING || PayRequestManager.isExpired(request)) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Pay request is no longer pending."));
-                return;
-            }
+        AccountHolder selected = centralBank.SearchForAccountByAccountId(payload.accountId());
+        if (selected == null || !selected.getPlayerUUID().equals(player.getUUID())) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Account mismatch."));
+            return;
+        }
 
-            String action = payload.action() == null ? "" : payload.action().trim().toLowerCase();
-            if ("decline".equals(action)) {
-                PayRequestManager.markDeclined(request.getRequestId());
-                ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
-                if (requester != null) {
-                    requester.sendSystemMessage(moneyLiteral(
-                            "§c" + player.getName().getString() + " declined your pay request for $" + request.getAmount().toPlainString() + "."
-                    ));
-                }
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(true, "Request declined."));
-                return;
-            }
+        PayRequestManager.PayRequest request = PayRequestManager.getRequest(payload.requestId());
+        if (request == null) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Pay request expired or missing."));
+            return;
+        }
+        if (!request.getPayerUUID().equals(player.getUUID())) {
+            reply.accept(new PayRequestActionResponsePayload(false, "This request is not for you."));
+            return;
+        }
+        if (request.getStatus() != PayRequestManager.Status.PENDING || PayRequestManager.isExpired(request)) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Pay request is no longer pending."));
+            return;
+        }
 
-            AccountHolder sender = null;
-            if ("accept_account".equals(action)) {
-                String senderRaw = payload.senderAccountId() == null ? "" : payload.senderAccountId().trim();
-                if (!senderRaw.isBlank()) {
-                    try {
-                        UUID senderId = UUID.fromString(senderRaw);
-                        AccountHolder candidate = centralBank.SearchForAccountByAccountId(senderId);
-                        if (candidate != null && candidate.getPlayerUUID().equals(player.getUUID())) {
-                            sender = candidate;
-                        }
-                    } catch (IllegalArgumentException ignored) {
-                        sender = null;
-                    }
-                }
-                if (sender == null) {
-                    PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Choose a valid account."));
-                    return;
-                }
-            } else {
-                sender = findPrimaryAccount(centralBank, player.getUUID());
-                if (sender == null) {
-                    PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "No primary account set. Use Choose Account."));
-                    return;
-                }
-            }
-
-            AccountHolder receiver = findReceiverAccountForRequest(centralBank, request);
-            if (receiver == null) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Requester destination account is unavailable."));
-                ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
-                if (requester != null) {
-                    requester.sendSystemMessage(moneyLiteral(
-                            "§cYour pay request could not be completed because your destination account is unavailable."
-                    ));
-                }
-                return;
-            }
-
-            if (sender.getAccountUUID().equals(receiver.getAccountUUID())) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Cannot pay the same account."));
-                return;
-            }
-
-            boolean success = new UserTransaction(
-                    sender.getAccountUUID(),
-                    receiver.getAccountUUID(),
-                    request.getAmount(),
-                    LocalDateTime.now(),
-                    "Pay Request"
-            ).makeTransaction(server);
-
-            if (!success) {
-                PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(false, "Payment failed. Check balance/account status."));
-                ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
-                if (requester != null) {
-                    requester.sendSystemMessage(moneyLiteral(
-                            "§e" + player.getName().getString() + " tried to accept your pay request, but payment failed."
-                    ));
-                }
-                return;
-            }
-
-            PayRequestManager.markAccepted(request.getRequestId());
-
-            NeoForge.EVENT_BUS.post(new BalanceChangedEvent(sender, sender.getBalance(), request.getAmount(), false));
-            NeoForge.EVENT_BUS.post(new BalanceChangedEvent(receiver, receiver.getBalance(), request.getAmount(), true));
-
+        String action = payload.action() == null ? "" : payload.action().trim().toLowerCase();
+        if ("decline".equals(action)) {
+            PayRequestManager.markDeclined(request.getRequestId());
             ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
             if (requester != null) {
                 requester.sendSystemMessage(moneyLiteral(
-                        "§a" + player.getName().getString() + " accepted your pay request for $" + request.getAmount().toPlainString() + "."
+                        "§c" + player.getName().getString() + " declined your pay request for $" + request.getAmount().toPlainString() + "."
                 ));
             }
+            reply.accept(new PayRequestActionResponsePayload(true, "Request declined."));
+            return;
+        }
 
-            PacketDistributor.sendToPlayer(player, new PayRequestActionResponsePayload(
-                    true,
-                    MoneyText.abbreviateCurrencyTokens(
-                            "Paid $" + request.getAmount().toPlainString() + " using " + sender.getAccountType().label + "."
-                    )
+        AccountHolder sender = null;
+        if ("accept_account".equals(action)) {
+            String senderRaw = payload.senderAccountId() == null ? "" : payload.senderAccountId().trim();
+            if (!senderRaw.isBlank()) {
+                try {
+                    UUID senderId = UUID.fromString(senderRaw);
+                    AccountHolder candidate = centralBank.SearchForAccountByAccountId(senderId);
+                    if (candidate != null && candidate.getPlayerUUID().equals(player.getUUID())) {
+                        sender = candidate;
+                    }
+                } catch (IllegalArgumentException ignored) {
+                    sender = null;
+                }
+            }
+            if (sender == null) {
+                reply.accept(new PayRequestActionResponsePayload(false, "Choose a valid account."));
+                return;
+            }
+        } else {
+            sender = findPrimaryAccount(centralBank, player.getUUID());
+            if (sender == null) {
+                reply.accept(new PayRequestActionResponsePayload(false, "No primary account set. Use Choose Account."));
+                return;
+            }
+        }
+
+        AccountHolder receiver = findReceiverAccountForRequest(centralBank, request);
+        if (receiver == null) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Requester destination account is unavailable."));
+            ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
+            if (requester != null) {
+                requester.sendSystemMessage(moneyLiteral(
+                        "§cYour pay request could not be completed because your destination account is unavailable."
+                ));
+            }
+            return;
+        }
+
+        if (sender.getAccountUUID().equals(receiver.getAccountUUID())) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Cannot pay the same account."));
+            return;
+        }
+
+        boolean success = new UserTransaction(
+                sender.getAccountUUID(),
+                receiver.getAccountUUID(),
+                request.getAmount(),
+                LocalDateTime.now(),
+                "Pay Request"
+        ).makeTransaction(server);
+
+        if (!success) {
+            reply.accept(new PayRequestActionResponsePayload(false, "Payment failed. Check balance/account status."));
+            ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
+            if (requester != null) {
+                requester.sendSystemMessage(moneyLiteral(
+                        "§e" + player.getName().getString() + " tried to accept your pay request, but payment failed."
+                ));
+            }
+            return;
+        }
+
+        PayRequestManager.markAccepted(request.getRequestId());
+
+        NeoForge.EVENT_BUS.post(new BalanceChangedEvent(sender, sender.getBalance(), request.getAmount(), false));
+        NeoForge.EVENT_BUS.post(new BalanceChangedEvent(receiver, receiver.getBalance(), request.getAmount(), true));
+
+        ServerPlayer requester = server.getPlayerList().getPlayer(request.getRequesterUUID());
+        if (requester != null) {
+            requester.sendSystemMessage(moneyLiteral(
+                    "§a" + player.getName().getString() + " accepted your pay request for $" + request.getAmount().toPlainString() + "."
             ));
-        });
+        }
+
+        reply.accept(new PayRequestActionResponsePayload(
+                true,
+                MoneyText.abbreviateCurrencyTokens(
+                        "Paid $" + request.getAmount().toPlainString() + " using " + sender.getAccountType().label + "."
+                )
+        ));
     }
 
     private static void handlePayRequestActionResponse(PayRequestActionResponsePayload payload, IPayloadContext context) {
         context.enqueueWork(() -> ClientPayloadInvoker.invoke("handlePayRequestActionResponse", payload));
+    }
+
+    private static VendingMachineOpenPayload buildVendingMachineOpenPayload(ServerLevel level,
+                                                                              BlockPos pos,
+                                                                              VendingMachineBlockEntity machine,
+                                                                              ServerPlayer viewer,
+                                                                              boolean configureView) {
+        List<ItemStack> displayItems = new ArrayList<>(VendingMachineBlockEntity.DISPLAY_SLOT_COUNT);
+        List<Long> prices = new ArrayList<>(VendingMachineBlockEntity.DISPLAY_SLOT_COUNT);
+        List<Integer> stock = new ArrayList<>(VendingMachineBlockEntity.DISPLAY_SLOT_COUNT);
+        for (int slot = 0; slot < VendingMachineBlockEntity.DISPLAY_SLOT_COUNT; slot++) {
+            displayItems.add(machine.getDisplayItem(slot));
+            prices.add(machine.getPriceDollars(slot));
+            stock.add(machine.getStockCount(slot));
+        }
+
+        List<ShopTerminalAccountSummary> accounts = new ArrayList<>();
+        var centralBank = BankManager.getCentralBank(level.getServer());
+        if (configureView && machine.canConfigure(viewer) && machine.getOwnerUuid() != null && centralBank != null) {
+            var ownerAccounts = centralBank.SearchForAccount(machine.getOwnerUuid())
+                    .values()
+                    .stream()
+                    .sorted(Comparator
+                            .comparing(AccountHolder::isPrimaryAccount).reversed()
+                            .thenComparing(account -> account.getDateOfCreation().toString()))
+                    .toList();
+            for (AccountHolder account : ownerAccounts) {
+                Bank bank = centralBank.getBank(account.getBankId());
+                accounts.add(new ShopTerminalAccountSummary(
+                        account.getAccountUUID(),
+                        account.getAccountType().label,
+                        bank == null ? "Unknown Bank" : bank.getBankName(),
+                        account.getBalance().toPlainString(),
+                        account.isPrimaryAccount()
+                ));
+            }
+        }
+
+        UUID settlement = machine.getSettlementAccountId();
+        return new VendingMachineOpenPayload(
+                level.dimension().location().toString(),
+                pos.getX(), pos.getY(), pos.getZ(),
+                machine.getOwnerName(),
+                configureView && machine.canConfigure(viewer),
+                machine.isCreativeMachine(),
+                settlement == null ? "" : settlement.toString(),
+                machine.getTotalSalesDollars(),
+                machine.getCashOccupiedSlots(),
+                machine.getCashValueCents(),
+                displayItems,
+                prices,
+                stock,
+                accounts
+        );
     }
 
     private static ShopTerminalOpenPayload buildShopTerminalOpenPayload(ServerLevel level,
@@ -3674,12 +4364,12 @@ public final class ModPayloads {
         ));
     }
 
-    private static void sendWithdrawResponse(net.minecraft.server.level.ServerPlayer player,
+    private static void sendWithdrawResponse(java.util.function.Consumer<WithdrawResponsePayload> reply,
                                              AccountHolder account,
                                              boolean success,
                                              String newBalance,
                                              String errorMessage) {
-        PacketDistributor.sendToPlayer(player, buildWithdrawResponse(
+        reply.accept(buildWithdrawResponse(
                 success,
                 newBalance == null ? "0" : newBalance,
                 errorMessage == null ? "" : errorMessage,
@@ -3698,7 +4388,7 @@ public final class ModPayloads {
                 success,
                 newBalance,
                 errorMessage,
-                account.getConfiguredDailyWithdrawalLimit().toPlainString(),
+                account.getEffectiveDailyWithdrawalLimit().toPlainString(),
                 account.getDailyWithdrawnAmount().toPlainString(),
                 account.getRemainingDailyWithdrawalLimit().toPlainString(),
                 account.getDailyWithdrawalResetEpochMillis()
@@ -3872,7 +4562,7 @@ public final class ModPayloads {
         return primary.getAccountType().label + " (" + shortId(primary.getAccountUUID()) + ")";
     }
 
-    private static String resolveServerPlayerName(net.minecraft.server.MinecraftServer server, UUID playerId) {
+    public static String resolveServerPlayerName(net.minecraft.server.MinecraftServer server, UUID playerId) {
         var player = server.getPlayerList().getPlayer(playerId);
         if (player != null) {
             return player.getName().getString();

@@ -20,7 +20,7 @@ public final class DollarBills {
 
     private static final int MAX_NESTED_INVENTORY_DEPTH = 8;
 
-    public static final int[] DENOMINATIONS_DESC = {100, 50, 20, 10, 5, 2, 1};
+    public static final int[] DENOMINATIONS_DESC = BillDenominations.DOLLARS_DESC;
     public static final int[] CASH_DENOMINATIONS_CENTS_DESC = {10_000, 5_000, 2_000, 1_000, 500, 200, 100, 50, 25, 10, 5, 1};
 
     private DollarBills() {}

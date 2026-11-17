@@ -13,13 +13,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BankSafeStaffReadinessTest {
     private static final String ROOT_PACKAGE = "net.austizz.ultimatebankingsystem.";
-    private static final String STAFFING_REASON = "SAFE_ACCESS_STAFF_MISSING";
-    private static final String STAFFING_LABEL = "At least one current bank employee must have Safe Access.";
     private static final UUID BANK_ID = UUID.fromString("10000000-0000-0000-0000-000000000001");
     private static final UUID EMPLOYEE_ID = UUID.fromString("30000000-0000-0000-0000-000000000001");
 
     @Test
-    void grantAndRevokeSafeAccessDriveVaultAndObjectiveReadinessWithoutLosingSetupData() throws Exception {
+    void safeAccessGrantAndRevokeDoNotGateVaultSetup() throws Exception {
         Object vault = vault();
         Object area = area(vault);
         Object premise = premise(area);
@@ -45,21 +43,15 @@ class BankSafeStaffReadinessTest {
         invoke(metadata, "putString", new Class<?>[]{String.class, String.class}, "employees", encodedEmployee);
 
         Object noGrant = setupProjection(snapshot, List.of(readiness), metadata);
-        assertStaffingBlocked(noGrant);
+        assertReady(noGrant);
 
         assertEquals(true, staffingMutation("grantSafeAccess", metadata));
         Object granted = setupProjection(snapshot, List.of(readiness), metadata);
-        assertEquals(true, value(value(granted, "objective"), "ready"));
-        assertEquals(1, value(value(granted, "objective"), "readyVaultCount"));
-        assertEquals(List.of(), listValue(value(granted, "objective"), "missingSteps"));
-        Object grantedVault = listValue(granted, "vaults").getFirst();
-        assertEquals("READY", value(grantedVault, "status"));
-        assertEquals(true, value(grantedVault, "ready"));
-        assertEquals(List.of(), listValue(grantedVault, "missingReasons"));
+        assertReady(granted);
 
         assertEquals(true, staffingMutation("revokeSafeAccess", metadata));
         Object revoked = setupProjection(snapshot, List.of(readiness), metadata);
-        assertStaffingBlocked(revoked);
+        assertReady(revoked);
 
         assertEquals(encodedEmployee, invoke(metadata, "getString", new Class<?>[]{String.class}, "employees"));
         assertEquals("premise-1", value(premise, "id"));
@@ -69,19 +61,18 @@ class BankSafeStaffReadinessTest {
         assertEquals(1, listValue(snapshot, "premises").size());
     }
 
-    private static void assertStaffingBlocked(Object result) throws Exception {
+    private static void assertReady(Object result) throws Exception {
         Object objective = value(result, "objective");
-        assertEquals(false, value(objective, "ready"));
+        assertEquals(true, value(objective, "ready"));
         assertEquals(1, value(objective, "premiseCount"));
         assertEquals(1, value(objective, "vaultCount"));
-        assertEquals(0, value(objective, "readyVaultCount"));
-        assertEquals(List.of(STAFFING_LABEL), listValue(objective, "missingSteps"));
+        assertEquals(1, value(objective, "readyVaultCount"));
+        assertEquals(List.of(), listValue(objective, "missingSteps"));
 
         Object vaultPayload = listValue(result, "vaults").getFirst();
-        assertEquals("NOT_READY", value(vaultPayload, "status"));
-        assertEquals(false, value(vaultPayload, "ready"));
-        assertEquals(List.of(STAFFING_REASON), listValue(vaultPayload, "missingReasons"));
-        assertEquals(List.of(STAFFING_LABEL), listValue(vaultPayload, "missingReasonLabels"));
+        assertEquals("READY", value(vaultPayload, "status"));
+        assertEquals(true, value(vaultPayload, "ready"));
+        assertEquals(List.of(), listValue(vaultPayload, "missingReasons"));
     }
 
     private static Object setupProjection(Object snapshot, List<?> readiness, Object metadata) throws Exception {

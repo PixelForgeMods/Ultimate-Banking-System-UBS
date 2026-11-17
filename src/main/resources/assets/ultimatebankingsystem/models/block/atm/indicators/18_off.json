@@ -1,0 +1,83 @@
+{
+  "ambientocclusion": false,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "textures": {
+    "atm": "ultimatebankingsystem:block/atm_machine",
+    "particle": "#atm"
+  },
+  "elements": [
+    {
+      "name": "FDK L3 screen guide",
+      "from": [
+        11.3,
+        23.54622,
+        1.91
+      ],
+      "to": [
+        11.65,
+        23.59222,
+        1.96
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            6.015625,
+            0.015625,
+            6.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:solid"
+}

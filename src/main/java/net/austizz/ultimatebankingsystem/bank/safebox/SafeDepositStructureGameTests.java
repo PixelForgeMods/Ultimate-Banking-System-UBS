@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -144,6 +145,55 @@ public final class SafeDepositStructureGameTests {
             level.destroyBlock(master, false);
             helper.succeed();
         });
+    }
+
+    @GameTest(template = EMPTY_TEMPLATE, timeoutTicks = 100)
+    public static void vaultDoorAtClaimBoundaryDoesNotNeedItsWholeFootprintClaimed(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos master = helper.absolutePos(new BlockPos(8, 1, 8));
+        BankVaultDoorBlock door = (BankVaultDoorBlock) ModBlocks.BANK_VAULT_DOOR.get();
+        BlockState masterState = door.defaultBlockState();
+        level.setBlock(master, masterState, Block.UPDATE_ALL);
+        door.setPlacedBy(level, master, masterState, null, ItemStack.EMPTY);
+
+        helper.runAfterDelay(1, () -> {
+            BlockPos claimedPart = master.above();
+            SafeBlockBounds claim = new SafeBlockBounds(level.dimension().location().toString(),
+                    claimedPart.getX(), claimedPart.getY(), claimedPart.getZ(),
+                    claimedPart.getX(), claimedPart.getY(), claimedPart.getZ());
+            SafeAreaSnapshot safeArea = new SafeAreaSnapshot("safe", "premise", claim, List.of());
+            SafePremiseSnapshot premise = new SafePremiseSnapshot(
+                    "premise", "bank", claim, null, null, List.of(safeArea));
+            if (!master.equals(SafetyDepositBoxService.completeDoorMasterWithin(
+                    level, premise, safeArea, master))) {
+                helper.fail("Complete door intersecting the claim must count even when its master is outside it");
+            }
+            LoadedSafeStructureIndex.clear(level.getServer());
+            SafetyDepositBoxService.reconcileLoadedVaultDoorIndex(level, premise, safeArea);
+            if (vaultDoorEntries(level, master).size() != 1) {
+                helper.fail("Boundary door master must be rediscovered from the loaded chunk");
+            }
+            level.destroyBlock(master, false);
+            helper.succeed();
+        });
+    }
+
+    @GameTest(template = EMPTY_TEMPLATE)
+    public static void vaultDoorCollisionStaysClosedUntilOpenState(GameTestHelper helper) {
+        BankVaultDoorBlock door = (BankVaultDoorBlock) ModBlocks.BANK_VAULT_DOOR.get();
+        BlockState doorway = door.defaultBlockState()
+                .setValue(BankVaultDoorBlock.PART_X, 2)
+                .setValue(BankVaultDoorBlock.PART_Y, 1);
+        if (door.getCollisionShape(doorway.setValue(BankVaultDoorBlock.POWERED, true),
+                helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1)), CollisionContext.empty())
+                .toAabbs().size() != 1) {
+            helper.fail("Doorway must retain its full closed collision during opening");
+        }
+        if (!door.getCollisionShape(doorway.setValue(BankVaultDoorBlock.OPEN, true),
+                helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1)), CollisionContext.empty()).isEmpty()) {
+            helper.fail("Doorway collision must clear only after the open state is reached");
+        }
+        helper.succeed();
     }
 
     @GameTest(template = EMPTY_TEMPLATE, timeoutTicks = 100)

@@ -4,6 +4,7 @@ import net.austizz.ultimatebankingsystem.UltimateBankingSystem;
 import net.austizz.ultimatebankingsystem.block.custom.CashStackBlock;
 import net.austizz.ultimatebankingsystem.block.custom.MoneyStackBlock;
 import net.austizz.ultimatebankingsystem.block.entity.custom.SafetyDepositBoxRowBlockEntity;
+import net.austizz.ultimatebankingsystem.entity.custom.JobNpcEntity;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -68,7 +69,7 @@ public class ModItems {
             () -> new CashTenderItem(CashStackBlock.CashKind.HALF_DOLLAR_COIN, new Item.Properties()));
     public static final DeferredItem<Item> BANK_NOTE = ITEMS.register("bank_note", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> CHEQUE = ITEMS.register("cheque", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> CREDIT_CARD = ITEMS.register("credit_card", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> CREDIT_CARD = ITEMS.register("credit_card", () -> new CreditCardItem(new Item.Properties().stacksTo(1)));
     public static final DeferredItem<Item> RFID_CARD = ITEMS.register("rfid_card",
             () -> new RfidCardItem(new Item.Properties()));
     public static final DeferredItem<Item> RFID_SPOOFER = ITEMS.register("rfid_spoofer",
@@ -96,6 +97,32 @@ public class ModItems {
     public static final DeferredItem<Item> HANDHELD_PAYMENT_TERMINAL = ITEMS.register("handheld_payment_terminal", HandheldPaymentTerminalItem::new);
     public static final DeferredItem<Item> BANK_TELLER_SPAWN_EGG = ITEMS.register("bank_teller_spawn_egg", BankTellerSpawnEggItem::new);
     public static final DeferredItem<Item> CASHIER_SPAWN_EGG = ITEMS.register("cashier_spawn_egg", CashierSpawnEggItem::new);
+    public static final DeferredItem<Item> JOB_MARKET_SPAWN_EGG = ITEMS.register("job_market_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.MARKET, "lumberjack"));
+    public static final DeferredItem<Item> LUMBERJACK_BUYER_SPAWN_EGG = ITEMS.register("lumberjack_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.LUMBERJACK_BUYER, "lumberjack"));
+    public static final DeferredItem<Item> MINER_BUYER_SPAWN_EGG = ITEMS.register("miner_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.MINER_BUYER, "miner"));
+    public static final DeferredItem<Item> FISHERMAN_BUYER_SPAWN_EGG = ITEMS.register("fisherman_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.FISHERMAN_BUYER, "fisherman"));
+    public static final DeferredItem<Item> FARMER_BUYER_SPAWN_EGG = ITEMS.register("farmer_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.FARMER_BUYER, "farmer"));
+    public static final DeferredItem<Item> HUNTER_BUYER_SPAWN_EGG = ITEMS.register("hunter_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.HUNTER_BUYER, "hunter"));
+    public static final DeferredItem<Item> BLACKSMITH_BUYER_SPAWN_EGG = ITEMS.register("blacksmith_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.BLACKSMITH_BUYER, "blacksmith"));
+    public static final DeferredItem<Item> COURIER_BUYER_SPAWN_EGG = ITEMS.register("courier_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.COURIER_BUYER, "courier"));
+    public static final DeferredItem<Item> CHEF_BUYER_SPAWN_EGG = ITEMS.register("chef_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.CHEF_BUYER, "chef"));
+    public static final DeferredItem<Item> HERBALIST_BUYER_SPAWN_EGG = ITEMS.register("herbalist_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.HERBALIST_BUYER, "herbalist"));
+    public static final DeferredItem<Item> SALVAGER_BUYER_SPAWN_EGG = ITEMS.register("salvager_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.SALVAGER_BUYER, "salvager"));
+    public static final DeferredItem<Item> TAILOR_BUYER_SPAWN_EGG = ITEMS.register("tailor_buyer_spawn_egg",
+            () -> new JobNpcSpawnEggItem(JobNpcEntity.Role.TAILOR_BUYER, "tailor"));
+    public static final DeferredItem<Item> COURIER_PARCEL = ITEMS.register("courier_parcel",
+            () -> new CourierParcelItem(new Item.Properties()));
 
     public static final List<DeferredItem<Item>> USD_BILLS = List.of(
             HUNDRED_DOLLAR_BILL,

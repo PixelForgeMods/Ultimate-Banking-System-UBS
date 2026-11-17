@@ -31,6 +31,7 @@ import net.austizz.ultimatebankingsystem.block.custom.ShoppingBagBlock;
 import net.austizz.ultimatebankingsystem.block.custom.ShoppingBasketHolderBlock;
 import net.austizz.ultimatebankingsystem.block.custom.ShopTerminalBlock;
 import net.austizz.ultimatebankingsystem.block.custom.TallWallShelfBlock;
+import net.austizz.ultimatebankingsystem.block.custom.VendingMachineBlock;
 import net.austizz.ultimatebankingsystem.item.ColoredNameBlockItem;
 import net.austizz.ultimatebankingsystem.item.BankVaultDoorBlockItem;
 import net.austizz.ultimatebankingsystem.item.GoldBarBlockItem;
@@ -56,11 +57,15 @@ public class ModBlocks {
     public static final DeferredBlock<Block> ATM_MACHINE = registerBlock("atm_machine",
             () -> new ATMBlock(BlockBehaviour.Properties.of()
                     .noOcclusion()
+                    .lightLevel(state -> 5)
                     .strength(4f)
                     .sound(SoundType.METAL)
 
 
             ));
+    public static final DeferredBlock<Block> IN_WALL_ATM = registerBlock("in_wall_atm",
+            () -> new net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock(BlockBehaviour.Properties.of()
+                    .noOcclusion().strength(4f).sound(SoundType.METAL)));
     public static final DeferredBlock<Block> BANK_OWNER_PC = registerBlock("bank_owner_pc",
             () -> new BankOwnerPcBlock(BlockBehaviour.Properties.of()
                     .noOcclusion()
@@ -98,6 +103,18 @@ public class ModBlocks {
                     .strength(3.0f)
                     .sound(SoundType.METAL)
             ));
+    public static final DeferredBlock<Block> VENDING_MACHINE = registerBlock("vending_machine",
+            () -> new VendingMachineBlock(BlockBehaviour.Properties.of()
+                    .noOcclusion()
+                    .strength(3.0f)
+                    .sound(SoundType.METAL)
+            ));
+    public static final DeferredBlock<Block> CREATIVE_VENDING_MACHINE = registerBlock("creative_vending_machine",
+            () -> new VendingMachineBlock(BlockBehaviour.Properties.of()
+                    .noOcclusion()
+                    .strength(3.0f)
+                    .sound(SoundType.METAL)
+            ), true);
     public static final DeferredBlock<Block> ACCESS_VERIFIER = registerBlock("access_verifier",
             () -> new AccessVerifierBlock(BlockBehaviour.Properties.of()
                     .noOcclusion()

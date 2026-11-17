@@ -1635,7 +1635,7 @@ public final class ShopService {
                     1,
                     totalSteps,
                     "Claim your first shop plot",
-                    "Where: Bank Owner PC > Retail Shop > Operations > Claim Tool: Plot Claim. Use the selector on your store floor, then save.",
+                    "Where: Business Manager PC > Shop Manager > Claiming > Plot Claim. Select the shop floor with Pos 1 and Pos 2, then apply/save the claim.",
                     List.of(setupProgress("plot regions", 0, 1))
             );
         }
@@ -1654,7 +1654,7 @@ public final class ShopService {
                     1,
                     totalSteps,
                     "Claim your first shop plot",
-                    "Where: Bank Owner PC > Retail Shop > Operations > Claim Tool: Plot Claim. Select the customer/shop floor, then save.",
+                    "Where: Business Manager PC > Shop Manager > Claiming > Plot Claim. Select the shop floor with Pos 1 and Pos 2, then apply/save the claim.",
                     List.of(setupProgress("plot regions", plotClaims, 1))
             );
         }
@@ -1664,7 +1664,7 @@ public final class ShopService {
                     2,
                     totalSteps,
                     "Assign a stockroom region",
-                    "Where: Bank Owner PC > Retail Shop > Operations > Claim Tool: Stockroom Claim. Select storage space inside the shop plot, then save.",
+                    "Where: Business Manager PC > Shop Manager > Claiming > Stockroom Claim. Select a storage region fully inside the shop plot with Pos 1 and Pos 2, then apply/save the claim.",
                     List.of(setupProgress("stockroom regions", stockroomClaims, 1))
             );
         }
@@ -1673,8 +1673,8 @@ public final class ShopService {
                     false,
                     3,
                     totalSteps,
-                    "Label a delivery pallet",
-                    "Where: Bank Owner PC > Retail Shop > Operations > Claim Tool: Delivery Pallets. Hold Add Delivery Pallet, click a pallet inside the shop claim or stockroom claim, then Paper=Save.",
+                    "Assign a delivery pallet",
+                    "Where: Business Manager PC > Shop Manager > Claiming > Delivery Pallet Claim Tool. Select a pallet inside the shop or stockroom claim, use Add/Remove, then apply/save the selection.",
                     List.of(setupProgress("delivery pallets", deliveryPallets, 1))
             );
         }
@@ -1684,7 +1684,7 @@ public final class ShopService {
                     4,
                     totalSteps,
                     "Place a shopping basket holder",
-                    "Where: UBS shop blocks/creative tab or recipe/JEI > Shopping Basket Holder. Place at least one inside the shop claim for customers.",
+                    "Where: UBS shop blocks in the creative tab or JEI/recipe search. Place at least one Shopping Basket Holder inside the shop claim so customers can collect baskets.",
                     List.of(setupProgress("basket holders", basketHolders, 1))
             );
         }
@@ -1694,7 +1694,7 @@ public final class ShopService {
                     5,
                     totalSteps,
                     "Set a settlement account",
-                    "Where: Bank Owner PC > Retail Shop > Finance > Settlement Account. Select the account that receives terminal/card revenue.",
+                    "Where: Business Manager PC > Shop Manager > Finance > Settlement Account. Select the UBS account that receives cashier and payment-terminal revenue.",
                     List.of(setupProgress("settlement account", hasSettlementAccount ? 1 : 0, 1))
             );
         }
@@ -1704,8 +1704,8 @@ public final class ShopService {
                     6,
                     totalSteps,
                     "Set up a linked cashier",
-                    "Where: Bank Owner PC > Retail Shop > Employees/Cashiers. Spawn/place a cashier inside the shop plot, place a Payment Terminal inside the shop plot, "
-                            + "then use Cashier-Terminal Link and click the cashier plus terminal.",
+                    "Where: Business Manager PC > Shop Manager > Staff. Hire or place a cashier inside the shop plot, place a Payment Terminal inside the shop plot, "
+                            + "then use Link Cashier to Payment Terminal and select both devices.",
                     List.of(
                             setupProgress("cashiers in shop", cashierStatus.cashiers(), 1),
                             setupProgress("linked cashier terminals", cashierStatus.linkedCashiers(), 1)
@@ -1719,7 +1719,7 @@ public final class ShopService {
                     7,
                     totalSteps,
                     "Order shop supplies",
-                    "Where: Bank Owner PC > Retail Shop > Webshop. Order Shopping Bags and at least 5 display blocks, then deliver/store them in the stockroom.",
+                    "Where: open Retail Webshop > Catalog from the desktop. Order at least 1 Shopping Bag and 5 display blocks, then receive/store them in the shop stockroom.",
                     List.of(
                             setupProgress("shopping bags in stockroom", suppliesStatus.shoppingBags(), SETUP_REQUIRED_SHOPPING_BAGS),
                             setupProgress("display blocks in stockroom or placed in shop", suppliesStatus.displayItems(), SETUP_REQUIRED_DISPLAY_ITEMS)
@@ -1732,7 +1732,7 @@ public final class ShopService {
                     8,
                     totalSteps,
                     "Place a shop display",
-                    "Where: Place one retail display block inside the shop plot. Shelves, selling tables, wall displays, glass counters, and invisible displays all count.",
+                    "Where: Business Manager PC > Shop Manager > Inventory. Place one supported display inside the shop plot: Shop Shelf, Tall Wall Shelf, Selling Table, Cooler, Modular Wall Display, Glass Counter Display, or an Invisible Display.",
                     List.of(setupProgress("placed shop displays", displayStatus.placedDisplays(), 1))
             );
         }
@@ -1742,7 +1742,7 @@ public final class ShopService {
                     9,
                     totalSteps,
                     "Place items inside a shop display",
-                    "Where: Open the display's Shelf Manager, switch Mode to Shop, set a sellable item, set a price, and load stock. Regular mode and empty/out-of-stock shelves do not count.",
+                    "Where: Business Manager PC > Shop Manager > Inventory. Open a placed display's inventory controls, switch it to Shop mode, assign a sellable item and price, and provide stock. Regular mode or an empty display does not count.",
                     List.of(setupProgress("stocked shop-mode displays", displayStatus.configuredShopDisplays(), 1))
             );
         }
@@ -2024,7 +2024,9 @@ public final class ShopService {
                 new ItemStack(ModBlocks.INVISIBLE_DISPLAY_MEDIUM.get().asItem()),
                 new ItemStack(ModBlocks.CREATIVE_INVISIBLE_DISPLAY_MEDIUM.get().asItem()),
                 new ItemStack(ModBlocks.INVISIBLE_DISPLAY_LARGE.get().asItem()),
-                new ItemStack(ModBlocks.CREATIVE_INVISIBLE_DISPLAY_LARGE.get().asItem())
+                new ItemStack(ModBlocks.CREATIVE_INVISIBLE_DISPLAY_LARGE.get().asItem()),
+                new ItemStack(ModBlocks.VENDING_MACHINE.get().asItem()),
+                new ItemStack(ModBlocks.CREATIVE_VENDING_MACHINE.get().asItem())
         );
     }
 
@@ -8070,12 +8072,12 @@ public final class ShopService {
         if (accounts.isEmpty()) {
             lines.add("No bank accounts found for this player. Create an account first.");
         }
-        lines.add("Delivery requirements: select one of your shops, then assign at least one live delivery pallet in Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets.");
-        lines.add("Use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then press Paper=Save.");
+        lines.add("Delivery requirements: select one of your shops, then assign at least one live delivery pallet in Business Manager PC > Shop Manager > Orders > Delivery Pallets.");
+        lines.add("Use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then apply/save the selection.");
         if (selectedShop == null) {
             lines.add("Requirement missing: choose one of your shops in Retail Webshop > Delivery before checkout.");
         } else if (availablePallets.isEmpty()) {
-            lines.add("Requirement missing: selected shop has no valid delivery pallets assigned. Open Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets.");
+            lines.add("Requirement missing: selected shop has no valid delivery pallets assigned. Open Business Manager PC > Shop Manager > Orders > Delivery Pallets.");
         } else if (cartBoxCount > 0 && freePalletSlots < cartBoxCount) {
             lines.add("Requirement missing: current cart needs " + formatWebshopBoxSlotCount(cartBoxCount)
                     + ", but selected shop has " + freePalletSlots + " free pallet slot(s). Clear boxes or assign more pallets.");
@@ -8336,7 +8338,7 @@ public final class ShopService {
         Set<String> assigned = collectAssignedPalletRefSet(selectedShop);
         if (assigned.isEmpty()) {
             return new ShopActionResult(false,
-                    "Selected shop has no delivery pallets assigned. Open Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then Paper=Save.");
+                    "Selected shop has no delivery pallets assigned. Open Business Manager PC > Shop Manager > Orders > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then apply/save.");
         }
         Map<String, PalletRef> liveLookup = buildLivePalletLookup(server, deliveryPalletSearchClaims(selectedShop));
         if (WEBSHOP_MODE_PALLET_SPECIFIC.equals(mode)) {
@@ -8345,7 +8347,7 @@ public final class ShopService {
             }
             if (!assigned.contains(selectedPalletId)) {
                 return new ShopActionResult(false,
-                        "Selected pallet is not assigned to that shop. Reassign it in Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets.");
+                        "Selected pallet is not assigned to that shop. Reassign it in Business Manager PC > Shop Manager > Orders > Delivery Pallets.");
             }
             PalletRef selectedRef = liveLookup.get(selectedPalletId);
             if (selectedRef == null) {
@@ -8802,6 +8804,7 @@ public final class ShopService {
         addWebshopCatalogEntry(list, ModBlocks.INVISIBLE_DISPLAY_SMALL.get().asItem(), 14_500L, "Displays", "Invisible small single-item display.");
         addWebshopCatalogEntry(list, ModBlocks.INVISIBLE_DISPLAY_MEDIUM.get().asItem(), 18_500L, "Displays", "Invisible medium single-item display.");
         addWebshopCatalogEntry(list, ModBlocks.INVISIBLE_DISPLAY_LARGE.get().asItem(), 23_500L, "Displays", "Invisible large single-item display.");
+        addWebshopCatalogEntry(list, ModBlocks.VENDING_MACHINE.get().asItem(), 45_000L, "Displays", "Automated multi-slot item dispenser.");
         addWebshopCatalogEntry(list, ModBlocks.PALLET.get().asItem(), 9_000L, "Logistics", "3x3 pallet for stockroom and deliveries.");
         addWebshopCatalogEntry(list, ModBlocks.CARDBOARD_BOX.get().asItem(), 400L, "Logistics", "18-slot box for stock transfer.");
         addWebshopCatalogEntry(list, ModBlocks.SHOPPING_BASKET_HOLDER.get().asItem(), 18_000L, "Checkout", "Basket pickup/return stand.");
@@ -9147,9 +9150,9 @@ public final class ShopService {
             case "Linked shop no longer exists." ->
                     "The selected shop was deleted or is no longer owned. Recreate/select a shop, then place a new order.";
             case "No assigned delivery pallets available." ->
-                    "Open Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then Paper=Save.";
+                    "Open Business Manager PC > Shop Manager > Orders > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then apply/save.";
             case "Specific pallet is no longer assigned." ->
-                    "Reassign that pallet in Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets, or choose another pallet in Retail Webshop > Delivery.";
+                    "Reassign that pallet in Business Manager PC > Shop Manager > Orders > Delivery Pallets, or choose another pallet in Retail Webshop > Delivery.";
             case "Specific pallet is currently missing.", "Target pallet is not loaded.", "Target pallet data is unavailable." ->
                     "Place/load the assigned pallet inside the shop claim, keep that chunk loaded, or select another live pallet in Retail Webshop > Delivery.";
             case "All assigned delivery pallets are full.", "Target pallet does not have enough free space.", "Pallet became full during delivery." ->
@@ -9157,7 +9160,7 @@ public final class ShopService {
             case "Pallet dimension is unavailable." ->
                     "Load the dimension containing the assigned delivery pallet, or reassign a pallet in a loaded dimension.";
             default ->
-                    "Check Retail Webshop > Delivery and Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets. The order needs " + slotNeed + ".";
+                    "Check Retail Webshop > Delivery and Business Manager PC > Shop Manager > Orders > Delivery Pallets. The order needs " + slotNeed + ".";
         };
     }
 
@@ -14461,7 +14464,8 @@ public final class ShopService {
                         if (!visited.add(key)) {
                             continue;
                         }
-                        if (!(level.getBlockEntity(pos) instanceof ShelfDisplayBlockEntity shelf)) {
+                        BlockEntity be = level.getBlockEntity(pos);
+                        if (!(be instanceof ShelfDisplayBlockEntity shelf)) {
                             continue;
                         }
                         if (shelf.getOwnerUuid() == null || !ownerId.equals(shelf.getOwnerUuid())) {
@@ -14911,15 +14915,27 @@ public final class ShopService {
             int maxY = regionMaxY(claim);
             int minZ = regionMinZ(claim);
             int maxZ = regionMaxZ(claim);
+            Map<Long, Boolean> chunkAvailability = new HashMap<>();
 
             for (int x = minX; x <= maxX; x++) {
                 for (int y = minY; y <= maxY; y++) {
                     for (int z = minZ; z <= maxZ; z++) {
                         BlockPos pos = new BlockPos(x, y, z);
+                        long chunkKey = ((long) (x >> 4) << 32) | ((z >> 4) & 0xFFFFFFFFL);
+                        boolean chunkLoaded = chunkAvailability.computeIfAbsent(
+                                chunkKey,
+                                ignored -> level.hasChunkAt(pos)
+                        );
+                        if (!chunkLoaded) {
+                            continue;
+                        }
                         BlockPos scanPos = pos;
                         BlockState scanState = level.getBlockState(pos);
                         if (scanState.is(ModBlocks.PALLET.get())) {
                             scanPos = PalletBlock.getMasterPos(scanState, pos);
+                        }
+                        if (!level.hasChunkAt(scanPos)) {
+                            continue;
                         }
                         String key = level.dimension().location()
                                 + "|" + scanPos.getX()

@@ -14,8 +14,6 @@ import java.util.UUID;
 public final class SafeStaffReadinessTestSupport {
     public static final UUID BANK_ID = UUID.fromString("10000000-0000-0000-0000-000000000001");
     public static final UUID EMPLOYEE_ID = UUID.fromString("30000000-0000-0000-0000-000000000001");
-    static final String STAFFING_REASON = "SAFE_ACCESS_STAFF_MISSING";
-    static final String STAFFING_LABEL = "At least one current bank employee must have Safe Access.";
     private static final String ROOT_PACKAGE = "net.austizz.ultimatebankingsystem.";
 
     private SafeStaffReadinessTestSupport() {
@@ -77,14 +75,6 @@ public final class SafeStaffReadinessTestSupport {
         Method method = load("bank.owner.staffing.BankStaffingService")
                 .getMethod("hasEligibleSafeAccessEmployee", minecraft("nbt.CompoundTag"));
         return (Boolean) method.invoke(null, metadata);
-    }
-
-    static Object project(Object metadata, Object readiness) throws Exception {
-        Method method = load("bank.safebox.SafetyDepositBoxService").getMethod(
-                "applyStaffingReadiness",
-                minecraft("nbt.CompoundTag"),
-                load("bank.safebox.setup.SafeVaultReadinessResolver$RowReadiness"));
-        return method.invoke(null, metadata, readiness);
     }
 
     static Object premiseProjection(Scenario scenario, Object metadata) throws Exception {

@@ -1,0 +1,202 @@
+{
+  "pages": [
+    {
+      "id": "start",
+      "category": "Start here",
+      "title": "Welcome to UBS",
+      "summary": "Banking, shops, jobs and security in one place."
+    },
+    {
+      "id": "help",
+      "category": "Start here",
+      "title": "Common questions",
+      "summary": "Quick fixes for the most common stumbling blocks."
+    },
+    {
+      "id": "accounts",
+      "category": "Banking",
+      "title": "Accounts and balances",
+      "summary": "Open, inspect and choose a primary account."
+    },
+    {
+      "id": "atm",
+      "category": "Banking",
+      "title": "Using an ATM",
+      "summary": "PIN access, cash, transfers and account settings."
+    },
+    {
+      "id": "transfers",
+      "category": "Banking",
+      "title": "Transfers and requests",
+      "summary": "Move money safely between players and accounts."
+    },
+    {
+      "id": "shared",
+      "category": "Banking",
+      "title": "Joint and business accounts",
+      "summary": "Share account access with clear ownership."
+    },
+    {
+      "id": "cash",
+      "category": "Banking",
+      "title": "Cash and wallets",
+      "summary": "Physical tender, cash storage and deposits."
+    },
+    {
+      "id": "currency",
+      "category": "Banking",
+      "title": "Currency denominations",
+      "summary": "Every UBS bill and coin, with live item previews."
+    },
+    {
+      "id": "money-stacks",
+      "category": "Banking",
+      "title": "Money straps and stacks",
+      "summary": "Bundle 100 matching bills and place cash piles."
+    },
+    {
+      "id": "cards",
+      "category": "Banking",
+      "title": "Cards and phone",
+      "summary": "Bank cards, mobile access and contactless payment."
+    },
+    {
+      "id": "documents",
+      "category": "Banking",
+      "title": "Notes and cheques",
+      "summary": "Issue account-backed payment documents."
+    },
+    {
+      "id": "hud",
+      "category": "Banking",
+      "title": "Balance HUD and pickpocket",
+      "summary": "Personal display and cash-risk settings."
+    },
+    {
+      "id": "loans",
+      "category": "Banking",
+      "title": "Loans and credit",
+      "summary": "Borrowing, repayments and credit status."
+    },
+    {
+      "id": "safebox",
+      "category": "Banking",
+      "title": "Safety deposit boxes",
+      "summary": "Store and recover items through bank services."
+    },
+    {
+      "id": "bank-ownership",
+      "category": "Banking",
+      "title": "Owning a bank",
+      "summary": "Charters, tellers, premises and owner controls."
+    },
+    {
+      "id": "shopping",
+      "category": "Shops",
+      "title": "Shopping in stores",
+      "summary": "Browse displays, use baskets and pay at checkout."
+    },
+    {
+      "id": "terminals",
+      "category": "Shops",
+      "title": "Payment terminals",
+      "summary": "Fixed checkout and handheld charges."
+    },
+    {
+      "id": "shop-owner",
+      "category": "Shops",
+      "title": "Running a shop",
+      "summary": "Claims, shelves, stockrooms, staff and settlement."
+    },
+    {
+      "id": "vending",
+      "category": "Shops",
+      "title": "Vending machines",
+      "summary": "Set products, prices and physical stock."
+    },
+    {
+      "id": "jobs",
+      "category": "Jobs",
+      "title": "The Job Market",
+      "summary": "Apply for work and earn digital UBS money."
+    },
+    {
+      "id": "job-selling",
+      "category": "Jobs",
+      "title": "Selling job products",
+      "summary": "Catalogs, buyers, quotas and modifiers."
+    },
+    {
+      "id": "courier",
+      "category": "Jobs",
+      "title": "Courier deliveries",
+      "summary": "Accept, carry and complete NPC delivery routes."
+    },
+    {
+      "id": "job-progress",
+      "category": "Jobs",
+      "title": "Levels, quests and achievements",
+      "summary": "Track progress and claim job rewards."
+    },
+    {
+      "id": "heists",
+      "category": "Heists and security",
+      "title": "Bank heists",
+      "summary": "Plan a crew, breach a bank and extract."
+    },
+    {
+      "id": "security",
+      "category": "Heists and security",
+      "title": "Safes, RFID and alarms",
+      "summary": "Secure property and configure access."
+    },
+    {
+      "id": "admin-start",
+      "category": "Operator",
+      "title": "Operator quick start",
+      "summary": "Server setup and important administration entry points."
+    },
+    {
+      "id": "admin-jobs",
+      "category": "Operator",
+      "title": "Job NPC administration",
+      "summary": "Place role-specific NPCs and manage appearances."
+    },
+    {
+      "id": "admin-shops",
+      "category": "Operator",
+      "title": "Shop and shelf tools",
+      "summary": "Batch-fill displays and inspect shop setup."
+    },
+    {
+      "id": "admin-claims",
+      "category": "Operator",
+      "title": "Claim tools",
+      "summary": "Select shop, stockroom, bank and safe regions."
+    },
+    {
+      "id": "admin-banks",
+      "category": "Operator",
+      "title": "Bank and heist administration",
+      "summary": "Approvals, premises and heist recovery."
+    },
+    {
+      "id": "admin-migration",
+      "category": "Operator",
+      "title": "Importing another economy",
+      "summary": "Preview and migrate data with backups."
+    },
+    {
+      "id": "admin-config",
+      "category": "Operator",
+      "title": "Configuration and limits",
+      "summary": "What operators can tune and how time is interpreted."
+    },
+    {
+      "id": "admin-wiki",
+      "category": "Operator",
+      "title": "Writing guide pages",
+      "summary": "Markdown tables, links and item or texture previews."
+    }
+  ]
+}

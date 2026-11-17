@@ -120,8 +120,7 @@ public class MoneyBriefcaseBlock extends HorizontalDirectionalBlock implements E
                                               Player player,
                                               InteractionHand hand,
                                               BlockHitResult hitResult) {
-        if (!MoneyBriefcaseBlockEntity.isMoneyStackItem(stack)) {
-            // Non-money items fall through to the empty-hand toggle handling.
+        if (!MoneyBriefcaseBlockEntity.isStoredItem(stack)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (level.isClientSide()) {
@@ -132,11 +131,14 @@ public class MoneyBriefcaseBlock extends HorizontalDirectionalBlock implements E
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (!briefcase.isOpenForStorage()) {
-            showStatus(serverPlayer, "Open the briefcase first.");
+            showStatus(serverPlayer, "Sneak-right-click to open the briefcase first.");
             return ItemInteractionResult.sidedSuccess(false);
         }
-        if (!briefcase.insertMoneyStack(serverPlayer, stack)) {
-            showStatus(serverPlayer, "The briefcase is full.");
+        if (!briefcase.insertStoredItem(serverPlayer, stack)) {
+            showStatus(serverPlayer, MoneyBriefcaseBlockEntity.isMetalBarItem(stack)
+                    && briefcase.getStoredMetalBarCount() >= MoneyBriefcaseBlockEntity.MAX_METAL_BARS
+                    ? "The briefcase can hold up to six gold or silver bars."
+                    : "The briefcase is full.");
         }
         return ItemInteractionResult.sidedSuccess(false);
     }
@@ -154,11 +156,19 @@ public class MoneyBriefcaseBlock extends HorizontalDirectionalBlock implements E
                 || !(level.getBlockEntity(pos) instanceof MoneyBriefcaseBlockEntity briefcase)) {
             return InteractionResult.PASS;
         }
-        if (serverPlayer.isShiftKeyDown() && briefcase.isOpenForStorage()) {
-            briefcase.withdrawLast(serverPlayer);
+        if (serverPlayer.isShiftKeyDown()) {
+            briefcase.setTargetOpen(!briefcase.isTargetOpen());
             return InteractionResult.sidedSuccess(false);
         }
-        briefcase.setTargetOpen(!briefcase.isTargetOpen());
+        if (briefcase.isOpenForStorage()) {
+            if (!briefcase.withdrawLast(serverPlayer)) {
+                showStatus(serverPlayer, "The briefcase is empty.");
+            }
+            return InteractionResult.sidedSuccess(false);
+        }
+        showStatus(serverPlayer, briefcase.isTargetOpen()
+                ? "The briefcase is still opening."
+                : "Sneak-right-click to open the briefcase.");
         return InteractionResult.sidedSuccess(false);
     }
 
@@ -166,7 +176,7 @@ public class MoneyBriefcaseBlock extends HorizontalDirectionalBlock implements E
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()
                 && level.getBlockEntity(pos) instanceof MoneyBriefcaseBlockEntity briefcase) {
-            boolean hasContents = briefcase.hasStoredMoney();
+            boolean hasContents = briefcase.hasStoredItems();
             // Shulker-style: contents ride along inside the dropped item, never
             // spill. Creative players only get a drop when it carries money.
             if (hasContents || player == null || !player.getAbilities().instabuild) {

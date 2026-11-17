@@ -29136,7 +29136,7 @@ public class BankOwnerPcScreen extends Screen implements OwnerPcClientScreen {
             case "Linked shop no longer exists." ->
                     "Recreate/select a shop, then place a new order.";
             case "No assigned delivery pallets available." ->
-                    "Open Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then Paper=Save.";
+                    "Open Business Manager PC > Shop Manager > Orders > Delivery Pallets, use the Delivery Pallet Claim Tool on a pallet inside the shop claim, then apply/save.";
             case "Specific pallet is no longer assigned." ->
                     "Reassign that pallet in Delivery Pallets, or choose another pallet in Retail Webshop > Delivery.";
             case "Specific pallet is currently missing.", "Target pallet is not loaded.", "Target pallet data is unavailable." ->
@@ -29146,7 +29146,7 @@ public class BankOwnerPcScreen extends Screen implements OwnerPcClientScreen {
             case "Pallet dimension is unavailable." ->
                     "Load the dimension containing the assigned pallet, or reassign a pallet in a loaded dimension.";
             default ->
-                    "Check Retail Webshop > Delivery and Bank Owner PC > Retail Shop > Order Manager > Delivery Pallets. This order needs " + slotNeed + ".";
+                    "Check Retail Webshop > Delivery and Business Manager PC > Shop Manager > Orders > Delivery Pallets. This order needs " + slotNeed + ".";
         };
     }
 
@@ -33853,8 +33853,8 @@ public class BankOwnerPcScreen extends Screen implements OwnerPcClientScreen {
             base = List.of(
                     "Shop Manager ready.",
                     "- Create Shop: creates your first shop profile.",
-                    "- Claim Tool (Plot/Stockroom): closes UI and gives temporary selector hotbar.",
-                    "- Claim Tool (Delivery Pallets): closes UI and labels delivery pallets with add/remove/save/cancel flow.",
+                    "- Claim Tool (Plot/Stockroom): closes UI and opens the custom Claiming selector.",
+                    "- Claim Tool (Delivery Pallets): opens the Claiming selector to add/remove pallet targets, then apply or cancel.",
                     "- Extra claims must connect to your existing shop claim.",
                     "- Plot claims cannot overlap your existing claimed regions.",
                     "- Stockroom claims must be fully inside your shop plot.",

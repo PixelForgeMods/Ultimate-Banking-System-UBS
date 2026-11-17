@@ -12,6 +12,7 @@ public record OwnerPcDesktopActionResponsePayload(
         boolean success,
         String message
 ) implements CustomPacketPayload {
+    public static final int MAX_MESSAGE_CHARS = 200_000;
 
     public static final Type<OwnerPcDesktopActionResponsePayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(UltimateBankingSystem.MODID, "owner_pc_desktop_action_response"));
@@ -20,7 +21,7 @@ public record OwnerPcDesktopActionResponsePayload(
             StreamCodec.composite(
                     ByteBufCodecs.STRING_UTF8, OwnerPcDesktopActionResponsePayload::action,
                     ByteBufCodecs.BOOL, OwnerPcDesktopActionResponsePayload::success,
-                    ByteBufCodecs.STRING_UTF8, OwnerPcDesktopActionResponsePayload::message,
+                    ByteBufCodecs.stringUtf8(MAX_MESSAGE_CHARS), OwnerPcDesktopActionResponsePayload::message,
                     OwnerPcDesktopActionResponsePayload::new
             );
 

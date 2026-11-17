@@ -1,0 +1,80 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Copycat exterior left wall tile 1",
+      "from": [
+        0,
+        16,
+        0
+      ],
+      "to": [
+        7.5,
+        30.8,
+        0.48
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            8.5,
+            1.2,
+            16.0,
+            16.0
+          ],
+          "texture": "#copycat"
+        },
+        "east": {
+          "uv": [
+            0.0,
+            1.2,
+            0.48,
+            16.0
+          ],
+          "texture": "#copycat"
+        },
+        "south": {
+          "uv": [
+            8.5,
+            1.2,
+            16.0,
+            16.0
+          ],
+          "texture": "#copycat"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            1.2,
+            0.48,
+            16.0
+          ],
+          "texture": "#copycat"
+        },
+        "up": {
+          "uv": [
+            0.0,
+            0.0,
+            7.5,
+            0.48
+          ],
+          "texture": "#copycat"
+        },
+        "down": {
+          "uv": [
+            0.0,
+            0.0,
+            7.5,
+            0.48
+          ],
+          "texture": "#copycat"
+        }
+      }
+    }
+  ]
+}

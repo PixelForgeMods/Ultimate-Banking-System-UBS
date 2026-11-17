@@ -38,7 +38,7 @@ public final class BankSafeSetupPayloadBuilder {
     static Result buildFromSnapshot(SafeDepositSetupSnapshot snapshot,
                                     List<SafeVaultReadinessResolver.RowReadiness> readiness,
                                     CompoundTag metadata) {
-        return buildProjected(snapshot, SafetyDepositBoxService.applyStaffingReadiness(metadata, readiness));
+        return buildProjected(snapshot, readiness);
     }
 
     private static Result buildProjected(SafeDepositSetupSnapshot snapshot,

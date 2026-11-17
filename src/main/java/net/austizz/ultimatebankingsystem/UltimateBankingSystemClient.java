@@ -5,12 +5,16 @@ import net.austizz.ultimatebankingsystem.client.BalanceHudRenderer;
 import net.austizz.ultimatebankingsystem.client.ClaimModeClientState;
 import net.austizz.ultimatebankingsystem.client.ClaimModeOutlineRenderer;
 import net.austizz.ultimatebankingsystem.client.DeliveryInfoBoardClientState;
+import net.austizz.ultimatebankingsystem.client.CourierDeliveryClientState;
+import net.austizz.ultimatebankingsystem.client.CourierDeliveryHudRenderer;
+import net.austizz.ultimatebankingsystem.client.CourierMapIntegration;
 import net.austizz.ultimatebankingsystem.client.DallasMaskAnimationClientState;
 import net.austizz.ultimatebankingsystem.client.DallasMaskKeyMappings;
 import net.austizz.ultimatebankingsystem.client.HeistClientState;
 import net.austizz.ultimatebankingsystem.client.HeistExfillBorderClientState;
 import net.austizz.ultimatebankingsystem.client.HeistExfillBorderRenderer;
 import net.austizz.ultimatebankingsystem.client.HeistWorldHologramRenderer;
+import net.austizz.ultimatebankingsystem.client.HudLayoutManager;
 import net.austizz.ultimatebankingsystem.client.NotificationClientState;
 import net.austizz.ultimatebankingsystem.client.NotificationRenderer;
 import net.austizz.ultimatebankingsystem.client.PhoneNotificationClientState;
@@ -26,6 +30,7 @@ import net.austizz.ultimatebankingsystem.client.StockroomLocateClientState;
 import net.austizz.ultimatebankingsystem.client.SafeBoxEscortMarkerClientState;
 import net.austizz.ultimatebankingsystem.client.renderer.DallasMaskFirstPersonRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.Ove9000SawFirstPersonRenderer;
+import net.austizz.ultimatebankingsystem.client.renderer.ShelfPriceLabelRenderer;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.austizz.ultimatebankingsystem.block.ModBlocks;
 import net.austizz.ultimatebankingsystem.block.custom.ModularWallDisplayBlock;
@@ -78,6 +83,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.neoforge.client.event.RenderHighlightEvent;
+import net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
@@ -144,13 +150,23 @@ public class UltimateBankingSystemClient {
         }
 
         GuiGraphics graphics = event.getGuiGraphics();
+        HudLayoutManager.beginFrame(graphics.guiWidth(), graphics.guiHeight());
+        if (SmartphoneClientState.isVisible()) {
+            SmartphoneOverlay.render(mc, graphics);
+            return;
+        }
         // HUD pass only: when a screen is open we draw alerts in the screen post pass so they stay above UI.
         if (mc.screen == null) {
+            net.austizz.ultimatebankingsystem.client.CreditCardHint.render(mc, graphics);
             renderActionAlert(mc, graphics);
             renderPhoneNotification(mc, graphics);
             NotificationRenderer.render(mc, graphics);
             renderShopSetupObjective(mc, graphics);
             renderDeliveryInfoBoard(mc, graphics);
+            CourierDeliveryHudRenderer.render(mc, graphics);
+        }
+        if (mc.screen != null) {
+            return;
         }
         renderBalanceHud(mc, graphics);
         renderHandheldTerminalOverlay(mc, graphics);
@@ -166,6 +182,7 @@ public class UltimateBankingSystemClient {
         if (mc.player == null || mc.options.hideGui || mc.screen == null) {
             return;
         }
+        HudLayoutManager.beginFrame(event.getGuiGraphics().guiWidth(), event.getGuiGraphics().guiHeight());
         // Screen pass: keep shared alerts visible above desktop/ATM widgets.
         renderActionAlert(mc, event.getGuiGraphics());
         renderPhoneNotification(mc, event.getGuiGraphics());
@@ -194,7 +211,7 @@ public class UltimateBankingSystemClient {
             return;
         }
         if (event.getKey() == GLFW.GLFW_KEY_RIGHT_BRACKET
-                && ShopSetupObjectiveClientState.isActive()
+                && isShopSetupVisible()
                 && ShopSetupObjectiveClientState.getProjectCount() > 1) {
             ShopSetupObjectiveClientState.cycleProject();
             return;
@@ -211,16 +228,20 @@ public class UltimateBankingSystemClient {
         if (mc.screen != null) {
             return;
         }
-        if (ShopSetupObjectiveClientState.isActive()) {
+        if (CourierDeliveryClientState.isActive()) {
+            CourierDeliveryClientState.toggleCollapsed();
+            return;
+        }
+        if (DeliveryInfoBoardClientState.isActive()) {
+            DeliveryInfoBoardClientState.toggleCollapsed();
+            return;
+        }
+        if (isShopSetupVisible()) {
             if (hardCloseKey) {
                 ShopSetupObjectiveClientState.dismiss();
                 return;
             }
             ShopSetupObjectiveClientState.toggleCollapsed();
-            return;
-        }
-        if (DeliveryInfoBoardClientState.isActive()) {
-            DeliveryInfoBoardClientState.toggleCollapsed();
             return;
         }
     }
@@ -295,6 +316,7 @@ public class UltimateBankingSystemClient {
         if (mc == null) {
             return;
         }
+        CourierMapIntegration.tick(mc);
         ClaimModeClientState.tick(mc);
         if (ClaimModeClientState.active()) {
             suppressClaimModeKeybinds(mc, ClaimModeClientState.cursorMode());
@@ -386,6 +408,7 @@ public class UltimateBankingSystemClient {
         HeistExfillBorderClientState.clear();
         HeistExfillBorderRenderer.clearCache();
         NotificationClientState.clear();
+        CourierDeliveryClientState.clear();
     }
 
     private static void suppressGameplayKeybinds(Minecraft mc) {
@@ -511,6 +534,7 @@ public class UltimateBankingSystemClient {
             return;
         }
         Minecraft mc = Minecraft.getInstance();
+        ShelfPriceLabelRenderer.renderWorld(event, mc);
         if (mc.level == null || mc.player == null) {
             return;
         }
@@ -1057,6 +1081,19 @@ public class UltimateBankingSystemClient {
             return;
         }
         BlockState state = mc.level.getBlockState(event.getTarget().getBlockPos());
+        if (state.getBlock() instanceof InWallATMBlock
+                && (state.getValue(InWallATMBlock.PART) == 2 || state.getValue(InWallATMBlock.PART) == 3)) {
+            var hit = event.getTarget();
+            var facing = state.getValue(InWallATMBlock.FACING);
+            var origin = InWallATMBlock.origin(hit.getBlockPos(), state);
+            boolean surround = InWallATMBlock.isSurround(hit.getLocation(), origin, facing);
+            var outline = surround ? InWallATMBlock.surroundOutline(facing, state.getValue(InWallATMBlock.PART))
+                    : InWallATMBlock.fasciaOutline(facing);
+            event.setCanceled(true);
+            drawOutlineShape(event.getPoseStack(), event.getMultiBufferSource().getBuffer(RenderType.lines()),
+                    event.getCamera().getPosition(), surround ? hit.getBlockPos() : origin, outline);
+            return;
+        }
         if (!state.is(ModBlocks.GLASS_COUNTER_DISPLAY.get())
                 && !state.is(ModBlocks.CREATIVE_GLASS_COUNTER_DISPLAY.get())
                 && !state.is(ModBlocks.GLASS_COUNTER_DISPLAY_OPEN.get())
@@ -1255,8 +1292,12 @@ public class UltimateBankingSystemClient {
     private record LocateRenderTarget(Vec3 anchor, AABB box, boolean palletBox) {
     }
 
+    private static boolean isShopSetupVisible() {
+        return ShopSetupObjectiveClientState.isActive() && !CourierDeliveryClientState.isActive();
+    }
+
     private static void renderShopSetupObjective(Minecraft mc, GuiGraphics graphics) {
-        if (mc.screen != null || !ShopSetupObjectiveClientState.isActive()) {
+        if (mc.screen != null || !isShopSetupVisible()) {
             return;
         }
         Font font = mc.font;
@@ -1265,10 +1306,8 @@ public class UltimateBankingSystemClient {
         }
 
         int guiWidth = graphics.guiWidth();
-        int guiHeight = graphics.guiHeight();
         int lineHeight = font.lineHeight;
         int panelWidth = Math.max(220, Math.min(300, guiWidth / 3));
-        int panelX = guiWidth - panelWidth - 8;
 
         if (ShopSetupObjectiveClientState.isCollapsed()) {
             String title = tr(ShopSetupObjectiveClientState.getProjectType() + " Requirements");
@@ -1280,8 +1319,10 @@ public class UltimateBankingSystemClient {
                     : tr("Press X to expand");
             int compactWidth = Math.max(176, Math.min(236, panelWidth));
             int compactHeight = 42;
-            int compactX = guiWidth - compactWidth - 8;
-            int compactY = guiHeight - compactHeight - 8;
+            HudLayoutManager.Bounds compactBounds = HudLayoutManager.placeTopRight(
+                    "shop-setup-objective", compactWidth, compactHeight, 8);
+            int compactX = compactBounds.x();
+            int compactY = compactBounds.y();
             graphics.pose().pushPose();
             graphics.pose().translate(0.0D, 0.0D, 1250.0D);
             graphics.fill(compactX, compactY, compactX + compactWidth, compactY + compactHeight, 0xD0132438);
@@ -1317,7 +1358,10 @@ public class UltimateBankingSystemClient {
         int bodyHeight = (detailLines.isEmpty() ? 0 : (detailLines.size() * lineHeight) + 2);
         int requirementHeight = requirements.isEmpty() ? 0 : (requirements.size() * lineHeight) + 3;
         int panelHeight = 58 + bodyHeight + requirementHeight + lineHeight + 4;
-        int panelY = Math.max(40, (guiHeight / 2) - (panelHeight / 2));
+        HudLayoutManager.Bounds panelBounds = HudLayoutManager.placeTopRight(
+                "shop-setup-objective", panelWidth, panelHeight, 8);
+        int panelX = panelBounds.x();
+        int panelY = panelBounds.y();
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0D, 0.0D, 1250.0D);
@@ -1368,9 +1412,7 @@ public class UltimateBankingSystemClient {
         }
 
         int guiWidth = graphics.guiWidth();
-        int panelWidth = Math.max(238, Math.min(314, guiWidth / 3));
-        int panelX = guiWidth - panelWidth - 8;
-        int panelY = 26;
+        int panelWidth = Math.max(220, Math.min(286, guiWidth / 3));
         int textWidth = panelWidth - 12;
         int lineHeight = font.lineHeight;
 
@@ -1380,8 +1422,10 @@ public class UltimateBankingSystemClient {
                 + " / " + DeliveryInfoBoardClientState.getActiveCap();
         if (DeliveryInfoBoardClientState.isCollapsed()) {
             int collapsedW = Math.max(150, Math.min(228, guiWidth / 4));
-            int collapsedX = guiWidth - collapsedW - 8;
-            int collapsedY = panelY;
+            HudLayoutManager.Bounds collapsedBounds = HudLayoutManager.placeBottomRight(
+                    "legacy-delivery-board", collapsedW, 26, 8);
+            int collapsedX = collapsedBounds.x();
+            int collapsedY = collapsedBounds.y();
             graphics.pose().pushPose();
             graphics.pose().translate(0.0D, 0.0D, 1240.0D);
             graphics.fill(collapsedX, collapsedY, collapsedX + collapsedW, collapsedY + 26, 0xD0112740);
@@ -1419,6 +1463,10 @@ public class UltimateBankingSystemClient {
                 + (lineHeight * 7)
                 + (dropTargetLines.size() * lineHeight)
                 + 12;
+        HudLayoutManager.Bounds panelBounds = HudLayoutManager.placeBottomRight(
+                "legacy-delivery-board", panelWidth, panelHeight, 8);
+        int panelX = panelBounds.x();
+        int panelY = panelBounds.y();
 
         long timeoutSeconds = Math.max(1L, (long) DeliveryInfoBoardClientState.getTimeoutMinutes() * 60L);
         float remainingRatio = Math.max(0.0F, Math.min(1.0F,
@@ -1571,8 +1619,10 @@ public class UltimateBankingSystemClient {
         }
         int textBlockHeight = wrapped.size() * lineHeight;
         int height = lineHeight + textBlockHeight + (padding * 2) + lineGap + progressGap + progressHeight;
-        int x = (graphics.guiWidth() - width) / 2;
-        int y = 8;
+        HudLayoutManager.Bounds alertBounds = HudLayoutManager.placeTopCenter(
+                "action-alert", width, height, 8);
+        int x = alertBounds.x();
+        int y = alertBounds.y();
 
         ActionAlertClientState.Tone tone = ActionAlertClientState.getTone();
         int borderColor;
@@ -1681,8 +1731,10 @@ public class UltimateBankingSystemClient {
         }
 
         int height = 48 + (wrapped.size() - 1) * mc.font.lineHeight;
-        int x = (graphics.guiWidth() - width) / 2;
-        int targetY = 18;
+        HudLayoutManager.Bounds notificationBounds = HudLayoutManager.placeTopCenter(
+                "phone-notification", width, height, 8);
+        int x = notificationBounds.x();
+        int targetY = notificationBounds.y();
         int y = Math.round(targetY - (height + 28) * (1.0F - progress));
         int radius = 14;
         int bg = withScaledAlpha(0xF8F7F8FA, alpha);
@@ -1787,7 +1839,9 @@ public class UltimateBankingSystemClient {
         }
 
         int centerX = graphics.guiWidth() / 2;
-        int panelY = (graphics.guiHeight() / 2) + 18;
+        HudLayoutManager.Bounds pickpocketBounds = HudLayoutManager.placeBottomCenter(
+                "pickpocket-overlay", 240, 86, 8);
+        int panelY = pickpocketBounds.y();
         int lineHeight = mc.font.lineHeight;
         graphics.pose().pushPose();
         graphics.pose().translate(0.0D, 0.0D, 520.0D);
@@ -1846,8 +1900,10 @@ public class UltimateBankingSystemClient {
         List<HeistClientState.HudCrewEntry> crew = HeistClientState.hudCrew();
         int width = Math.min(214, Math.max(176, graphics.guiWidth() / 5));
         int height = 74 + crew.size() * 23;
-        int x = graphics.guiWidth() - width - 12;
-        int y = Math.max(18, (graphics.guiHeight() - height) / 2);
+        HudLayoutManager.Bounds hudBounds = HudLayoutManager.placeRightCenter(
+                "heist-hud", width, height, 12);
+        int x = hudBounds.x();
+        int y = hudBounds.y();
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0D, 0.0D, 610.0D);
@@ -1885,8 +1941,10 @@ public class UltimateBankingSystemClient {
             int centerX = graphics.guiWidth() / 2;
             String prompt = state.prompt().replace("{key}", PickpocketKeyMappings.getBoundKeyName());
             int promptWidth = Math.max(150, mc.font.width(prompt) + 22);
-            int promptX = centerX - promptWidth / 2;
-            int promptY = graphics.guiHeight() / 2 + 28;
+            HudLayoutManager.Bounds promptBounds = HudLayoutManager.placeBottomCenter(
+                    "heist-action-prompt", promptWidth, 28, 8);
+            int promptX = promptBounds.x();
+            int promptY = promptBounds.y();
             graphics.fill(promptX, promptY, promptX + promptWidth, promptY + 28, 0xDC111A24);
             graphics.fill(promptX, promptY, promptX + promptWidth, promptY + 2, 0xFFFFB84D);
             graphics.drawString(mc.font, prompt, centerX - mc.font.width(prompt) / 2,
@@ -1977,8 +2035,10 @@ public class UltimateBankingSystemClient {
         int lineHeight = mc.font.lineHeight;
         int width = Math.max(mc.font.width(line1), Math.max(mc.font.width(line2), mc.font.width(line3))) + padding * 2;
         int height = lineHeight * 3 + padding * 2 + 2;
-        int x = (graphics.guiWidth() - width) / 2;
-        int y = graphics.guiHeight() - height - 46;
+        HudLayoutManager.Bounds overlayBounds = HudLayoutManager.placeBottomCenter(
+                "handheld-terminal-overlay", width, height, 8);
+        int x = overlayBounds.x();
+        int y = overlayBounds.y();
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0D, 0.0D, 500.0D);
@@ -2045,8 +2105,10 @@ public class UltimateBankingSystemClient {
         int width = Math.max(Math.max(mc.font.width(line1), mc.font.width(line2)),
                 Math.max(Math.max(mc.font.width(line3), mc.font.width(line4)), mc.font.width(line5))) + padding * 2;
         int height = lineHeight * 5 + padding * 2 + 2;
-        int x = (graphics.guiWidth() - width) / 2;
-        int y = graphics.guiHeight() - height - 70;
+        HudLayoutManager.Bounds overlayBounds = HudLayoutManager.placeBottomCenter(
+                "shelf-overlay", width, height, 8);
+        int x = overlayBounds.x();
+        int y = overlayBounds.y();
 
         graphics.pose().pushPose();
         graphics.pose().translate(0.0D, 0.0D, 500.0D);

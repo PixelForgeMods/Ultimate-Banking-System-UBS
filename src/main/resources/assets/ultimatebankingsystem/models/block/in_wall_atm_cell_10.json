@@ -1,0 +1,377 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Upper housing left side",
+      "from": [
+        8.3,
+        0,
+        0
+      ],
+      "to": [
+        8.63,
+        6.116100000000003,
+        11.399999999999999
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.4755940082644628,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            0.5244059917355373,
+            0.078125,
+            0.921875,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            0.078125,
+            0.5244059917355373,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Upper housing top",
+      "from": [
+        8.63,
+        5.766100000000002,
+        0
+      ],
+      "to": [
+        16,
+        6.116100000000003,
+        11.399999999999999
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            1.5244059917355373,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.078125,
+            0.5244059917355373,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.4755940082644628
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Rear locked service cover",
+      "from": [
+        8.63,
+        0,
+        10.95
+      ],
+      "to": [
+        16,
+        5.766100000000002,
+        11.399999999999999
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.5,
+            0.078125,
+            2.921875,
+            0.31258990963855426
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.5,
+            0.31258990963855426
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.31258990963855426
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Concealed electronics enclosure",
+      "from": [
+        8.64,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        5.716100000000004,
+        10.899999999999999
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            3.078125,
+            0.078125,
+            3.5,
+            0.3122492415048545
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            3.422044836956522,
+            0.078125,
+            3.921875,
+            0.3122492415048545
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            3.078125,
+            0.4220448369565218,
+            3.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Rear access door gasket",
+      "from": [
+        8.82,
+        0,
+        11.395
+      ],
+      "to": [
+        16,
+        5.366100000000003,
+        11.43
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            11.5,
+            0.078125,
+            11.921875,
+            0.3056449434673368
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            11.078125,
+            0.078125,
+            11.5,
+            0.3056449434673368
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            11.078125,
+            0.078125,
+            11.921875,
+            0.3056449434673368
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            11.078125,
+            0.078125,
+            11.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Rear access door inset",
+      "from": [
+        8.9,
+        0,
+        11.420000000000002
+      ],
+      "to": [
+        16,
+        5.286100000000005,
+        11.46
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.5,
+            0.078125,
+            2.921875,
+            0.30406962386018255
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.5,
+            0.30406962386018255
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.30406962386018255
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    }
+  ]
+}

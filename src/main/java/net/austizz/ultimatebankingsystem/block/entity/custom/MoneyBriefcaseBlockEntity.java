@@ -23,17 +23,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Money briefcase: a flat leather case holding exactly 20 money-stack items
- * (2 layers x 2 deep x 5 across, one strapped stack per slot).
+ * Money briefcase: a flat leather case holding 20 money-stack or bullion items
+ * (2 layers x 2 deep x 5 across, one item per slot), with a six-bar limit.
  *
  * Item persistence mechanism: breaking a placed briefcase produces one
  * money_briefcase item carrying the whole inventory via the vanilla
  * BLOCK_ENTITY_DATA data component ({@link BlockItem#setBlockEntityData}).
  * On placement, vanilla BlockItem.updateCustomBlockEntityTag applies that
- * component back through {@link #loadAdditional}, restoring all 20 slots.
+ * component back through {@link #loadAdditional}, restoring all stored items.
  */
 public class MoneyBriefcaseBlockEntity extends BlockEntity {
     public static final int SLOT_COUNT = 20;
+    public static final int MAX_METAL_BARS = 6;
     public static final int SLOTS_PER_LAYER = 10;
     public static final int SLOTS_PER_ROW = 5;
 
@@ -67,7 +68,7 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
 
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            return isMoneyStackItem(stack);
+            return isStoredItem(stack);
         }
     };
 
@@ -79,6 +80,16 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
         return stack != null
                 && !stack.isEmpty()
                 && MoneyStackBlock.BillDenomination.fromStackItem(stack.getItem()) != null;
+    }
+
+    public static boolean isMetalBarItem(ItemStack stack) {
+        return stack != null
+                && !stack.isEmpty()
+                && (stack.is(ModBlocks.GOLD_BAR.get().asItem()) || stack.is(ModBlocks.SILVER_BAR.get().asItem()));
+    }
+
+    public static boolean isStoredItem(ItemStack stack) {
+        return isMoneyStackItem(stack) || isMetalBarItem(stack);
     }
 
     public boolean isTargetOpen() {
@@ -110,13 +121,23 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
         this.dropHandled = true;
     }
 
-    public boolean hasStoredMoney() {
+    public boolean hasStoredItems() {
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
             if (!items.getStackInSlot(slot).isEmpty()) {
                 return true;
             }
         }
         return false;
+    }
+
+    public int getStoredMetalBarCount() {
+        int count = 0;
+        for (int slot = 0; slot < SLOT_COUNT; slot++) {
+            if (isMetalBarItem(items.getStackInSlot(slot))) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, MoneyBriefcaseBlockEntity briefcase) {
@@ -162,11 +183,14 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
     }
 
     /**
-     * Inserts one money-stack item from the held stack into the first free slot.
-     * Returns true when one item was stored; false when the case is full.
+     * Inserts one supported item from the held stack into the first free slot.
+     * Returns true when stored, or false when the case or bar allowance is full.
      */
-    public boolean insertMoneyStack(ServerPlayer player, ItemStack held) {
-        if (player == null || !isMoneyStackItem(held) || !isOpenForStorage()) {
+    public boolean insertStoredItem(ServerPlayer player, ItemStack held) {
+        if (player == null || !isStoredItem(held) || !isOpenForStorage()) {
+            return false;
+        }
+        if (isMetalBarItem(held) && getStoredMetalBarCount() >= MAX_METAL_BARS) {
             return false;
         }
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
@@ -209,7 +233,7 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
      */
     public ItemStack createDropStack() {
         ItemStack stack = new ItemStack(ModBlocks.MONEY_BRIEFCASE.get());
-        if (level != null && hasStoredMoney()) {
+        if (level != null && hasStoredItems()) {
             CompoundTag tag = new CompoundTag();
             tag.put(STORAGE_KEY, items.serializeNBT(level.registryAccess()));
             BlockItem.setBlockEntityData(stack, ModBlockEntities.MONEY_BRIEFCASE.get(), tag);
@@ -236,6 +260,15 @@ public class MoneyBriefcaseBlockEntity extends BlockEntity {
                 : new CompoundTag();
         storageTag.putInt("Size", SLOT_COUNT);
         items.deserializeNBT(registries, storageTag);
+        int bars = 0;
+        for (int slot = 0; slot < SLOT_COUNT; slot++) {
+            ItemStack stored = items.getStackInSlot(slot);
+            if (!stored.isEmpty() && !isStoredItem(stored)) {
+                items.setStackInSlot(slot, ItemStack.EMPTY);
+            } else if (isMetalBarItem(stored) && ++bars > MAX_METAL_BARS) {
+                items.setStackInSlot(slot, ItemStack.EMPTY);
+            }
+        }
     }
 
     @Override

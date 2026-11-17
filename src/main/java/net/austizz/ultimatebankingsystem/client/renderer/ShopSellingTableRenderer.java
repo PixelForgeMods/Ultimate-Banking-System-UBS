@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ShopSellingTableRenderer implements BlockEntityRenderer<ShopSellingTableBlockEntity> {
@@ -64,17 +65,28 @@ public class ShopSellingTableRenderer implements BlockEntityRenderer<ShopSelling
             yaw += (gameTime + partialTick) * SPIN_DEGREES_PER_TICK;
         }
 
-        poseStack.pushPose();
+        double baseX;
+        double baseY;
+        double baseZ;
         if (largeTable) {
             // 2x2 footprint is {master, east, north, north-east}; center is (1.0, 0.0) from master origin.
-            poseStack.translate(1.0D, 1.62D, 0.0D);
+            baseX = 1.0D;
+            baseY = 1.62D;
+            baseZ = 0.0D;
         } else if (invisibleDisplay) {
             // Invisible displays have no physical top surface; render item centered in the display block volume.
-            poseStack.translate(0.5D, 0.92D, 0.5D);
+            baseX = 0.5D;
+            baseY = 0.92D;
+            baseZ = 0.5D;
         } else {
             // Raise item so full blocks are clearly visible above the tabletop.
-            poseStack.translate(0.5D, 1.34D, 0.5D);
+            baseX = 0.5D;
+            baseY = 1.34D;
+            baseZ = 0.5D;
         }
+
+        poseStack.pushPose();
+        poseStack.translate(baseX, baseY, baseZ);
         poseStack.translate(transform.offsetX(), transform.offsetY(), transform.offsetZ());
         poseStack.mulPose(Axis.YP.rotationDegrees(yaw + transform.rotationY()));
         poseStack.mulPose(Axis.XP.rotationDegrees(transform.rotationX()));
@@ -108,5 +120,16 @@ public class ShopSellingTableRenderer implements BlockEntityRenderer<ShopSelling
                 0
         );
         poseStack.popPose();
+
+        ShelfPriceLabelRenderer.queue(
+                table.getLevel(),
+                table.getBlockPos(),
+                0,
+                table.getSlotPrice(0),
+                table.isShopMode(),
+                new Vec3(baseX + transform.offsetX(), baseY + transform.offsetY()
+                        + (largeTable ? 1.08D : invisibleDisplay ? 0.58D : 0.64D),
+                        baseZ + transform.offsetZ())
+        );
     }
 }

@@ -1,0 +1,107 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Retractable anti-trapping cash shutter",
+      "from": [
+        15.2,
+        20.2661,
+        3.38
+      ],
+      "to": [
+        22.1,
+        21.0361,
+        3.47
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "rotation": {
+        "angle": 22.5,
+        "axis": "x",
+        "origin": [
+          16,
+          20.4161,
+          3.7
+        ]
+      }
+    }
+  ]
+}

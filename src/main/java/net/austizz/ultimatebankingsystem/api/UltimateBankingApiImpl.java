@@ -8,6 +8,10 @@ import net.austizz.ultimatebankingsystem.account.transaction.UserTransaction;
 import net.austizz.ultimatebankingsystem.bank.Bank;
 import net.austizz.ultimatebankingsystem.bank.centralbank.CentralBank;
 import net.austizz.ultimatebankingsystem.bank.handler.BankManager;
+import net.austizz.ultimatebankingsystem.api.job.ApiJobMarketSnapshot;
+import net.austizz.ultimatebankingsystem.api.job.ApiJobQuote;
+import net.austizz.ultimatebankingsystem.api.job.ApiJobSnapshot;
+import net.austizz.ultimatebankingsystem.api.job.UltimateJobApi;
 import net.austizz.ultimatebankingsystem.item.DollarBills;
 import net.austizz.ultimatebankingsystem.item.ModItems;
 import net.austizz.ultimatebankingsystem.item.WalletData;
@@ -16,6 +20,7 @@ import net.austizz.ultimatebankingsystem.network.ServerNotification;
 import net.austizz.ultimatebankingsystem.util.ItemStackDataCompat;
 import net.austizz.ultimatebankingsystem.util.MoneyText;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.chat.Component;
@@ -43,7 +48,7 @@ import java.util.regex.Pattern;
 final class UltimateBankingApiImpl implements UltimateBankingApi {
     private static final UUID SHOP_TERMINAL_ID = UUID.nameUUIDFromBytes("ultimatebankingsystem:shop-terminal".getBytes());
     private static final UUID API_EXTERNAL_ID = UUID.nameUUIDFromBytes("ultimatebankingsystem:api-external".getBytes());
-    private static final String API_VERSION = "2.1.1";
+    private static final String API_VERSION = "2.2.0";
     private static final int DEFAULT_TRANSACTION_LIMIT = 50;
     private static final int MAX_TRANSACTION_LIMIT = 500;
     private static final int MAX_REFERENCE_LENGTH = 160;
@@ -74,7 +79,22 @@ final class UltimateBankingApiImpl implements UltimateBankingApi {
             "%ubs_bank_reserve_<bank-uuid>%",
             "%ubs_bank_reserve_raw_<bank-uuid>%",
             "%ubs_bank_total_deposits_<bank-uuid>%",
-            "%ubs_bank_total_deposits_raw_<bank-uuid>%"
+            "%ubs_bank_total_deposits_raw_<bank-uuid>%",
+            "%ubs_job%",
+            "%ubs_job_id%",
+            "%ubs_job_level%",
+            "%ubs_job_xp%",
+            "%ubs_job_xp_to_next_level%",
+            "%ubs_job_daily_earnings%",
+            "%ubs_job_daily_earnings_raw%",
+            "%ubs_job_lifetime_earnings%",
+            "%ubs_job_lifetime_earnings_raw%",
+            "%ubs_job_daily_units%",
+            "%ubs_lumberjack_quote%",
+            "%ubs_lumberjack_market_money_family%",
+            "%ubs_lumberjack_market_xp_family%",
+            "%ubs_lumberjack_market_money_bonus%",
+            "%ubs_lumberjack_market_xp_bonus%"
     );
 
     private static final List<String> CANONICAL_PLACEHOLDERS = List.of(
@@ -84,7 +104,12 @@ final class UltimateBankingApiImpl implements UltimateBankingApi {
             "{ubs_account_count}", "{ubs_has_account}", "{ubs_has_primary_account}",
             "{ubs_cash_balance}", "{ubs_cash_balance_raw}", "{ubs_account_status}",
             "{ubs_owned_bank_count}", "{ubs_owns_bank}", "{ubs_owned_shop_count}", "{ubs_owns_shop}",
-            "{ubs_server_bank_count}", "{ubs_server_shop_count}"
+            "{ubs_server_bank_count}", "{ubs_server_shop_count}", "{ubs_job}", "{ubs_job_id}",
+            "{ubs_job_level}", "{ubs_job_xp}", "{ubs_job_xp_to_next_level}",
+            "{ubs_job_daily_earnings}", "{ubs_job_daily_earnings_raw}", "{ubs_job_lifetime_earnings}",
+            "{ubs_job_lifetime_earnings_raw}", "{ubs_job_daily_units}", "{ubs_lumberjack_quote}",
+            "{ubs_lumberjack_market_money_family}", "{ubs_lumberjack_market_xp_family}",
+            "{ubs_lumberjack_market_money_bonus}", "{ubs_lumberjack_market_xp_bonus}"
     );
 
     @Override
@@ -1547,14 +1572,17 @@ final class UltimateBankingApiImpl implements UltimateBankingApi {
         if (token == null || token.isBlank()) {
             return "";
         }
-        CentralBank centralBank = resolveCentralBank();
-        if (centralBank == null) {
-            return "";
-        }
         String trimmed = token.trim();
         String normalized = normalizePlaceholderToken(trimmed);
         normalized = normalized.toLowerCase(Locale.ROOT);
         if (!normalized.startsWith("ubs_")) {
+            return "";
+        }
+        if (isJobPlaceholder(normalized)) {
+            return resolveJobPlaceholder(playerId, normalized);
+        }
+        CentralBank centralBank = resolveCentralBank();
+        if (centralBank == null) {
             return "";
         }
 
@@ -1718,6 +1746,51 @@ final class UltimateBankingApiImpl implements UltimateBankingApi {
             return bankId == null ? "" : formatMoneyDisplay(getBankTotalDeposits(bankId).balanceAfter());
         }
 
+        return "";
+    }
+
+    private boolean isJobPlaceholder(String normalized) {
+        return normalized.startsWith("ubs_job") || normalized.startsWith("ubs_lumberjack_");
+    }
+
+    private String resolveJobPlaceholder(UUID playerId, String normalized) {
+        UltimateJobApi jobs = UltimateBankingApiProvider.jobs();
+        if ("ubs_lumberjack_market_money_family".equals(normalized)
+                || "ubs_lumberjack_market_xp_family".equals(normalized)
+                || "ubs_lumberjack_market_money_bonus".equals(normalized)
+                || "ubs_lumberjack_market_xp_bonus".equals(normalized)) {
+            ApiJobMarketSnapshot market = jobs.getLumberjackMarket();
+            if ("ubs_lumberjack_market_money_family".equals(normalized)) return market.moneySpotlightFamily();
+            if ("ubs_lumberjack_market_xp_family".equals(normalized)) return market.xpSpotlightFamily();
+            if ("ubs_lumberjack_market_money_bonus".equals(normalized)) {
+                return market.moneySpotlightBonusPercent() + "%";
+            }
+            return market.xpSpotlightBonusPercent() + "%";
+        }
+        if (playerId == null) return "";
+        Optional<ApiJobSnapshot> snapshot = jobs.getPlayerJob(playerId);
+        if (snapshot.isEmpty()) return "";
+        ApiJobSnapshot job = snapshot.get();
+        if ("ubs_job".equals(normalized)) return job.activeJobName().isBlank() ? "NONE" : job.activeJobName();
+        if ("ubs_job_id".equals(normalized)) return job.activeJobId();
+        if ("ubs_job_level".equals(normalized)) return String.valueOf(job.level());
+        if ("ubs_job_xp".equals(normalized)) return String.valueOf(job.xp());
+        if ("ubs_job_xp_to_next_level".equals(normalized)) return String.valueOf(job.xpToNextLevel());
+        if ("ubs_job_daily_earnings".equals(normalized)) return formatMoneyDisplay(job.dailyEarnings());
+        if ("ubs_job_daily_earnings_raw".equals(normalized)) return formatMoneyRaw(job.dailyEarnings());
+        if ("ubs_job_lifetime_earnings".equals(normalized)) return formatMoneyDisplay(job.lifetimeEarnings());
+        if ("ubs_job_lifetime_earnings_raw".equals(normalized)) return formatMoneyRaw(job.lifetimeEarnings());
+        if ("ubs_job_daily_units".equals(normalized)) {
+            return String.format(Locale.ROOT, "%.3f", job.dailyNormalizedRawUnitsMilli() / 1000.0D);
+        }
+        if ("ubs_lumberjack_quote".equals(normalized)) {
+            ServerPlayer player = resolveOnlinePlayer(playerId);
+            if (player == null || player.getMainHandItem().isEmpty()) return "-";
+            return jobs.getLumberjackQuote(BuiltInRegistries.ITEM.getKey(player.getMainHandItem().getItem()).toString())
+                    .map(ApiJobQuote::liveQuoteCents)
+                    .map(value -> formatMoneyDisplay(BigDecimal.valueOf(value, 2)))
+                    .orElse("-");
+        }
         return "";
     }
 

@@ -1,0 +1,99 @@
+{
+  "ambientocclusion": false,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "textures": {
+    "atm": "ultimatebankingsystem:block/atm_machine",
+    "particle": "#atm"
+  },
+  "elements": [
+    {
+      "name": "PIN ENTER row 2 column 3",
+      "from": [
+        6.49,
+        18.46,
+        1.02
+      ],
+      "to": [
+        7.17,
+        18.58,
+        1.49
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          8,
+          18.15,
+          -0.1
+        ]
+      },
+      "faces": {
+        "north": {
+          "uv": [
+            11.015625,
+            0.015625,
+            11.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            11.015625,
+            0.015625,
+            11.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            11.015625,
+            0.015625,
+            11.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            11.015625,
+            0.015625,
+            11.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            3.75,
+            11.5,
+            4.9375,
+            12.6875
+          ],
+          "texture": "#atm",
+          "rotation": 180,
+          "neoforge_data": {
+            "block_light": 12,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            11.015625,
+            0.015625,
+            11.984375,
+            0.984375
+          ],
+          "texture": "#atm"
+        }
+      },
+      "shade": false
+    }
+  ],
+  "render_type": "minecraft:solid"
+}

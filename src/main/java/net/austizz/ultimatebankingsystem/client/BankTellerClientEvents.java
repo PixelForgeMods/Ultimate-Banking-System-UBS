@@ -9,6 +9,7 @@ import net.austizz.ultimatebankingsystem.client.model.SafetyDepositBoxTrayModel;
 import net.austizz.ultimatebankingsystem.client.renderer.BankSafeIronBarGateItemRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.BankSafeIronBarGateRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.BankTellerRenderer;
+import net.austizz.ultimatebankingsystem.client.renderer.JobNpcRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.BankVaultDoorItemRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.BankVaultDoorRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.GlassCounterDisplayRenderer;
@@ -23,7 +24,10 @@ import net.austizz.ultimatebankingsystem.client.renderer.SecureSafeRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.ShopSellingTableRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.ShoppingBasketRenderer;
 import net.austizz.ultimatebankingsystem.client.renderer.TallWallShelfRenderer;
+import net.austizz.ultimatebankingsystem.client.renderer.VendingMachineRenderer;
 import net.austizz.ultimatebankingsystem.block.entity.ModBlockEntities;
+import net.austizz.ultimatebankingsystem.item.ModItems;
+import net.austizz.ultimatebankingsystem.client.renderer.CreditCardItemRenderer;
 import net.austizz.ultimatebankingsystem.entity.ModEntities;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -41,10 +45,13 @@ public final class BankTellerClientEvents {
 
     @SubscribeEvent
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlockEntities.ATM.get(), net.austizz.ultimatebankingsystem.client.renderer.AtmButtonRenderer::new);
         event.registerEntityRenderer(ModEntities.BANK_TELLER.get(), BankTellerRenderer::new);
+        event.registerEntityRenderer(ModEntities.JOB_NPC.get(), JobNpcRenderer::new);
         event.registerEntityRenderer(ModEntities.SAFETY_DEPOSIT_BOX_DISPLAY_PROXY.get(),
                 SafetyDepositBoxDisplayProxyRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.TALL_WALL_SHELF.get(), TallWallShelfRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.VENDING_MACHINE.get(), VendingMachineRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SHOP_SELLING_TABLE.get(), ShopSellingTableRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.SHOPPING_BASKET.get(), ShoppingBasketRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.PALLET.get(), PalletRenderer::new);
@@ -69,6 +76,18 @@ public final class BankTellerClientEvents {
 
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new IClientItemExtensions() {
+            private CreditCardItemRenderer renderer;
+
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                if (renderer == null) {
+                    var mc = Minecraft.getInstance();
+                    renderer = new CreditCardItemRenderer(mc.getBlockEntityRenderDispatcher(), mc.getEntityModels());
+                }
+                return renderer;
+            }
+        }, ModItems.CREDIT_CARD.get());
         event.registerItem(new IClientItemExtensions() {
             private BankVaultDoorItemRenderer renderer;
 

@@ -1564,34 +1564,44 @@ public final class ShopCashierInteractionManager {
         }
         int lowThreshold = ShopService.shopCashierLowBagThreshold();
         Map<String, Integer> bagCountCache = new HashMap<>();
+        List<BankTellerEntity> cashierSnapshot = new ArrayList<>();
 
         for (ServerLevel level : server.getAllLevels()) {
             for (Entity entity : level.getAllEntities()) {
                 if (!(entity instanceof BankTellerEntity cashier) || !cashier.isCashier()) {
                     continue;
                 }
-                UUID ownerId = cashier.getOwnerUUID();
-                UUID shopId = cashier.getShopId();
-                if (ownerId == null || shopId == null) {
-                    continue;
-                }
-
-                String cacheKey = ownerId + "|" + shopId;
-                int bagCount = bagCountCache.computeIfAbsent(
-                        cacheKey,
-                        ignored -> ShopService.countShoppingBagsInStockroom(server, centralBank, ownerId, shopId)
-                );
-                String warning = null;
-                ChatFormatting warningColor = ChatFormatting.GREEN;
-                if (bagCount <= 0) {
-                    warning = "Shopping Bags Out Of Stock";
-                    warningColor = ChatFormatting.RED;
-                } else if (bagCount <= lowThreshold) {
-                    warning = "Shopping Bags Low: " + bagCount;
-                    warningColor = ChatFormatting.GOLD;
-                }
-                updateCashierHologram(cashier, warning, warningColor);
+                cashierSnapshot.add(cashier);
             }
+        }
+
+        // Stockroom scans can touch world state, so never run them while the
+        // live entity lookup iterator is open.
+        for (BankTellerEntity cashier : cashierSnapshot) {
+            if (!cashier.isAlive() || !cashier.isCashier()) {
+                continue;
+            }
+            UUID ownerId = cashier.getOwnerUUID();
+            UUID shopId = cashier.getShopId();
+            if (ownerId == null || shopId == null) {
+                continue;
+            }
+
+            String cacheKey = ownerId + "|" + shopId;
+            int bagCount = bagCountCache.computeIfAbsent(
+                    cacheKey,
+                    ignored -> ShopService.countShoppingBagsInStockroom(server, centralBank, ownerId, shopId)
+            );
+            String warning = null;
+            ChatFormatting warningColor = ChatFormatting.GREEN;
+            if (bagCount <= 0) {
+                warning = "Shopping Bags Out Of Stock";
+                warningColor = ChatFormatting.RED;
+            } else if (bagCount <= lowThreshold) {
+                warning = "Shopping Bags Low: " + bagCount;
+                warningColor = ChatFormatting.GOLD;
+            }
+            updateCashierHologram(cashier, warning, warningColor);
         }
     }
 

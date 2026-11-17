@@ -5,15 +5,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static net.austizz.ultimatebankingsystem.bank.owner.setup.SafeStaffReadinessTestSupport.EMPLOYEE_ID;
-import static net.austizz.ultimatebankingsystem.bank.owner.setup.SafeStaffReadinessTestSupport.STAFFING_LABEL;
-import static net.austizz.ultimatebankingsystem.bank.owner.setup.SafeStaffReadinessTestSupport.STAFFING_REASON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SharedStaffReadinessConsumerTest {
     @Test
-    void premiseConsumerStopsReportingReadyAfterLastSafeAccessRevoke() throws Exception {
+    void premiseConsumerStaysReadyAfterLastSafeAccessRevoke() throws Exception {
         SafeStaffReadinessTestSupport.Scenario scenario = SafeStaffReadinessTestSupport.scenario();
         Object metadata = SafeStaffReadinessTestSupport.metadataWithEmployee();
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation("grantSafeAccess", metadata, EMPLOYEE_ID));
@@ -22,37 +20,33 @@ class SharedStaffReadinessConsumerTest {
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation("revokeSafeAccess", metadata, EMPLOYEE_ID));
 
-        assertEquals("NOT_READY", SafeStaffReadinessTestSupport.value(
+        assertEquals("READY", SafeStaffReadinessTestSupport.value(
                 SafeStaffReadinessTestSupport.premiseProjection(scenario, metadata), "status").toString(),
-                "the premise consumer must not retain raw READY after the last Safe Access revoke");
+                "staffing changes must not gate the safe premise");
     }
 
     @Test
-    void sharedProjectionPreservesOtherReasonsOrderingLabelsAndReferences() throws Exception {
+    void premiseProjectionPreservesStructuralReasonsAfterSafeAccessGrant() throws Exception {
         SafeStaffReadinessTestSupport.Scenario scenario =
                 SafeStaffReadinessTestSupport.scenario("VAULT_DOOR_MISSING", "TELLER_ROUTE_MISSING");
         Object metadata = SafeStaffReadinessTestSupport.metadataWithEmployee();
 
-        Object blocked = SafeStaffReadinessTestSupport.project(metadata, scenario.readiness());
+        Object blocked = scenario.readiness();
         Object blockedSummary = SafeStaffReadinessTestSupport.value(blocked, "summary");
-        assertEquals(List.of("VAULT_DOOR_MISSING", "TELLER_ROUTE_MISSING", STAFFING_REASON),
+        assertEquals(List.of("VAULT_DOOR_MISSING", "TELLER_ROUTE_MISSING"),
                 SafeStaffReadinessTestSupport.listValue(blockedSummary, "missingReasons").stream()
                         .map(Object::toString).toList());
         assertEquals(List.of(
                         "Complete BANK_VAULT_DOOR multiblock is missing.",
-                        "Bank-bound teller outbound and return routes are missing.",
-                        STAFFING_LABEL),
+                        "Bank-bound teller outbound and return routes are missing."),
                 SafeStaffReadinessTestSupport.listValue(blocked, "humanMissingReasons"));
         assertSame(scenario.premise(), SafeStaffReadinessTestSupport.value(blocked, "premise"));
         assertSame(scenario.area(), SafeStaffReadinessTestSupport.value(blocked, "safeArea"));
         assertSame(scenario.vault(), SafeStaffReadinessTestSupport.value(blocked, "vault"));
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation("grantSafeAccess", metadata, EMPLOYEE_ID));
-        Object granted = SafeStaffReadinessTestSupport.project(metadata, blocked);
-        Object grantedSummary = SafeStaffReadinessTestSupport.value(granted, "summary");
-        assertEquals(List.of("VAULT_DOOR_MISSING", "TELLER_ROUTE_MISSING"),
-                SafeStaffReadinessTestSupport.listValue(grantedSummary, "missingReasons").stream()
-                        .map(Object::toString).toList());
+        assertEquals("NOT_READY", SafeStaffReadinessTestSupport.value(
+                SafeStaffReadinessTestSupport.premiseProjection(scenario, metadata), "status").toString());
         assertEquals(EMPLOYEE_ID + "=STAFF:125.50",
                 SafeStaffReadinessTestSupport.getString(metadata, "employees"));
     }
@@ -62,7 +56,7 @@ class SharedStaffReadinessConsumerTest {
         Object metadata = SafeStaffReadinessTestSupport.setupMetadataWithEmployee();
 
         assertPublicReasons(metadata, List.of(
-                "VAULT_DOOR_MISSING", "ASSIGNABLE_ROW_MISSING", "VIEWING_ROOM_MISSING", STAFFING_REASON));
+                "VAULT_DOOR_MISSING", "ASSIGNABLE_ROW_MISSING", "VIEWING_ROOM_MISSING"));
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation("grantSafeAccess", metadata, EMPLOYEE_ID));
         assertPublicReasons(metadata, List.of(
@@ -70,7 +64,7 @@ class SharedStaffReadinessConsumerTest {
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation("revokeSafeAccess", metadata, EMPLOYEE_ID));
         assertPublicReasons(metadata, List.of(
-                "VAULT_DOOR_MISSING", "ASSIGNABLE_ROW_MISSING", "VIEWING_ROOM_MISSING", STAFFING_REASON));
+                "VAULT_DOOR_MISSING", "ASSIGNABLE_ROW_MISSING", "VIEWING_ROOM_MISSING"));
         assertEquals(EMPLOYEE_ID + "=STAFF:125.50",
                 SafeStaffReadinessTestSupport.getString(metadata, "employees"));
     }
@@ -87,9 +81,8 @@ class SharedStaffReadinessConsumerTest {
         assertEquals("premise-1", SafeStaffReadinessTestSupport.value(vault, "premiseId"));
         assertEquals("safe-area-1", SafeStaffReadinessTestSupport.value(vault, "safeAreaId"));
         assertEquals("vault-1", SafeStaffReadinessTestSupport.value(vault, "vaultId"));
-        assertEquals(expectedReasons.contains(STAFFING_REASON),
-                SafeStaffReadinessTestSupport.listValue(
-                        SafeStaffReadinessTestSupport.value(setup, "objective"), "missingSteps")
-                        .contains(STAFFING_LABEL));
+        assertEquals(false, SafeStaffReadinessTestSupport.listValue(
+                SafeStaffReadinessTestSupport.value(setup, "objective"), "missingSteps")
+                .stream().anyMatch(reason -> reason.toString().contains("Safe Access")));
     }
 }

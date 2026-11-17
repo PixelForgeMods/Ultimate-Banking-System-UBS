@@ -77,7 +77,7 @@ public final class AccountLoan {
         return periodicPayment;
     }
 
-    public long getCreatedAtGameTime() {
+    public long getCreaterdAtGameTime() {
         return createdAtGameTime;
     }
 

@@ -37,6 +37,7 @@ public final class CreditCardService {
     public static final String TAG_ACCOUNT_ID = "ubs_cc_account";
     public static final String TAG_BANK_ID = "ubs_cc_bank";
     public static final String TAG_BANK_NAME = "ubs_cc_bank_name";
+    public static final String TAG_HOLDER_NAME = "ubs_cc_holder_name";
     public static final String TAG_OWNER_ID = "ubs_cc_owner";
     public static final String TAG_CARD_NUMBER = "ubs_cc_number";
     public static final String TAG_CVC = "ubs_cc_cvc";
@@ -210,6 +211,11 @@ public final class CreditCardService {
         }
 
         boolean stackUpdated = false;
+        String holderName = readNonBlank(record, "holderName", "");
+        if (!holderName.equals(tag.getString(TAG_HOLDER_NAME))) {
+            tag.putString(TAG_HOLDER_NAME, holderName);
+            stackUpdated = true;
+        }
         String stackBankName = readNonBlank(tag, TAG_BANK_NAME, "");
         if (!bankName.isBlank() && !bankName.equals(stackBankName)) {
             tag.putString(TAG_BANK_NAME, bankName);
@@ -496,6 +502,7 @@ public final class CreditCardService {
             tag.putUUID(TAG_BANK_ID, record.getUUID("bankId"));
         }
         tag.putString(TAG_BANK_NAME, readNonBlank(record, "bankName", ""));
+        tag.putString(TAG_HOLDER_NAME, readNonBlank(record, "holderName", ""));
         if (record.hasUUID("ownerPlayerId")) {
             tag.putUUID(TAG_OWNER_ID, record.getUUID("ownerPlayerId"));
         }

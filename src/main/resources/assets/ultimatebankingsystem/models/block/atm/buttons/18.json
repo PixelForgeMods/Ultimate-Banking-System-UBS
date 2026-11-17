@@ -1,0 +1,1535 @@
+{
+  "ambientocclusion": false,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "textures": {
+    "atm": "ultimatebankingsystem:block/atm_machine",
+    "particle": "#atm"
+  },
+  "elements": [
+    {
+      "name": "FDK L3 round button segment 0",
+      "from": [
+        11.56983,
+        23.39422,
+        1.77
+      ],
+      "to": [
+        11.73017,
+        23.43311,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 1",
+      "from": [
+        11.51956,
+        23.43311,
+        1.77
+      ],
+      "to": [
+        11.78044,
+        23.472,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 2",
+      "from": [
+        11.49323,
+        23.472,
+        1.77
+      ],
+      "to": [
+        11.80677,
+        23.51089,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 3",
+      "from": [
+        11.47938,
+        23.51089,
+        1.77
+      ],
+      "to": [
+        11.82062,
+        23.54977,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 4",
+      "from": [
+        11.475,
+        23.54977,
+        1.77
+      ],
+      "to": [
+        11.825,
+        23.58866,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 5",
+      "from": [
+        11.47938,
+        23.58866,
+        1.77
+      ],
+      "to": [
+        11.82062,
+        23.62755,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 6",
+      "from": [
+        11.49323,
+        23.62755,
+        1.77
+      ],
+      "to": [
+        11.80677,
+        23.66644,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 7",
+      "from": [
+        11.51956,
+        23.66644,
+        1.77
+      ],
+      "to": [
+        11.78044,
+        23.70533,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 round button segment 8",
+      "from": [
+        11.56983,
+        23.70533,
+        1.77
+      ],
+      "to": [
+        11.73017,
+        23.74422,
+        1.94
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 13,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            6.49609375,
+            0.49609375,
+            6.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 10,
+            "sky_light": 0,
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "FDK L3 dark center 0",
+      "from": [
+        11.59273,
+        23.44422,
+        1.74
+      ],
+      "to": [
+        11.70727,
+        23.472,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 1",
+      "from": [
+        11.55683,
+        23.472,
+        1.74
+      ],
+      "to": [
+        11.74317,
+        23.49977,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 2",
+      "from": [
+        11.53802,
+        23.49977,
+        1.74
+      ],
+      "to": [
+        11.76198,
+        23.52755,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 3",
+      "from": [
+        11.52813,
+        23.52755,
+        1.74
+      ],
+      "to": [
+        11.77187,
+        23.55533,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 4",
+      "from": [
+        11.525,
+        23.55533,
+        1.74
+      ],
+      "to": [
+        11.775,
+        23.58311,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 5",
+      "from": [
+        11.52813,
+        23.58311,
+        1.74
+      ],
+      "to": [
+        11.77187,
+        23.61089,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 6",
+      "from": [
+        11.53802,
+        23.61089,
+        1.74
+      ],
+      "to": [
+        11.76198,
+        23.63866,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 7",
+      "from": [
+        11.55683,
+        23.63866,
+        1.74
+      ],
+      "to": [
+        11.74317,
+        23.66644,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    },
+    {
+      "name": "FDK L3 dark center 8",
+      "from": [
+        11.59273,
+        23.66644,
+        1.74
+      ],
+      "to": [
+        11.70727,
+        23.69422,
+        1.79
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "east": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "south": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "west": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "up": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        },
+        "down": {
+          "uv": [
+            5.49609375,
+            0.49609375,
+            5.50390625,
+            0.50390625
+          ],
+          "texture": "#atm"
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:solid"
+}

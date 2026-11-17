@@ -20,6 +20,7 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModBlocks.ATM_MACHINE.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(ModBlocks.ATM_MACHINE.get());
+                        output.accept(ModBlocks.IN_WALL_ATM.get());
                         output.accept(ModBlocks.BANK_OWNER_PC.get());
                         output.accept(ModItems.BANK_TELLER_SPAWN_EGG.get());
                         output.accept(ModItems.BANK_NOTE.get());
@@ -76,6 +77,8 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModBlocks.PAYMENT_TERMINAL.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(ModBlocks.PAYMENT_TERMINAL.get());
+                        output.accept(ModBlocks.VENDING_MACHINE.get());
+                        output.accept(ModBlocks.CREATIVE_VENDING_MACHINE.get());
                         output.accept(ModItems.HANDHELD_PAYMENT_TERMINAL.get());
                         output.accept(ModItems.CASHIER_SPAWN_EGG.get());
                         output.accept(ModBlocks.COLOR_BUTTON_BLOCK.get());
@@ -142,6 +145,27 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.OVE9000_SAW.get());
                         output.accept(ModItems.OVE9000_SAW_BLADE.get());
                         output.accept(ModBlocks.HEIST_DUFFEL.get());
+                    })
+                    .build()
+    );
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> JOBS_TAB = CREATIVE_TABS.register("jobs", () ->
+            CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.ultimatebankingsystem.jobs"))
+                    .icon(() -> new ItemStack(ModItems.JOB_MARKET_SPAWN_EGG.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.JOB_MARKET_SPAWN_EGG.get());
+                        output.accept(ModItems.LUMBERJACK_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.MINER_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.FISHERMAN_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.FARMER_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.HUNTER_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.BLACKSMITH_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.COURIER_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.CHEF_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.HERBALIST_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.SALVAGER_BUYER_SPAWN_EGG.get());
+                        output.accept(ModItems.TAILOR_BUYER_SPAWN_EGG.get());
                     })
                     .build()
     );

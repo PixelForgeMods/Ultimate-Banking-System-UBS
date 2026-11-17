@@ -1,0 +1,96 @@
+{
+  "model": "atm_machine_hyosung_5te",
+  "reference": "User-supplied Hyosung 5TE / MX5700TE brochure and product image",
+  "brochure_dimensions_mm": {
+    "height": 1445,
+    "width": 770,
+    "depth": 1238
+  },
+  "model_coordinates": "Java block model units; adapted proportions, not a mechanical CAD model",
+  "texture": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+  "texture_resolution": [
+    2048,
+    2048
+  ],
+  "touchscreen": true,
+  "optional_function_keys": false,
+  "anchors": {
+    "screen_center": [
+      17.85,
+      25.918515522815003,
+      5.768108656305202
+    ],
+    "screen_local_bounds": {
+      "from": [
+        13.08,
+        21.9761,
+        3.49
+      ],
+      "to": [
+        22.62,
+        30.6061,
+        3.52
+      ],
+      "rotation": [
+        22.5,
+        0,
+        0
+      ],
+      "origin": [
+        16,
+        20.4161,
+        3.7
+      ]
+    },
+    "card_slot": [
+      10.635,
+      26.836167200099567,
+      5.7477273124627
+    ],
+    "receipt_slot": [
+      10.61,
+      29.09955940326769,
+      6.999148798069253
+    ],
+    "cash_slot": [
+      18.65,
+      20.75567038849698,
+      3.494289156202184
+    ],
+    "screen_and_slot_normal": [
+      0,
+      0.3826834323650898,
+      -0.9238795325112867
+    ],
+    "keypad_origin": [
+      16,
+      18.266099999999998,
+      -0.1
+    ],
+    "keypad_press_direction": [
+      0,
+      -0.9238795325112867,
+      0.3826834323650898
+    ]
+  },
+  "moving_groups": [
+    "Moving cash shutter",
+    "Key 1",
+    "Key 2",
+    "Key 3",
+    "Key CANCEL",
+    "Key 4",
+    "Key 5",
+    "Key 6",
+    "Key CLEAR",
+    "Key 7",
+    "Key 8",
+    "Key 9",
+    "Key ENTER",
+    "Key blank 13",
+    "Key 0",
+    "Key blank 15",
+    "Key blank 16"
+  ],
+  "runtime_status": "Integrated as the two-by-three in-wall variant, with six independent full-depth copycat cells and an eye-level touchscreen."
+}

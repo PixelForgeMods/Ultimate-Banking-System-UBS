@@ -78,6 +78,7 @@ public final class SafetyDepositBoxService {
     public static final String ASSIGNMENTS_KEY = "safeDepositAssignments";
     public static final String ESCROW_KEY = "safeDepositEscrow";
     public static final String NEXT_NUMBER_KEY = "safeDepositNextNumber";
+    private static final String ROW_WITNESSES_KEY = "safeDepositReadyRows";
     public static final String POLICY_MODE_KEY = "safeDepositPolicyMode";
     public static final String ONE_TIME_FEE_KEY = "safeDepositOneTimeFee";
     public static final String RENT_AMOUNT_KEY = "safeDepositRentAmount";
@@ -169,6 +170,56 @@ public final class SafetyDepositBoxService {
         return safeDepositSetupSnapshot(metadata);
     }
 
+    public static void recordFullyAssignableRow(ServerLevel level, BlockPos pos,
+                                                 SafetyDepositBoxRowBlockEntity row) {
+        if (level == null || pos == null || row == null || !row.isFullyAssignableRow()) {
+            return;
+        }
+        CentralBank centralBank = BankManager.getCentralBank(level.getServer());
+        UUID bankId = findBankIdForSafeArea(centralBank, level, pos);
+        if (bankId == null) {
+            return;
+        }
+        CompoundTag metadata = centralBank.getOrCreateBankMetadata(bankId);
+        String dimension = level.dimension().location().toString();
+        for (SafePremiseSnapshot premise : safeDepositSetupSnapshot(metadata).premises()) {
+            for (SafeAreaSnapshot area : premise.safeAreas()) {
+                if (area != null && area.bounds() != null
+                        && area.bounds().contains(dimension, pos.getX(), pos.getY(), pos.getZ())) {
+                    rememberReadyRow(metadata, area.id(), dimension, pos);
+                }
+            }
+        }
+    }
+
+    private static void rememberReadyRow(CompoundTag metadata, String areaId, String dimension, BlockPos pos) {
+        CompoundTag witnesses = metadata.getCompound(ROW_WITNESSES_KEY);
+        CompoundTag current = witnesses.getCompound(areaId);
+        if (dimension.equals(current.getString("dimension"))
+                && pos.getX() == current.getInt("x")
+                && pos.getY() == current.getInt("y")
+                && pos.getZ() == current.getInt("z")) {
+            return;
+        }
+        CompoundTag witness = new CompoundTag();
+        witness.putString("dimension", dimension);
+        witness.putInt("x", pos.getX());
+        witness.putInt("y", pos.getY());
+        witness.putInt("z", pos.getZ());
+        witnesses.put(areaId, witness);
+        metadata.put(ROW_WITNESSES_KEY, witnesses);
+        BankManager.markDirty();
+    }
+
+    private static void forgetReadyRow(CompoundTag metadata, String areaId) {
+        CompoundTag witnesses = metadata.getCompound(ROW_WITNESSES_KEY);
+        if (witnesses.contains(areaId)) {
+            witnesses.remove(areaId);
+            metadata.put(ROW_WITNESSES_KEY, witnesses);
+            BankManager.markDirty();
+        }
+    }
+
     public static SafeVaultReadinessResolver.RowReadiness safeDepositVaultReadiness(MinecraftServer server,
                                                                                     CompoundTag metadata,
                                                                                     SafeVaultReadinessResolver.RowLocation location) {
@@ -182,9 +233,7 @@ public final class SafetyDepositBoxService {
         SafeVaultReadinessResolver.LoadedWorldFacts facts = loadedWorldFacts(server, snapshot, metadata);
         SafeTellerRoutePairResolver.Context routes = new SafeTellerRoutePairResolver.Context(metadata);
         return new SafeVaultReadinessOperation(snapshot,
-                new SafeVaultReadinessResolver.EvaluationContext(routes, facts),
-                BankStaffingService.hasEligibleSafeAccessEmployee(
-                        server, metadata, setupBankId(snapshot).orElse(null)));
+                new SafeVaultReadinessResolver.EvaluationContext(routes, facts));
     }
 
     private static Optional<UUID> setupBankId(SafeDepositSetupSnapshot snapshot) {
@@ -235,30 +284,6 @@ public final class SafetyDepositBoxService {
         return List.copyOf(readiness);
     }
 
-    public static SafeVaultReadinessResolver.RowReadiness applyStaffingReadiness(
-            CompoundTag metadata,
-            SafeVaultReadinessResolver.RowReadiness readiness) {
-        return applyStaffingReadiness(BankStaffingService.hasEligibleSafeAccessEmployee(metadata), readiness);
-    }
-
-    public static List<SafeVaultReadinessResolver.RowReadiness> applyStaffingReadiness(
-            CompoundTag metadata,
-            List<SafeVaultReadinessResolver.RowReadiness> readiness) {
-        if (readiness == null || readiness.isEmpty()) {
-            return List.of();
-        }
-        boolean eligibleSafeAccessStaff = BankStaffingService.hasEligibleSafeAccessEmployee(metadata);
-        return readiness.stream()
-                .map(row -> applyStaffingReadiness(eligibleSafeAccessStaff, row))
-                .toList();
-    }
-
-    private static SafeVaultReadinessResolver.RowReadiness applyStaffingReadiness(
-            boolean eligibleSafeAccessStaff,
-            SafeVaultReadinessResolver.RowReadiness readiness) {
-        return SafeVaultReadinessResolver.withEligibleSafeAccessStaff(readiness, eligibleSafeAccessStaff);
-    }
-
     public static Optional<BlockPos> resolveEscortVaultDoorMaster(MinecraftServer server,
                                                                    CompoundTag metadata,
                                                                    SafeVaultReadinessResolver.RowLocation location) {
@@ -272,15 +297,7 @@ public final class SafetyDepositBoxService {
     public static boolean shouldSkipVaultForAssignment(
             CompoundTag metadata,
             SafeVaultReadinessResolver.RowReadiness readiness) {
-        return shouldSkipVaultForAssignment(
-                BankStaffingService.hasEligibleSafeAccessEmployee(metadata), readiness);
-    }
-
-    private static boolean shouldSkipVaultForAssignment(
-            boolean eligibleSafeAccessStaff,
-            SafeVaultReadinessResolver.RowReadiness readiness) {
-        SafeVaultReadinessResolver.RowReadiness current = applyStaffingReadiness(eligibleSafeAccessStaff, readiness);
-        return current.summary() != null && !current.summary().ready();
+        return readiness != null && readiness.summary() != null && !readiness.summary().ready();
     }
 
     public static ActionResult validateVaultAccessForReadiness(boolean managementAccess,
@@ -1765,6 +1782,11 @@ public final class SafetyDepositBoxService {
         }
         SafeDepositSetupNbtCodec.migrateLegacy(stagedMetadata, bankId);
         centralBank.putBankMetadata(bankId, stagedMetadata);
+        for (LoadedSafeRow loaded : collectLoadedSafeRows(server, areas)) {
+            if (loaded.strictClaim() && loaded.row().isFullyAssignableRow()) {
+                recordFullyAssignableRow(levelForDimension(server, loaded.dimension()), loaded.pos(), loaded.row());
+            }
+        }
         return ActionResult.ok("Safe area claimed for " + bank.getBankName() + ".");
     }
 
@@ -2333,6 +2355,7 @@ public final class SafetyDepositBoxService {
         List<SafeVaultReadinessResolver.LoadedRowSnapshot> rows = new ArrayList<>();
         Set<String> seenRows = new HashSet<>();
         List<SafeBlockBounds> rowBounds = new ArrayList<>();
+        List<SafeAreaSnapshot> safeAreas = new ArrayList<>();
         for (var premise : snapshot.premises()) {
             if (premise == null) {
                 continue;
@@ -2342,6 +2365,7 @@ public final class SafetyDepositBoxService {
                     continue;
                 }
                 rowBounds.add(safeArea.bounds());
+                safeAreas.add(safeArea);
                 ServerLevel level = levelForDimension(server, safeArea.bounds().dimension());
                 if (level == null) {
                     continue;
@@ -2377,6 +2401,38 @@ public final class SafetyDepositBoxService {
                         pos,
                         row.getModuleTypesSnapshot()
                 ));
+            }
+        }
+        for (SafeAreaSnapshot area : safeAreas) {
+            SafeVaultReadinessResolver.LoadedRowSnapshot loaded = rows.stream()
+                    .filter(row -> area.bounds().contains(row.dimension(),
+                            row.pos().getX(), row.pos().getY(), row.pos().getZ()))
+                    .filter(row -> SafetyDepositBoxRowBlockEntity.isFullyAssignableRow(row.moduleTypes()))
+                    .findFirst().orElse(null);
+            if (loaded != null) {
+                rememberReadyRow(metadata, area.id(), loaded.dimension(), loaded.pos());
+                continue;
+            }
+            CompoundTag witness = metadata.getCompound(ROW_WITNESSES_KEY).getCompound(area.id());
+            if (!witness.contains("dimension") || !witness.contains("x")
+                    || !witness.contains("y") || !witness.contains("z")) {
+                continue;
+            }
+            String dimension = witness.getString("dimension");
+            BlockPos pos = new BlockPos(witness.getInt("x"), witness.getInt("y"), witness.getInt("z"));
+            ServerLevel level = levelForDimension(server, dimension);
+            if (level == null || !area.bounds().contains(dimension, pos.getX(), pos.getY(), pos.getZ())) {
+                forgetReadyRow(metadata, area.id());
+                continue;
+            }
+            level.getChunk(pos);
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (level.getBlockState(pos).is(ModBlocks.SAFETY_DEPOSIT_BOX_ROW.get())
+                    && blockEntity instanceof SafetyDepositBoxRowBlockEntity row && row.isFullyAssignableRow()) {
+                rows.add(new SafeVaultReadinessResolver.LoadedRowSnapshot(dimension, pos,
+                        row.getModuleTypesSnapshot()));
+            } else {
+                forgetReadyRow(metadata, area.id());
             }
         }
         UUID bankId = setupBankId(snapshot).orElse(null);
@@ -2417,7 +2473,7 @@ public final class SafetyDepositBoxService {
         List<LoadedSafeStructureIndex.Entry> indexedDoors = LoadedSafeStructureIndex.findInBounds(
                 level.getServer(),
                 LoadedSafeStructureIndex.Kind.VAULT_DOOR_MASTER,
-                List.of(premise.bounds()),
+                List.of(vaultDoorSearchBounds(safeArea.bounds())),
                 entry -> loadedVaultDoorMasterAt(level, entry.blockPos()),
                 entry -> completeDoorMasterWithin(level, premise, safeArea, entry.blockPos()) != null
         );
@@ -2437,17 +2493,9 @@ public final class SafetyDepositBoxService {
                 || safeArea == null || safeArea.bounds() == null) {
             return;
         }
-        SafeBlockBounds premiseBounds = premise.bounds();
-        SafeBlockBounds safeBounds = safeArea.bounds();
-        int minX = Math.max(premiseBounds.minX(), safeBounds.minX() - 4);
-        int maxX = Math.min(premiseBounds.maxX(), safeBounds.maxX() + 4);
-        int minZ = Math.max(premiseBounds.minZ(), safeBounds.minZ() - 4);
-        int maxZ = Math.min(premiseBounds.maxZ(), safeBounds.maxZ() + 4);
-        if (minX > maxX || minZ > maxZ) {
-            return;
-        }
-        for (int chunkX = minX >> 4; chunkX <= maxX >> 4; chunkX++) {
-            for (int chunkZ = minZ >> 4; chunkZ <= maxZ >> 4; chunkZ++) {
+        SafeBlockBounds searchBounds = vaultDoorSearchBounds(safeArea.bounds());
+        for (int chunkX = searchBounds.minX() >> 4; chunkX <= searchBounds.maxX() >> 4; chunkX++) {
+            for (int chunkZ = searchBounds.minZ() >> 4; chunkZ <= searchBounds.maxZ() >> 4; chunkZ++) {
                 LevelChunk chunk = level.getChunkSource().getChunkNow(chunkX, chunkZ);
                 if (chunk == null) {
                     continue;
@@ -2457,7 +2505,7 @@ public final class SafetyDepositBoxService {
                         continue;
                     }
                     BlockPos master = blockEntity.getBlockPos();
-                    if (premiseBounds.contains(level.dimension().location().toString(),
+                    if (searchBounds.contains(level.dimension().location().toString(),
                             master.getX(), master.getY(), master.getZ())) {
                         LoadedSafeStructureIndex.register(
                                 level, master, LoadedSafeStructureIndex.Kind.VAULT_DOOR_MASTER);
@@ -2465,6 +2513,12 @@ public final class SafetyDepositBoxService {
                 }
             }
         }
+    }
+
+    private static SafeBlockBounds vaultDoorSearchBounds(SafeBlockBounds safeBounds) {
+        return new SafeBlockBounds(safeBounds.dimension(),
+                safeBounds.minX() - 4, safeBounds.minY() - 3, safeBounds.minZ() - 4,
+                safeBounds.maxX() + 4, safeBounds.maxY() + 3, safeBounds.maxZ() + 4);
     }
 
     private static boolean loadedVaultDoorMasterAt(ServerLevel level, BlockPos pos) {
@@ -2500,13 +2554,12 @@ public final class SafetyDepositBoxService {
         }
         boolean intersectsSafeArea = false;
         for (BlockPos part : BankVaultDoorBlock.multiblockPartPositions(level, master)) {
-            if (!premise.bounds().contains(premise.bounds().dimension(), part.getX(), part.getY(), part.getZ())) {
-                return null;
-            }
             if (loadedBlockState(level, part) == null) {
                 return null;
             }
-            intersectsSafeArea |= safeArea.bounds().contains(
+            intersectsSafeArea |= premise.bounds().contains(
+                    premise.bounds().dimension(), part.getX(), part.getY(), part.getZ())
+                    && safeArea.bounds().contains(
                     safeArea.bounds().dimension(), part.getX(), part.getY(), part.getZ());
         }
         if (!intersectsSafeArea) {

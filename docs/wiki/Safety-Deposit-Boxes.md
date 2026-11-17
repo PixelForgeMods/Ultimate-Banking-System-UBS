@@ -1,6 +1,6 @@
 # Safety Deposit Boxes
 
-Safety-deposit service is a physical bank feature. A bank cannot lease boxes until its premises, vault, rows, staff, and private viewing infrastructure are valid.
+Safety-deposit service is a physical bank feature. A bank cannot lease boxes until its premises, vault, rows, and private viewing infrastructure are valid.
 
 ## Required Setup
 
@@ -9,11 +9,10 @@ At least one vault must have all of the following:
 1. A claimed bank premise with a valid outside exit.
 2. A safe area nested inside that premise.
 3. A complete loaded `bank_vault_door` multiblock inside the safe area.
-4. At least one loaded deposit-row block whose usable positions are fully populated with box modules.
-5. At least one current bank employee with `Safe Access` (operators satisfy this for the Central Bank).
-6. At least one ready private viewing room associated with the premise.
+4. At least one deposit-row block whose usable positions are fully populated with box modules.
+5. At least one ready private viewing room associated with the premise.
 
-Readiness is recalculated from current world state. Removing a required door, row, permission, or room suspends new/physical access but does not delete assignments, rent records, escrow, or customer contents. Restoring the requirement re-enables service.
+Readiness is recalculated from current world state. A completed row stays recognized when its chunk unloads; UBS reloads and verifies that row on the next check. Removing a required door, row, or room suspends new/physical access but does not delete assignments, rent records, escrow, or customer contents. Restoring the requirement re-enables service.
 
 ## Deposit Rows
 
@@ -86,4 +85,3 @@ Legacy account commands remain for compatible worlds:
 ```
 
 Normal physical access should use the Bank Teller.
-

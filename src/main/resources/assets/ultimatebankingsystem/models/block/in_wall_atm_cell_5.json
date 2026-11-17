@@ -1,0 +1,1202 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Upper housing right side",
+      "from": [
+        7.370000000000001,
+        0,
+        3.2
+      ],
+      "to": [
+        7.699999999999999,
+        6.116100000000003,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            2.475594008264463,
+            0.078125,
+            2.921875,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.524405991735537,
+            0.3181463662790699
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            2.078125,
+            0.078125,
+            2.921875,
+            0.5244059917355373
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Upper housing top",
+      "from": [
+        0,
+        5.766100000000002,
+        3.2
+      ],
+      "to": [
+        7.370000000000001,
+        6.116100000000003,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.4755940082644627,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.5244059917355373
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.4755940082644628,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Concealed electronics enclosure",
+      "from": [
+        0,
+        0,
+        8.5
+      ],
+      "to": [
+        7.359999999999999,
+        5.716100000000004,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.078125,
+            0.078125,
+            3.5,
+            0.3122492415048545
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            3.577955163043478,
+            0.078125,
+            3.921875,
+            0.3122492415048545
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            3.5,
+            0.078125,
+            3.921875,
+            0.4220448369565218
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Upper front cabinet return",
+      "from": [
+        0,
+        4.9161,
+        3.2
+      ],
+      "to": [
+        7.370000000000001,
+        5.766100000000002,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            0.49999999999999994,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            0.49999999999999994,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            0.49999999999999994,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell flat section",
+      "from": [
+        0,
+        0,
+        -0.65
+      ],
+      "to": [
+        8.5,
+        4.216100000000004,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.7133632812500001
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.7133632812500001
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.7133632812500001
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 0",
+      "from": [
+        0,
+        4.216100000000004,
+        -0.65
+      ],
+      "to": [
+        8.499120000000001,
+        4.286100000000005,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 1",
+      "from": [
+        0,
+        4.286100000000005,
+        -0.65
+      ],
+      "to": [
+        8.492080000000001,
+        4.356100000000005,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 2",
+      "from": [
+        0,
+        4.356100000000005,
+        -0.65
+      ],
+      "to": [
+        8.47777,
+        4.426100000000005,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 3",
+      "from": [
+        0,
+        4.426100000000005,
+        -0.65
+      ],
+      "to": [
+        8.45572,
+        4.4961000000000055,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 4",
+      "from": [
+        0,
+        4.4961000000000055,
+        -0.65
+      ],
+      "to": [
+        8.42512,
+        4.566100000000006,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 5",
+      "from": [
+        0,
+        4.566100000000006,
+        -0.65
+      ],
+      "to": [
+        8.384620000000002,
+        4.636100000000006,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 6",
+      "from": [
+        0,
+        4.636100000000006,
+        -0.65
+      ],
+      "to": [
+        8.331949999999999,
+        4.706100000000006,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 7",
+      "from": [
+        0,
+        4.706100000000006,
+        -0.65
+      ],
+      "to": [
+        8.263010000000001,
+        4.7761,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 8",
+      "from": [
+        0,
+        4.7761,
+        -0.65
+      ],
+      "to": [
+        8.16875,
+        4.8461,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Top rounded marquee shell rounded band 9",
+      "from": [
+        0,
+        4.8461,
+        -0.65
+      ],
+      "to": [
+        8.01857,
+        4.9161,
+        0.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            1.078125,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            1.5,
+            0.078125,
+            1.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "HYOSUNG frosted illuminated sign",
+      "from": [
+        0,
+        0,
+        -0.69
+      ],
+      "to": [
+        7.280000000000001,
+        3.9361000000000033,
+        -0.65
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            1.25,
+            4.0,
+            3.697823383084575
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            5.078125,
+            0.078125,
+            5.921875,
+            0.904265391791044
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            5.5,
+            0.078125,
+            5.921875,
+            0.904265391791044
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            5.5,
+            0.078125,
+            5.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Marquee rear mounting cowl",
+      "from": [
+        0,
+        0,
+        0.65
+      ],
+      "to": [
+        8,
+        4.816100000000006,
+        3.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.5,
+            0.7335418346774195
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.7335418346774195
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            0.5,
+            0.078125,
+            0.921875,
+            0.7335418346774195
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            0.5,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    }
+  ]
+}

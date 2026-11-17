@@ -1,6 +1,6 @@
 # Developer API
 
-UBS exposes server-side Java interfaces for NeoForge `1.21.1`. Version `2.1.1` is the current API release and includes the authoritative economy module used by the Ages of War web gateway: institutional accounts, explicit grants, reconciliation snapshots, durable idempotent operations, revisions, and monetary escrow. The `2.0.0` finance, cash, notification, market-price, bank, shop, heist, and discovery interfaces remain available.
+UBS exposes server-side Java interfaces for NeoForge `1.21.1`. Version `2.2.0` is the current API release and includes the authoritative economy module plus the general organization-account API: namespaced external ownership, shared access, fine-grained permissions, lifecycle controls, durable operation receipts, audit queries, persisted events, bank-status events, limits, and atomic money movement. The earlier finance, cash, notification, market-price, bank, shop, heist, and discovery interfaces remain available.
 
 ## Entry Points
 
@@ -13,9 +13,10 @@ var banks = UltimateBankingApiProvider.banks();
 var shops = UltimateBankingApiProvider.shops();
 var heists = UltimateBankingApiProvider.heists();
 var economy = UltimateBankingApiProvider.economy();
+var organizations = UltimateBankingApiProvider.organizations();
 ```
 
-`finance.getApiVersion()` and `economy.getApiVersion()` return `2.1.1`.
+`finance.getApiVersion()`, `economy.getApiVersion()`, and `organizations.getApiVersion()` return `2.2.0`.
 
 ## Contract and Threading
 
@@ -39,7 +40,7 @@ var economy = UltimateBankingApiProvider.economy();
 - `ApiNotificationResult` and `ApiAlertResult`: UI-delivery outcomes.
 - `ApiEconomyOperationResult`: durable authoritative receipt with status/code, stable operation ID, duplicate flag, economy revision, transaction IDs, affected accounts, and optional escrow state.
 
-## Authoritative Economy Module (2.1.1)
+## Authoritative Economy Module (2.2.0)
 
 `UltimateBankingApiProvider.economy()` is the integration seam for remote projections and commands. Its interface deliberately has four methods:
 
@@ -108,6 +109,247 @@ if (!receipt.success()) {
 ### Matched escrow
 
 Create an escrow in a real bank, then fund it with exactly two `ApiEconomyTransferLeg` entries of equal value. Each side may contribute at most `$25,000.00`. Funding prevalidates the complete movement before changing any balance. A release must consume the complete holding balance; a refund returns the recorded contributions. Terminal escrow operations are idempotent through their command keys.
+
+## Organization Accounts API
+
+`UltimateBankingApiProvider.organizations()` is the general integration surface for durable accounts owned by something other than a player: nations, guilds, companies, factions, towns, automated services, or another mod's entity. It is intentionally not tied to a particular external mod.
+
+### Identity model
+
+An organization account is identified by the tuple `(namespace, externalId, bankId)`.
+
+| Field | Meaning | Example |
+| --- | --- | --- |
+| `namespace` | Lowercase integration ownership namespace. It prevents two mods from colliding. | `opac_nations` |
+| `externalId` | Stable identifier assigned by the integration. It may be a UUID or another safe external ID. | `nation-42` |
+| `bankId` | UBS bank holding the account. | `centralBank.getBankId()` |
+| `accountType` | Integration-defined uppercase type label. | `NATION_TREASURY` |
+| `displayName` | Player-facing label. | `Kingdom of Arathia Treasury` |
+| `purpose` | Short reason for the account. | `government treasury` |
+| `metadata` | Small string map for integration identifiers and display data. | `nationId=42` |
+
+UBS derives a stable account UUID from the namespace, external ID, and bank. Do not generate a new account on every startup and do not use the display name as identity. The external ID must remain stable for the lifetime of the external organization.
+
+### Actors and trust boundary
+
+Use `ApiOrganizationActor.integration("your_mod_namespace")` for normal integration calls. The integration may manage accounts in its own namespace, and it cannot read or alter another integration's accounts. Use `ApiOrganizationActor.player(playerId)` for a human operating through member access. `ApiOrganizationActor.officialSystem()` is reserved for trusted UBS-owned server adapters and bank-status/system adjustments; an addon should not expose it to client or web input.
+
+```java
+var integration = ApiOrganizationActor.integration("opac_nations");
+var leader = ApiOrganizationActor.player(leaderUuid);
+```
+
+### Account lifecycle and access
+
+Account status is `OPEN`, `FROZEN`, or `CLOSED`. Frozen accounts remain visible to authorized readers but reject money operations. Closing is terminal and requires a zero balance; leadership or membership changes cannot reopen a closed account. Use `setStatus` for an operational freeze/reopen and `closeAccount` for permanent closure.
+
+Built-in roles grant these default permissions:
+
+| Role | Default permissions |
+| --- | --- |
+| `OWNER` | View balance, view transactions, deposit, withdraw, transfer, manage members, manage account, manage limits |
+| `ADMINISTRATOR` | Same management permissions as owner, without ownership semantics |
+| `TREASURER` | View balance, view transactions, deposit, withdraw, transfer |
+| `SPENDER` | View balance, view transactions, transfer |
+| `DEPOSITOR` | View balance, view transactions, deposit |
+| `VIEWER` | View balance, view transactions |
+| `CUSTOM` | Only explicitly supplied permissions |
+
+`setMemberAccess` replaces a player's complete organization grant. `removeMember` revokes it. `transferLeadership` changes the owner role in place and demotes the previous owner to the requested non-owner role, so a leadership change never requires recreating the treasury or losing its balance.
+
+The individual permissions are `VIEW_BALANCE`, `VIEW_TRANSACTIONS`, `DEPOSIT`, `WITHDRAW`, `TRANSFER`, `MANAGE_MEMBERS`, `MANAGE_ACCOUNT`, and `MANAGE_LIMITS`. Use `validateAccess` for UI decisions, but treat the mutation result as authoritative because access can change between a screen opening and a button press.
+
+### Create an account
+
+```java
+var request = new ApiOrganizationAccountRequest(
+        integration,
+        "opac:create-account:nation-42:v1",
+        "opac_nations",
+        "nation-42",
+        bankId,
+        "NATION_TREASURY",
+        "Kingdom of Arathia Treasury",
+        "government treasury",
+        Map.of("nationId", "42", "createdBy", leaderUuid.toString()),
+        leaderUuid,
+        new BigDecimal("100000.00"),
+        new BigDecimal("1000000.00")
+);
+
+ApiOrganizationOperationResult receipt = organizations.createAccount(request);
+if (!receipt.success()) {
+    // Keep the external setup pending and surface receipt.code()/message().
+}
+UUID treasuryId = receipt.account().accountId();
+```
+
+`initialOwnerPlayerId` is optional. An account can be entirely integration-managed, or the integration can grant human access after creation. `perTransactionLimit` and `dailySpendingLimit` use dollars with at most two decimal places; zero means no limit. Metadata is bounded to keep world saves and audit records predictable.
+
+### Read and manage accounts
+
+| Method | Use |
+| --- | --- |
+| `getAccount(accountId, viewer)` | Read one account snapshot if the viewer is authorized. |
+| `findAccount(namespace, externalId, bankId, viewer)` | Resolve a stable external identity without storing UBS internals. |
+| `listAccounts(namespace, bankId, viewer)` | Enumerate visible accounts, restricted to an integration's own namespace. |
+| `updateAccount(request)` | Change display name, custom type, purpose, metadata, or limits. |
+| `setStatus(request)` | Freeze or reopen an account. |
+| `closeAccount(request)` | Permanently close a zero-balance account. |
+| `setMemberAccess(request)` | Add or replace a player's role and explicit permissions. |
+| `removeMember(request)` | Remove a player's access. |
+| `transferLeadership(request)` | Assign a new owner and safely demote the previous owner. |
+| `validateAccess(accountId, actor, permission)` | Validate one permission for a UI or command before submitting a mutation. |
+
+Snapshots include owner type, namespace, external ID, display name, custom type, purpose, bank identity/status, account status, balance, limits, daily spend, metadata, authorized member details when permitted, and timestamps. `balanceVisible()` distinguishes a real zero balance from a balance redacted for a member who has transaction visibility without balance visibility. They contain immutable copies and must be treated as read models.
+
+### Money operations
+
+All money requests require a unique idempotency key, a positive exact amount, a namespace-unique external reference, a category, and an optional description. Categories are integration-defined uppercase labels such as `TAX`, `UPKEEP`, `GOVERNMENT_SPENDING`, `SALARY`, or `NATION_TRANSFER`.
+
+| Method | Meaning | Required member permission |
+| --- | --- | --- |
+| `transfer(request)` | Atomically transfer from the organization account to a UBS account, including another organization account. | `TRANSFER` |
+| `sourceFunds(request)` | Mint/source an explicit external reward, grant, reimbursement, or adjustment into the organization account. | `DEPOSIT` |
+| `sinkFunds(request)` | Remove an explicit fee, upkeep charge, tax settlement, or administrative adjustment from the organization account. | `WITHDRAW` |
+
+The owning integration and official system may perform operations in their own account namespace. Player actors are checked against the account grant. The underlying UBS ledger validates both sides before a transfer, so a failed destination or insufficient source cannot leave a one-sided movement.
+
+```java
+var transfer = organizations.transfer(new ApiOrganizationMoneyRequest(
+        leader,
+        "opac:upkeep:nation-42:day-20500",
+        treasuryId,
+        recipientAccountId,
+        new BigDecimal("125.00"),
+        "opac-nation-42-upkeep-day-20500",
+        "UPKEEP",
+        "Daily territory upkeep"
+));
+```
+
+`findTransactionByExternalReference(namespace, reference, viewer)` is the preflight check for scheduled work. If it returns a transaction, do not submit the same business action again. A repeated idempotency key with the same payload returns the original receipt with `duplicate=true`; reusing it with a different payload returns `IDEMPOTENCY_CONFLICT`.
+
+### Operation receipts and cancellation
+
+Every mutating request returns `ApiOrganizationOperationResult` with a stable operation ID, status (`PENDING`, `SUCCEEDED`, `FAILED`, or `CANCELLED`), code, message, revision, affected accounts, transaction IDs, and snapshots where applicable. `findOperation(idempotencyKey)` allows an integration to reconcile after a timeout or restart. `cancelOperation` is available only before a persisted operation has started execution and must be called by the actor that created it. Once execution has started, retry the original request so UBS can reconcile the journal and underlying ledger instead of cancelling a potentially-applied mutation. A final receipt is never silently replaced.
+
+Operation records, organization transactions, and events are persisted in the Central Bank saved data and pruned with bounded histories. This gives retry safety across normal server restarts after the world save. It is not a substitute for a remote database transaction: an external integration should keep its business operation pending until it has received and persisted the UBS receipt.
+
+### Audit queries
+
+`audit(ApiOrganizationAuditQuery)` returns immutable transaction snapshots filtered by namespace, external ID, account, external reference, category, acting player, time range, and success/failure status. Player viewers only receive transactions for accounts on which they have `VIEW_TRANSACTIONS`; an integration viewer is restricted to its own namespace; the official system can reconcile all organization transactions.
+
+`events(ApiOrganizationEventQuery)` returns persisted lifecycle/security events filtered by namespace, account, event type, and time range. Events include account creation/update/closure, freezes/reopens, access changes, leadership transfers, successful/failed/cancelled transactions, operation failures, and bank suspension, lockdown, reopening, or revocation. Each event exposes the actor type, player or integration identity, primary account, and every affected account, so a receiving organization can reconcile a cross-bank transfer without guessing from the source event.
+
+For live server-thread reactions, subscribe to `OrganizationApiEvent` on `NeoForge.EVENT_BUS`. Its `snapshot()` is the same immutable event shape returned by the query API; do not retain or mutate internal NBT.
+
+### Bank status controls
+
+`setBankStatus` is an official-system operation for server-controlled `ACTIVE`, `SUSPENDED`, `LOCKDOWN`, or `REVOKED` transitions. Integration-owned accounts automatically reject money operations while their bank is unavailable, and the transition creates a persisted bank-status event. Normal integrations should observe status through account snapshots or events rather than changing it directly.
+
+### Capability negotiation
+
+Do not infer support from the mod version alone. Call:
+
+```java
+if (organizations.supports(ApiOrganizationCapability.IDEMPOTENT_TRANSACTIONS)
+        && organizations.supports(ApiOrganizationCapability.ATOMIC_TRANSFERS)) {
+    // Enable the integration's scheduled treasury workflow.
+}
+```
+
+`getCapabilities()` currently advertises `ORGANIZATION_ACCOUNTS`, `NAMESPACED_EXTERNAL_OWNERS`, `CUSTOM_ACCOUNT_TYPES`, `SHARED_ACCESS`, `FINE_GRAINED_PERMISSIONS`, `ACCOUNT_LIFECYCLE`, `LEADERSHIP_TRANSFER`, `IDEMPOTENT_TRANSACTIONS`, `UNIQUE_EXTERNAL_REFERENCES`, `CANCELLABLE_OPERATIONS`, `SOURCE_AND_SINK_OPERATIONS`, `ATOMIC_TRANSFERS`, `ORGANIZATION_LIMITS`, `AUDIT_QUERIES`, `PERSISTED_EVENTS`, and `BANK_STATUS_EVENTS`. An integration can disable only the affected feature when running against a future UBS build with a reduced capability set.
+
+## Jobs API (2.2.0)
+
+`UltimateBankingApiProvider.jobs()` exposes the server-authoritative career system. Jobs use the same core contract as Lumberjack: a player applies once, keeps progress separately for each job, performs supported world activities, turns eligible plain items in at that job's buyer, and receives a validated digital payout plus job XP. The catalog, quote, inventory removal, primary-account deposit, daily limits, quest progress, and achievement rewards are all revalidated on the logical server thread.
+
+```java
+var jobs = UltimateBankingApiProvider.jobs();
+if (jobs.isAvailable()) {
+    for (String jobId : jobs.getRegisteredJobIds()) {
+        System.out.println(jobs.getJobQuotes(jobId));
+    }
+}
+```
+
+### Built-in careers
+
+| ID | Career | World activity recorded | Buyer/catalog focus |
+| --- | --- | --- | --- |
+| `lumberjack` | Lumberjack | Non-creative raw wood breaks | Raw wood plus wood products from loaded wood families |
+| `miner` | Miner | Supported stone, ore, and mineral block breaks | Stone, ores, raw minerals, refined bars, and gems |
+| `fisherman` | Fisherman | Fishing drops from `ItemFishedEvent` | Fresh, smoked, and cooked fish products |
+| `farmer` | Farmer | Crop breaks and eligible passive-animal goods | Produce, seeds, grain, livestock goods, and farm supplies |
+| `hunter` | Hunter | Player-caused living-entity drops, including projectile kills | Field drops, hides, pelts, and trophies |
+| `blacksmith` | Blacksmith | Supported crafted equipment and metal outputs | Metal stock, tools, weapons, armor, and smithing goods |
+| `courier` | Courier | Completed NPC parcel routes | Dispatcher-issued parcels delivered to the named destination NPC |
+| `chef` | Chef | Supported crafted food outputs | Ingredients and prepared meals |
+| `herbalist` | Herbalist | Supported plant and botanical block breaks | Botanicals, remedies, potions, and alchemy supplies |
+| `salvager` | Salvager | Supported salvage-material block breaks | Metal salvage and reclaimed materials |
+| `tailor` | Tailor | Supported crafted textile and leather outputs | Textiles, leatherwork, and wearable goods |
+
+The catalog is built from the loaded item registry when the server starts or an operator runs `/ubs admin job reload`. Vanilla tags, common `c:` tags, and stable item-path conventions are used, so a compatible mod can contribute resources without a compile-time dependency on that mod. A resource may be present in a catalog without being accepted in a sale if it has non-default components; this prevents named, enchanted, or otherwise modified items from being converted accidentally.
+
+### API surface
+
+| Method | Returns or action | When to use it |
+| --- | --- | --- |
+| `getApiVersion()` | Job API version | Capability/version logging and compatibility checks |
+| `isAvailable()` | Whether a server is currently attached | Guard calls made during client setup or server shutdown |
+| `getRegisteredJobIds()` | Sorted built-in/registered job IDs | Build a job picker without hardcoding the list |
+| `getJobDefinition(jobId)` | Optional `ApiJobDefinition` metadata | Read the display name, description, icon, buyer, catalog heading, activity label, and base value |
+| `getJobDefinitions()` | Immutable metadata list | Populate a complete external career directory in one call |
+| `getPlayerJob(playerId)` | Optional `ApiJobSnapshot` | Read the player's active job, level, XP, daily/lifetime earnings and units |
+| `getJobQuotes(jobId)` | Live `ApiJobQuote` list | Populate a buyer, sell menu, scoreboard, or external job board |
+| `getJobQuote(jobId, itemId)` | One live quote | Validate/display one item before requesting a sale |
+| `getLumberjackQuotes()` / `getLumberjackQuote(itemId)` | Compatibility aliases for Lumberjack | Keep older Lumberjack integrations source-compatible |
+| `getLumberjackMarket()` / `getJobMarket(jobId)` | Compatibility/generic market rotation snapshot | Read the current spotlight and server daily totals |
+| `getLevelForXp(xp)` | Level from cumulative job XP | Render an external progression bar consistently with UBS |
+| `sell(player, jobId, itemId, quantity)` | `ApiJobSaleResult` | Submit a player-context sale; the player must be online and active in that job |
+| `sellLumberjack(player, itemId, quantity)` | Lumberjack compatibility sale | Keep an older integration working without a job ID |
+| `recordActivity(player, metric, family, amount)` | Records a non-sale activity | Let a route, farming, brewing, machine, or custom-mod event report work without granting money directly |
+
+`ApiJobQuote` contains the item ID, localized display name captured by the server, material family, category, configured base quote, current live quote in cents, normalized-unit weight, XP weight, and the configured minimum number of shop samples. `ApiJobSaleResult.payout()` is a dollar `BigDecimal`; quote and payout values are never client-authoritative.
+
+### Sale and inventory rules
+
+`sell` is intentionally narrower than a generic inventory API. The server checks the active job, the requested job catalog, a UBS primary account, a positive quantity, the current quote, per-player and server daily payout/unit limits, and the exact item/components immediately before removing anything. It can collect plain matching stacks from the player inventory, offhand, and nested item-handler inventories such as backpacks up to a bounded depth of four. The item is removed only after a matching snapshot is confirmed; if the deposit fails, the removed stacks are restored.
+
+Do not call `depositToPrimary` yourself for a job sale and do not award XP from a client packet. Use `sell` so the item removal and UBS payout stay in the same server-controlled workflow. A successful sale updates the job's daily/lifetime statistics, supply pressure, daily quest progress, and activity-specific counters.
+
+### Activity bridge
+
+UBS listens for normal NeoForge events and records activity without taking ownership of drops or outputs:
+
+| Career | Event bridge | Counter |
+| --- | --- | --- |
+| Lumberjack | `BlockEvent.BreakEvent` | `logs_broken` |
+| Miner | `BlockEvent.BreakEvent` | `blocks_mined` |
+| Fisherman | `ItemFishedEvent` | `fish_caught` |
+| Farmer | `BlockEvent.BreakEvent` and passive-animal drops | `crops_harvested`, `animals_harvested` |
+| Hunter | `LivingDropsEvent` with player/projectile attribution | `drops_recovered` |
+| Blacksmith | `PlayerEvent.ItemCraftedEvent` | `items_forged` |
+| Courier | Successful NPC parcel delivery | `deliveries_completed` |
+| Chef | `PlayerEvent.ItemCraftedEvent` | `meals_prepared` |
+| Herbalist | `BlockEvent.BreakEvent` | `plants_gathered` |
+| Salvager | `BlockEvent.BreakEvent` | `scrap_recovered` |
+| Tailor | `PlayerEvent.ItemCraftedEvent` | `items_stitched` |
+
+The activity bridge ignores creative and spectator players. Mod integrations that implement a richer mechanic can report the supported counter through `recordActivity`; this records progress and quests but never pays the player by itself. The built-in job achievement and daily-quest boards only advance when their activity metric matches the submitted counter.
+
+### Daily quests, milestones, and achievements
+
+Each job receives three deterministic daily cards. Lumberjack retains its established raw/product/earnings rotation; the other careers rotate through job-specific activity, sale, and settlement templates. The reset is every 24 real-world hours at the UTC day boundary, survives restarts, and is returned to clients as `dailyQuestResetEpochSeconds`. Minecraft time is used separately for the existing payout/supply caps.
+
+Every job has a shared five-level milestone track at levels `5, 10, ..., 100`. Rewards improve the verified job payout rate, sale XP certification, daily payout room, or normalized intake capacity. Job-specific achievement cards add fieldwork, trade, contract, exploration, career, and job-themed objectives. Rewards are server-created and may contain digital money, job XP, or a persisted random item from a loaded non-vanilla mod. Claiming is one-time and requires the player's active job; the client supplies only the achievement ID.
+
+### In-game commands and screens
+
+Players can use `/ubs job` or interact with a Job Market NPC. Operators with permission level 2 can use `/ubs admin job spawn market`, `/ubs admin job spawn buyer <job-id>`, `/ubs admin job spawn lumberjack`, `/ubs admin job test buyer`, `/ubs admin job npc edit`, and `/ubs admin job reload`. The Courier buyer is a Dispatcher: its bounded `courierOrders` snapshot contains generated NPC routes, and accepting one issues a server-assigned parcel. Delivery is completed by interacting with the destination job NPC, not by calling `sell`. The shared screen uses job metadata and server payloads rather than Lumberjack-specific labels: job list, catalog, carried-only filtering, live quotes, daily cards, milestone roadmap, achievements, and guide content are all driven by the selected job ID. Packet lists are bounded so a large modded registry cannot exceed the custom-payload element limit.
+
+For a custom job integration, use an existing registered job ID only when its catalog and activity semantics match the built-in classifier. Otherwise, keep the external catalog in the integration and use `recordActivity` for the shared progress/quest bridge; never rely on client-side item names or a client-supplied payout.
 
 ## Finance API
 
@@ -228,7 +470,7 @@ The result exposes availability, item ID, sample count, and median/average/minim
 
 `ApiServerSnapshot` contains API version, online-player count, bank/account/shop counts, active-heist count, and feature flags.
 
-Feature flags: `BANKING`, `SHOPS`, `HEISTS`, `SMARTPHONE`, `SAFETY_DEPOSIT_BOXES`, `RFID_ACCESS`, `PHYSICAL_CURRENCY`, `WALLET`, `OWNER_PC`, `INSTITUTIONAL_ECONOMY`, `IDEMPOTENT_OPERATIONS`, `MONETARY_ESCROW`.
+Feature flags: `BANKING`, `SHOPS`, `HEISTS`, `SMARTPHONE`, `SAFETY_DEPOSIT_BOXES`, `RFID_ACCESS`, `PHYSICAL_CURRENCY`, `WALLET`, `OWNER_PC`, `INSTITUTIONAL_ECONOMY`, `IDEMPOTENT_OPERATIONS`, `MONETARY_ESCROW`, `ORGANIZATION_ACCOUNTS`, `ORGANIZATION_AUDIT`, `ORGANIZATION_EVENTS`.
 
 `ApiPlayerPortfolioSnapshot` contains account count, primary account, total balance, owned/accessed bank IDs, owned/accessed shop IDs, and current heist session ID.
 

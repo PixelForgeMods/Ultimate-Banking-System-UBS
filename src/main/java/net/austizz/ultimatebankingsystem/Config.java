@@ -22,6 +22,46 @@ public class Config {
                     + "The 10,000 default supports long website statements; lower it only if you accept shorter history.")
             .defineInRange("AccountTransactionLogLimit", DEFAULT_ACCOUNT_TRANSACTION_LOG_LIMIT, 1, 50_000);
 
+    public static final ModConfigSpec.IntValue LUMBERJACK_RAW_LOG_VALUE_CENTS = BUILDER
+            .comment("Base Lumberjack value of one normalized raw log unit, in cents.")
+            .defineInRange("LumberjackRawLogValueCents", 500, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_MARKET_SAMPLE_MINIMUM = BUILDER
+            .comment("Minimum valid open-shop price samples required before the Lumberjack quote uses the shop-market anchor.")
+            .defineInRange("LumberjackMarketSampleMinimum", 3, 1, 1000);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_SUPPLY_TARGET_UNITS = BUILDER
+            .comment("Seven-day normalized raw-log supply target used by the Lumberjack supply multiplier.")
+            .defineInRange("LumberjackSupplyTargetUnits", 100_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_MAX_LEVEL_PAYOUT_BONUS_PERCENT = BUILDER
+            .comment("Maximum Lumberjack level payout bonus. The feature caps this at 20 percent.")
+            .defineInRange("LumberjackMaxLevelPayoutBonusPercent", 20, 0, 20);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_PLAYER_DAILY_PAYOUT_CENTS = BUILDER
+            .comment("Maximum Lumberjack payout per player per Minecraft day, in cents.")
+            .defineInRange("LumberjackPlayerDailyPayoutCents", 1_000_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_SERVER_DAILY_PAYOUT_CENTS = BUILDER
+            .comment("Maximum combined Lumberjack payout per server per Minecraft day, in cents.")
+            .defineInRange("LumberjackServerDailyPayoutCents", 25_000_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_PLAYER_DAILY_UNITS = BUILDER
+            .comment("Maximum normalized raw-log units a player may turn in per Minecraft day.")
+            .defineInRange("LumberjackPlayerDailyUnits", 2_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_SERVER_DAILY_UNITS = BUILDER
+            .comment("Maximum normalized raw-log units the server may accept per Minecraft day.")
+            .defineInRange("LumberjackServerDailyUnits", 50_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_LEVEL_XP_BASE = BUILDER
+            .comment("Base XP required for the first Lumberjack level step.")
+            .defineInRange("LumberjackLevelXpBase", 1000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue LUMBERJACK_LEVEL_XP_STEP = BUILDER
+            .comment("Additional XP required for each later Lumberjack level step.")
+            .defineInRange("LumberjackLevelXpStep", 300, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue PAYMENT_TERMINAL_FEEDBACK_TICKS = BUILDER
             .comment("Legacy terminal feedback setting. Terminal payment lock/feedback is currently fixed to 2 seconds.")
             .defineInRange("PaymentTerminalFeedbackTicks", 40, 20, 20 * 30);

@@ -97,14 +97,16 @@ public final class NotificationRenderer {
             return;
         }
         int width = cardWidth(graphics.guiWidth(), false);
-        int y = 10;
+        HudLayoutManager.Bounds stackBounds = HudLayoutManager.placeTopRight(
+                "notifications.top-right", width, stackHeight(minecraft, stack, width), 10);
+        int y = stackBounds.y();
         for (NotificationClientState.View notification : stack) {
             CardLayout layout = layout(minecraft, notification, width);
-            if (y + layout.height() > graphics.guiHeight() - 8) {
+            if (y + layout.height() > stackBounds.bottom()) {
                 break;
             }
             float visibility = smooth(notification.visibility(now));
-            int x = graphics.guiWidth() - width - 10 + Math.round((1.0F - visibility) * 38.0F);
+            int x = stackBounds.x() + Math.round((1.0F - visibility) * 38.0F);
             renderCard(minecraft, graphics, notification, layout, x, y, visibility, now);
             y += layout.height() + STACK_GAP;
         }
@@ -118,16 +120,16 @@ public final class NotificationRenderer {
             return;
         }
         int width = cardWidth(graphics.guiWidth(), true);
-        int y = ActionAlertClientState.isActive()
-                ? 92
-                : PhoneNotificationClientState.isActive() && !SmartphoneClientState.isInteractive() ? 78 : 10;
+        HudLayoutManager.Bounds stackBounds = HudLayoutManager.placeTopCenter(
+                "notifications.top-center", width, stackHeight(minecraft, stack, width), 10);
+        int y = stackBounds.y();
         for (NotificationClientState.View notification : stack) {
             CardLayout layout = layout(minecraft, notification, width);
-            if (y + layout.height() > graphics.guiHeight() - 8) {
+            if (y + layout.height() > stackBounds.bottom()) {
                 break;
             }
             float visibility = smooth(notification.visibility(now));
-            int x = (graphics.guiWidth() - width) / 2;
+            int x = stackBounds.x();
             int animatedY = y - Math.round((1.0F - visibility) * 28.0F);
             renderCard(minecraft, graphics, notification, layout, x, animatedY, visibility, now);
             y += layout.height() + STACK_GAP;
@@ -142,18 +144,33 @@ public final class NotificationRenderer {
             return;
         }
         int width = cardWidth(graphics.guiWidth(), false);
-        int y = graphics.guiHeight() - 30;
+        HudLayoutManager.Bounds stackBounds = HudLayoutManager.placeBottomRight(
+                "notifications.bottom-right", width, stackHeight(minecraft, stack, width), 8);
+        int y = stackBounds.bottom();
         for (NotificationClientState.View notification : stack) {
             CardLayout layout = layout(minecraft, notification, width);
-            if (y - layout.height() < 8) {
+            if (y - layout.height() < stackBounds.y()) {
                 break;
             }
             y -= layout.height();
             float visibility = smooth(notification.visibility(now));
-            int x = graphics.guiWidth() - width - 10 + Math.round((1.0F - visibility) * 38.0F);
+            int x = stackBounds.x() + Math.round((1.0F - visibility) * 38.0F);
             renderCard(minecraft, graphics, notification, layout, x, y, visibility, now);
             y -= STACK_GAP;
         }
+    }
+
+    private static int stackHeight(Minecraft minecraft,
+                                   List<NotificationClientState.View> stack,
+                                   int width) {
+        if (stack == null || stack.isEmpty()) {
+            return 1;
+        }
+        int total = 0;
+        for (NotificationClientState.View notification : stack) {
+            total += layout(minecraft, notification, width).height() + STACK_GAP;
+        }
+        return Math.max(1, total - STACK_GAP);
     }
 
     private static CardLayout layout(Minecraft minecraft,

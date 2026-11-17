@@ -99,10 +99,9 @@ The `Safe` panel contains safety-deposit setup and operations. Service stays dis
 1. A safe area nested inside a claimed premise.
 2. A loaded bank vault door in that safe area.
 3. At least one deposit-row block with every slot physically filled.
-4. At least one employee with `Safe Access`.
-5. A ready private viewing room in the premise.
+4. A ready private viewing room in the premise.
 
-Removing a required door, row, room, or permission changes the vault back to unavailable without deleting customer data. Restoring the requirement makes it eligible again.
+Removing a required door, row, or room changes the vault back to unavailable without deleting customer data. A completed row remains recognized when its chunk unloads and is rechecked when setup is viewed again. Restoring the requirement makes it eligible again.
 
 ### Private Viewing Rooms
 

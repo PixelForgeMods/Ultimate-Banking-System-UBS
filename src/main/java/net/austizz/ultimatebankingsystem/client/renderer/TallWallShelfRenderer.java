@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
@@ -34,7 +35,8 @@ public class TallWallShelfRenderer implements BlockEntityRenderer<TallWallShelfB
             return;
         }
 
-        float yaw = -state.getValue(TallWallShelfBlock.FACING).toYRot();
+        var facing = state.getValue(TallWallShelfBlock.FACING);
+        float yaw = -facing.toYRot();
 
         for (int slot = 0; slot < TallWallShelfBlockEntity.SLOT_COUNT; slot++) {
             ItemStack stack = shelf.getDisplayItem(slot);
@@ -71,6 +73,20 @@ public class TallWallShelfRenderer implements BlockEntityRenderer<TallWallShelfB
             );
 
             poseStack.popPose();
+
+            Vec3 labelOffset = new Vec3(
+                    0.0D,
+                    transform.offsetY() + 0.32D,
+                    0.30D
+            ).yRot((float) Math.toRadians(yaw));
+            ShelfPriceLabelRenderer.queue(
+                    shelf.getLevel(),
+                    shelf.getBlockPos(),
+                    slot,
+                    shelf.getSlotPrice(slot),
+                    shelf.isShopMode(),
+                    new Vec3(0.5D, SLOT_Y[slot], 0.5D).add(labelOffset)
+            );
         }
     }
 }

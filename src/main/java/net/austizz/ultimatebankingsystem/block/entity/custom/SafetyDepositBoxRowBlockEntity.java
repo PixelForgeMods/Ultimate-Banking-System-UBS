@@ -1,6 +1,7 @@
 package net.austizz.ultimatebankingsystem.block.entity.custom;
 
 import net.austizz.ultimatebankingsystem.bank.safebox.LoadedSafeStructureIndex;
+import net.austizz.ultimatebankingsystem.bank.safebox.SafetyDepositBoxService;
 import net.austizz.ultimatebankingsystem.block.entity.ModBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -43,6 +44,9 @@ public class SafetyDepositBoxRowBlockEntity extends BlockEntity {
     public void onLoad() {
         super.onLoad();
         LoadedSafeStructureIndex.register(level, worldPosition, LoadedSafeStructureIndex.Kind.ROW);
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel && isFullyAssignableRow()) {
+            SafetyDepositBoxService.recordFullyAssignableRow(serverLevel, worldPosition, this);
+        }
     }
 
     @Override
@@ -211,6 +215,9 @@ public class SafetyDepositBoxRowBlockEntity extends BlockEntity {
             previousDoorProgress[i] = 0.0F;
         }
         markUpdated();
+        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel && isFullyAssignableRow()) {
+            SafetyDepositBoxService.recordFullyAssignableRow(serverLevel, worldPosition, this);
+        }
         return true;
     }
 

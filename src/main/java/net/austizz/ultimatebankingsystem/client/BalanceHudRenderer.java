@@ -72,15 +72,9 @@ public final class BalanceHudRenderer {
         HudPosition position = HudPosition.parseOrDefault(
                 selectedPosition.isBlank() ? Config.HUD_CORNER.get() : selectedPosition,
                 HudPosition.TOP_RIGHT);
-        Layout layout = layout(screenWidth, screenHeight, cardWidth, cardHeight, position);
-        if (position == HudPosition.TOP_RIGHT && minecraft.screen == null) {
-            int reservedBottom = NotificationRenderer.topRightStackBottom(
-                    minecraft, screenWidth, screenHeight);
-            int candidateY = reservedBottom + 6;
-            if (reservedBottom > 0 && candidateY + cardHeight <= screenHeight - MARGIN) {
-                layout = new Layout(layout.x(), candidateY, layout.width(), layout.height(), layout.position());
-            }
-        }
+        HudLayoutManager.Bounds placement = HudLayoutManager.placeConfigured(
+                "balance-hud", cardWidth, cardHeight, position, MARGIN);
+        Layout layout = new Layout(placement.x(), placement.y(), placement.width(), placement.height(), position);
 
         float visibility = HudClientState.getAppearanceProgress(now);
         int slide = Math.round((1.0F - visibility) * 18.0F);

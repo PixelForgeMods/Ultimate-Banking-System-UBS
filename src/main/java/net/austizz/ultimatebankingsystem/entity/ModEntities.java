@@ -2,6 +2,7 @@ package net.austizz.ultimatebankingsystem.entity;
 
 import net.austizz.ultimatebankingsystem.UltimateBankingSystem;
 import net.austizz.ultimatebankingsystem.entity.custom.BankTellerEntity;
+import net.austizz.ultimatebankingsystem.entity.custom.JobNpcEntity;
 import net.austizz.ultimatebankingsystem.entity.custom.SafetyDepositBoxDisplayProxyEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -30,6 +31,13 @@ public final class ModEntities {
                             .clientTrackingRange(8)
                             .updateInterval(2)
                             .build(UltimateBankingSystem.MODID + ":safety_deposit_box_display_proxy"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<JobNpcEntity>> JOB_NPC =
+            ENTITY_TYPES.register("job_npc", () -> EntityType.Builder.of(JobNpcEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.95F)
+                    .clientTrackingRange(12)
+                    .updateInterval(2)
+                    .build(UltimateBankingSystem.MODID + ":job_npc"));
 
     private ModEntities() {}
 

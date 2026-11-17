@@ -1,0 +1,120 @@
+{
+  "ambientocclusion": false,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "textures": {
+    "atm": "ultimatebankingsystem:block/atm_machine",
+    "particle": "#atm"
+  },
+  "elements": [
+    {
+      "name": "Card lower guide",
+      "from": [
+        4.43,
+        20.19,
+        1.91
+      ],
+      "to": [
+        5.57,
+        20.33,
+        2.19
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    }
+  ],
+  "render_type": "minecraft:solid"
+}

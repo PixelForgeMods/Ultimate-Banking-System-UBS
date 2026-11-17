@@ -21,6 +21,7 @@ import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBasketBlock
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBasketHolderBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.TallWallShelfBlockEntity;
+import net.austizz.ultimatebankingsystem.block.entity.custom.VendingMachineBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -31,11 +32,24 @@ public final class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, UltimateBankingSystem.MODID);
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity>> ATM =
+            BLOCK_ENTITY_TYPES.register("atm", () -> BlockEntityType.Builder.of(
+                    net.austizz.ultimatebankingsystem.block.entity.custom.AtmBlockEntity::new,
+                    ModBlocks.ATM_MACHINE.get(), ModBlocks.IN_WALL_ATM.get()).build(null));
+
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShopTerminalBlockEntity>> PAYMENT_TERMINAL =
             BLOCK_ENTITY_TYPES.register("payment_terminal", () ->
                     BlockEntityType.Builder.of(
                             ShopTerminalBlockEntity::new,
                             ModBlocks.PAYMENT_TERMINAL.get()
+                    ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<VendingMachineBlockEntity>> VENDING_MACHINE =
+            BLOCK_ENTITY_TYPES.register("vending_machine", () ->
+                    BlockEntityType.Builder.of(
+                            VendingMachineBlockEntity::new,
+                            ModBlocks.VENDING_MACHINE.get(),
+                            ModBlocks.CREATIVE_VENDING_MACHINE.get()
                     ).build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<AccessVerifierBlockEntity>> ACCESS_VERIFIER =

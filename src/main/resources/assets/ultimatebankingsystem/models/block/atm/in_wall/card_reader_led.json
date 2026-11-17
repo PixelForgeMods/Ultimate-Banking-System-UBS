@@ -1,0 +1,113 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Restrained green reader status LED",
+      "from": [
+        10.42,
+        26.6361,
+        3.16
+      ],
+      "to": [
+        10.86,
+        26.696099999999998,
+        3.21
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            10.08,
+            0.08,
+            10.92,
+            0.92
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "rotation": {
+        "angle": 22.5,
+        "axis": "x",
+        "origin": [
+          16,
+          20.4161,
+          3.7
+        ]
+      }
+    }
+  ]
+}

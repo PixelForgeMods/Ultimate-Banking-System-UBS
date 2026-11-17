@@ -1,0 +1,125 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Lower armored safe body",
+      "from": [
+        8.3,
+        0.15,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        8
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            0.078125,
+            0.13824912765658248,
+            0.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            0.5926067073170732,
+            0.13824912765658248,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.5,
+            0.40739329268292684
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Safe bottom shadow line",
+      "from": [
+        8.4,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        0.15,
+        7.899999999999999
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            3.078125,
+            0.078125,
+            3.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            3.593519088669951,
+            0.078125,
+            3.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            3.078125,
+            0.5935190886699508,
+            3.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            3.078125,
+            0.078125,
+            3.5,
+            0.40648091133004915
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    }
+  ]
+}

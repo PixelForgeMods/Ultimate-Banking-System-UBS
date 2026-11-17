@@ -17,6 +17,7 @@ import net.austizz.ultimatebankingsystem.block.entity.custom.HeistDuffelBlockEnt
 import net.austizz.ultimatebankingsystem.block.entity.custom.MetalPalletBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.PalletBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagBlockEntity;
+import net.austizz.ultimatebankingsystem.block.entity.custom.VendingMachineBlockEntity;
 import net.austizz.ultimatebankingsystem.command.UBSCommands;
 import net.austizz.ultimatebankingsystem.entity.ModEntities;
 import net.austizz.ultimatebankingsystem.events.BalanceChangedEvent;
@@ -24,10 +25,12 @@ import net.austizz.ultimatebankingsystem.economy.WorldCashEconomyService;
 import net.austizz.ultimatebankingsystem.item.ModCreativeTabs;
 import net.austizz.ultimatebankingsystem.item.ModItems;
 import net.austizz.ultimatebankingsystem.loan.LoanService;
+import net.austizz.ultimatebankingsystem.job.JobService;
 import net.austizz.ultimatebankingsystem.menu.ModMenus;
 import net.austizz.ultimatebankingsystem.npc.BankTellerInteractionManager;
 import net.austizz.ultimatebankingsystem.npc.BankTellerPaymentInteractionManager;
 import net.austizz.ultimatebankingsystem.npc.ShopCashierInteractionManager;
+import net.austizz.ultimatebankingsystem.npc.skin.NpcSkinService;
 import net.austizz.ultimatebankingsystem.payments.ScheduledPaymentService;
 import net.austizz.ultimatebankingsystem.pickpocket.PickpocketService;
 import net.austizz.ultimatebankingsystem.phone.SmartphoneService;
@@ -39,6 +42,8 @@ import net.austizz.ultimatebankingsystem.network.HudStatePayload;
 import net.austizz.ultimatebankingsystem.network.BankSetupObjectivesPayload;
 import net.austizz.ultimatebankingsystem.network.ModPayloads;
 import net.austizz.ultimatebankingsystem.network.NumismaticsMigrationPayloads;
+import net.austizz.ultimatebankingsystem.network.JobPayloads;
+import net.austizz.ultimatebankingsystem.network.ShelfFillPayloads;
 import net.austizz.ultimatebankingsystem.util.MoneyText;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -57,6 +62,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -101,6 +107,8 @@ public class UltimateBankingSystem {
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(ModPayloads::register);
         modEventBus.addListener(NumismaticsMigrationPayloads::register);
+        modEventBus.addListener(JobPayloads::register);
+        modEventBus.addListener(ShelfFillPayloads::register);
         modEventBus.addListener(this::registerCapabilities);
         NeoForge.EVENT_BUS.register(this);
         ModItems.register(modEventBus);
@@ -127,6 +135,7 @@ public class UltimateBankingSystem {
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.METAL_PALLET.get(), (MetalPalletBlockEntity blockEntity, net.minecraft.core.Direction side) -> blockEntity.getItemHandler());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.SHOPPING_BAG.get(), (ShoppingBagBlockEntity blockEntity, net.minecraft.core.Direction side) -> blockEntity.getItemHandler());
         event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.HEIST_DUFFEL.get(), (HeistDuffelBlockEntity blockEntity, net.minecraft.core.Direction side) -> blockEntity.getItemHandler());
+        event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, ModBlockEntities.VENDING_MACHINE.get(), (VendingMachineBlockEntity blockEntity, net.minecraft.core.Direction side) -> blockEntity.getCashHandler());
     }
 
     @SubscribeEvent
@@ -145,9 +154,18 @@ public class UltimateBankingSystem {
 
     @SubscribeEvent
     public void onServerStarted(ServerStartingEvent event) {
+        JobService.onServerStarting(event.getServer());
         // NeoEssentials finishes constructing its leaderboard manager during startup.
         // Re-register on the next server tick against the final manager and loaded world.
         event.getServer().execute(UbsPlaceholderIntegrations::install);
+    }
+
+    @SubscribeEvent
+    public void onTagsUpdated(TagsUpdatedEvent event) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        if (server != null && event.shouldUpdateStaticData()) {
+            JobService.refreshCatalog(server);
+        }
     }
 
     @SubscribeEvent
@@ -157,6 +175,7 @@ public class UltimateBankingSystem {
         resetPerformanceAnalytics();
         PickpocketService.onServerStopping();
         WorldCashEconomyService.onServerStopping();
+        JobService.onServerStopping(event.getServer());
         SafetyDepositBoxService.onServerStopping();
         ShopService.clearClaimSessionsOnServerStopping();
         ClaimModeService.onServerStopping();
@@ -167,6 +186,7 @@ public class UltimateBankingSystem {
     public void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             SmartphoneService.onPlayerLogin(player);
+            NpcSkinService.syncPlayer(player);
         }
     }
 
@@ -197,6 +217,7 @@ public class UltimateBankingSystem {
             ShelfBasketSessionService.tick(server);
             PickpocketService.tick(server);
             WorldCashEconomyService.tick(server);
+            JobService.tick(server);
 
             long autosaveIntervalTicks = Math.max(1, Config.AUTOSAVE_INTERVAL_MINUTES.get()) * 60L * 20L;
             if (gameTime % autosaveIntervalTicks == 0L && gameTime != lastAutosaveTick) {

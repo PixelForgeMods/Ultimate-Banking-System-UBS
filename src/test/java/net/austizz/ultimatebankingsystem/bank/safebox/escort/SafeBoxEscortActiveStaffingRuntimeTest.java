@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SafeBoxEscortActiveStaffingRuntimeTest {
     @Test
-    void activeRuntimeRechecksLiveAuthorizationAfterFinalSafeAccessRevoke() throws Exception {
+    void activeRuntimeStaysAuthorizedAfterSafeAccessRevoke() throws Exception {
         SafeBoxEscortFreshAuthorizationFixture authorization =
                 new SafeBoxEscortFreshAuthorizationFixture(
                         SafeStaffReadinessTestSupport.BANK_ID, "vault-1");
@@ -33,8 +33,8 @@ class SafeBoxEscortActiveStaffingRuntimeTest {
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation(
                 "revokeSafeAccess", metadata, SafeStaffReadinessTestSupport.EMPLOYEE_ID));
 
-        assertEquals("DENIED_ACTIVE_ESCORT", runtime.inspect(),
-                "the next active access inspection must re-run live staffing authorization");
+        assertEquals("ALLOWED", runtime.inspect(),
+                "revoking an employee flag must not close an otherwise ready vault");
         assertTrue(runtime.authorizationChecks() >= 3,
                 "grant plus both access inspections must invoke live authorization");
     }

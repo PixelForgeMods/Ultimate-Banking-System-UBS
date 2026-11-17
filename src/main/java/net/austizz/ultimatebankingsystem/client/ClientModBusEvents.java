@@ -9,6 +9,7 @@ import net.austizz.ultimatebankingsystem.gui.screens.HeistDuffelScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.SecureSafeScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.SafetyDepositBoxScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.ShoppingBagScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.VendingMachineStockScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.WalletScreen;
 import net.austizz.ultimatebankingsystem.menu.ModMenus;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -34,6 +35,23 @@ public final class ClientModBusEvents {
     }
 
     @SubscribeEvent
+    public static void onAdditionalModels(ModelEvent.RegisterAdditional event) {
+        event.register(ModelResourceLocation.standalone(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(UltimateBankingSystem.MODID, "block/atm/cash_shutter")));
+        event.register(ModelResourceLocation.standalone(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(UltimateBankingSystem.MODID, "block/atm/card_reader_led")));
+        event.register(ModelResourceLocation.standalone(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath(UltimateBankingSystem.MODID, "block/atm/card_reader_guide")));
+        event.register(ModelResourceLocation.standalone(net.austizz.ultimatebankingsystem.client.renderer.CreditCardItemRenderer.MODEL));
+        for(int index=0;index<16;index++) event.register(ModelResourceLocation.standalone(AtmControls.part("buttons/"+index)));
+        for(String part:new String[]{"cash_shutter","card_reader_led","card_reader_guide"}) event.register(ModelResourceLocation.standalone(AtmControls.part(part)));
+        for (int index = 0; index < 24; index++) {
+            event.register(ModelResourceLocation.standalone(AtmControls.model(index)));
+            if (index >= 16) {
+                event.register(ModelResourceLocation.standalone(AtmControls.indicator(index, false)));
+                event.register(ModelResourceLocation.standalone(AtmControls.indicator(index, true)));
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             ItemBlockRenderTypes.setRenderLayer(ModBlocks.GLASS_COUNTER_DISPLAY.get(), RenderType.translucent());
@@ -52,6 +70,14 @@ public final class ClientModBusEvents {
 
     @SubscribeEvent
     public static void onModifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        AtmControls.reload(net.minecraft.client.Minecraft.getInstance().getResourceManager());
+        for(var state:ModBlocks.IN_WALL_ATM.get().getStateDefinition().getPossibleStates()) {
+            if (state.getValue(net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock.PART)
+                    >= net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock.WALL_CELLS) continue;
+            var key=BlockModelShaper.stateToModelLocation(state);
+            var model=event.getModels().get(key);
+            if(model!=null)event.getModels().put(key,new net.austizz.ultimatebankingsystem.client.model.AtmWallBakedModel(model,state));
+        }
         // Wrap ONLY the metal pallet CENTER blockstate variant (part_x=1,
         // part_z=1 -- the block's default state) with the content-appending
         // model; the 8 part variants keep their plain baked models.
@@ -77,6 +103,7 @@ public final class ClientModBusEvents {
         event.register(ModMenus.SECURE_SAFE.get(), SecureSafeScreen::new);
         event.register(ModMenus.HEIST_DUFFEL.get(), HeistDuffelScreen::new);
         event.register(ModMenus.HEIST_DUFFEL_ITEM.get(), HeistDuffelScreen::new);
+        event.register(ModMenus.VENDING_MACHINE_STOCK.get(), VendingMachineStockScreen::new);
     }
 
     @SubscribeEvent

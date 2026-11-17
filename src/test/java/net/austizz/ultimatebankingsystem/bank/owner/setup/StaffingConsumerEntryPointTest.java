@@ -18,12 +18,12 @@ class StaffingConsumerEntryPointTest {
     private static final UUID ACCOUNT_ID = UUID.fromString("40000000-0000-0000-0000-000000000001");
 
     @Test
-    void assignmentGateAndReadinessOperationFollowGrantAndRevokeFromMetadata() throws Exception {
+    void assignmentGateAndReadinessIgnoreSafeAccessGrants() throws Exception {
         SafeStaffReadinessTestSupport.Scenario scenario = SafeStaffReadinessTestSupport.scenario();
         Object metadata = SafeStaffReadinessTestSupport.metadataWithEmployee();
 
-        assertTrue(assignmentSkips(metadata, scenario.readiness()));
-        assertTrue(hasMissingReason(resolveVault(metadata, scenario), "SAFE_ACCESS_STAFF_MISSING"));
+        assertFalse(assignmentSkips(metadata, scenario.readiness()));
+        assertFalse(hasMissingReason(resolveVault(metadata, scenario), "SAFE_ACCESS_STAFF_MISSING"));
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation(
                 "grantSafeAccess", metadata, EMPLOYEE_ID));
@@ -32,17 +32,17 @@ class StaffingConsumerEntryPointTest {
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation(
                 "revokeSafeAccess", metadata, EMPLOYEE_ID));
-        assertTrue(assignmentSkips(metadata, scenario.readiness()));
-        assertTrue(hasMissingReason(resolveVault(metadata, scenario), "SAFE_ACCESS_STAFF_MISSING"));
+        assertFalse(assignmentSkips(metadata, scenario.readiness()));
+        assertFalse(hasMissingReason(resolveVault(metadata, scenario), "SAFE_ACCESS_STAFF_MISSING"));
     }
 
     @Test
-    void openAuthorityReturnsVaultNotReadyAfterFinalGrantRevoke() throws Exception {
+    void openAuthorityDoesNotCloseVaultAfterSafeAccessRevoke() throws Exception {
         SafeStaffReadinessTestSupport.Scenario scenario = SafeStaffReadinessTestSupport.scenario();
         Object metadata = SafeStaffReadinessTestSupport.metadataWithEmployee();
         OpenFixture open = new OpenFixture(metadata, scenario.readiness());
 
-        assertDecision(open.authorize(), false, "VAULT_NOT_READY");
+        assertDecision(open.authorize(), true, "NONE");
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation(
                 "grantSafeAccess", metadata, EMPLOYEE_ID));
@@ -50,7 +50,7 @@ class StaffingConsumerEntryPointTest {
 
         assertTrue(SafeStaffReadinessTestSupport.staffingMutation(
                 "revokeSafeAccess", metadata, EMPLOYEE_ID));
-        assertDecision(open.authorize(), false, "VAULT_NOT_READY");
+        assertDecision(open.authorize(), true, "NONE");
     }
 
     private static boolean assignmentSkips(Object metadata, Object readiness) throws Exception {

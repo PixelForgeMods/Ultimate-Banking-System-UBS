@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.austizz.ultimatebankingsystem.UltimateBankingSystem;
+import net.austizz.ultimatebankingsystem.block.ModBlocks;
 import net.austizz.ultimatebankingsystem.block.custom.MoneyBriefcaseBlock;
 import net.austizz.ultimatebankingsystem.block.entity.custom.MoneyBriefcaseBlockEntity;
 import net.minecraft.client.Minecraft;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 /**
  * Fully procedural briefcase renderer: black pebbled leather shell with gold
@@ -55,6 +57,10 @@ public class MoneyBriefcaseRenderer implements BlockEntityRenderer<MoneyBriefcas
     private static final float BUNDLE_SCALE_MODEL_X = 4.55F / 12.0F;
     private static final float BUNDLE_SCALE_MODEL_Y = 0.5F;
     private static final float BUNDLE_SCALE_MODEL_Z = 2.55F / 5.0F;
+    private static final float BAR_SCALE_X = 0.40F;
+    private static final float BAR_SCALE_Y = 0.50F;
+    private static final float BAR_SCALE_Z = 0.30F;
+    private static final double BAR_BASE_Y = 0.95D;
 
     public MoneyBriefcaseRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -191,8 +197,30 @@ public class MoneyBriefcaseRenderer implements BlockEntityRenderer<MoneyBriefcas
             int xCol = layerSlot % MoneyBriefcaseBlockEntity.SLOTS_PER_ROW;
 
             double x = GRID_X_CENTERS[xCol] / 16.0D;
-            double y = (GRID_BASE_Y + layer * GRID_LAYER_STEP_Y) / 16.0D;
+            boolean metalBar = MoneyBriefcaseBlockEntity.isMetalBarItem(stored);
+            double y = (metalBar ? BAR_BASE_Y : GRID_BASE_Y + layer * GRID_LAYER_STEP_Y) / 16.0D;
             double z = GRID_Z_CENTERS[zRow] / 16.0D;
+
+            if (metalBar) {
+                BlockState barState = (stored.is(ModBlocks.GOLD_BAR.get().asItem())
+                        ? ModBlocks.GOLD_BAR.get()
+                        : ModBlocks.SILVER_BAR.get()).defaultBlockState();
+                poseStack.pushPose();
+                poseStack.translate(x, y, z);
+                poseStack.scale(BAR_SCALE_X, BAR_SCALE_Y, BAR_SCALE_Z);
+                poseStack.translate(-0.5D, 0.0D, -0.5D);
+                Minecraft.getInstance().getBlockRenderer().renderSingleBlock(
+                        barState,
+                        poseStack,
+                        bufferSource,
+                        packedLight,
+                        packedOverlay,
+                        ModelData.EMPTY,
+                        null
+                );
+                poseStack.popPose();
+                continue;
+            }
 
             ItemStack renderStack = stored.copy();
             renderStack.setCount(1);

@@ -1,0 +1,2240 @@
+{
+  "ambientocclusion": false,
+  "texture_size": [
+    2048,
+    2048
+  ],
+  "textures": {
+    "atm": "ultimatebankingsystem:block/atm_machine",
+    "particle": "#atm"
+  },
+  "elements": [
+    {
+      "name": "Green anti skimming collar smooth segment 0",
+      "from": [
+        4.73778,
+        19.52,
+        2.17
+      ],
+      "to": [
+        5.26222,
+        19.6019,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 1",
+      "from": [
+        4.55703,
+        19.6019,
+        2.17
+      ],
+      "to": [
+        5.44297,
+        19.68381,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 2",
+      "from": [
+        4.44299,
+        19.68381,
+        2.17
+      ],
+      "to": [
+        5.55701,
+        19.76571,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 3",
+      "from": [
+        4.35899,
+        19.76571,
+        2.17
+      ],
+      "to": [
+        5.64101,
+        19.84762,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 4",
+      "from": [
+        4.29424,
+        19.84762,
+        2.17
+      ],
+      "to": [
+        5.70576,
+        19.92952,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 5",
+      "from": [
+        4.24377,
+        19.92952,
+        2.17
+      ],
+      "to": [
+        5.75623,
+        20.01143,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 6",
+      "from": [
+        4.20485,
+        20.01143,
+        2.17
+      ],
+      "to": [
+        5.79515,
+        20.09333,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 7",
+      "from": [
+        4.17585,
+        20.09333,
+        2.17
+      ],
+      "to": [
+        5.82415,
+        20.17524,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 8",
+      "from": [
+        4.15575,
+        20.17524,
+        2.17
+      ],
+      "to": [
+        5.84425,
+        20.25714,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 9",
+      "from": [
+        4.14391,
+        20.25714,
+        2.17
+      ],
+      "to": [
+        5.85609,
+        20.33905,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 10",
+      "from": [
+        4.14,
+        20.33905,
+        2.17
+      ],
+      "to": [
+        5.86,
+        20.42095,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 11",
+      "from": [
+        4.14391,
+        20.42095,
+        2.17
+      ],
+      "to": [
+        5.85609,
+        20.50286,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 12",
+      "from": [
+        4.15575,
+        20.50286,
+        2.17
+      ],
+      "to": [
+        5.84425,
+        20.58476,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 13",
+      "from": [
+        4.17585,
+        20.58476,
+        2.17
+      ],
+      "to": [
+        5.82415,
+        20.66667,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 14",
+      "from": [
+        4.20485,
+        20.66667,
+        2.17
+      ],
+      "to": [
+        5.79515,
+        20.74857,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 15",
+      "from": [
+        4.24377,
+        20.74857,
+        2.17
+      ],
+      "to": [
+        5.75623,
+        20.83048,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 16",
+      "from": [
+        4.29424,
+        20.83048,
+        2.17
+      ],
+      "to": [
+        5.70576,
+        20.91238,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 17",
+      "from": [
+        4.35899,
+        20.91238,
+        2.17
+      ],
+      "to": [
+        5.64101,
+        20.99429,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 18",
+      "from": [
+        4.44299,
+        20.99429,
+        2.17
+      ],
+      "to": [
+        5.55701,
+        21.07619,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 19",
+      "from": [
+        4.55703,
+        21.07619,
+        2.17
+      ],
+      "to": [
+        5.44297,
+        21.1581,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    },
+    {
+      "name": "Green anti skimming collar smooth segment 20",
+      "from": [
+        4.73778,
+        21.1581,
+        2.17
+      ],
+      "to": [
+        5.26222,
+        21.24,
+        2.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "east": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "south": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            12.49609375,
+            0.49609375,
+            12.50390625,
+            0.50390625
+          ],
+          "texture": "#atm",
+          "neoforge_data": {
+            "block_light": 15,
+            "sky_light": 15,
+            "ambient_occlusion": false
+          },
+          "tintindex": 0
+        }
+      },
+      "shade": false
+    }
+  ],
+  "render_type": "minecraft:solid"
+}

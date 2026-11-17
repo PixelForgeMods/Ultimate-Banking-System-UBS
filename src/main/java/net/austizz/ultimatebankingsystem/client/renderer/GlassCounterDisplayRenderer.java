@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class GlassCounterDisplayRenderer implements BlockEntityRenderer<GlassCounterDisplayBlockEntity> {
@@ -67,6 +68,20 @@ public class GlassCounterDisplayRenderer implements BlockEntityRenderer<GlassCou
             );
 
             poseStack.popPose();
+
+            Vec3 labelOffset = new Vec3(
+                    SLOT_X + transform.offsetX(),
+                    transform.offsetY() + 0.23D,
+                    0.28D + transform.offsetZ()
+            ).yRot((float) Math.toRadians(yaw));
+            ShelfPriceLabelRenderer.queue(
+                    counter.getLevel(),
+                    counter.getBlockPos(),
+                    slot,
+                    counter.getSlotPrice(slot),
+                    counter.isShopMode(),
+                    new Vec3(0.5D, SHELF_Y[row], 0.5D).add(labelOffset)
+            );
         }
     }
 }

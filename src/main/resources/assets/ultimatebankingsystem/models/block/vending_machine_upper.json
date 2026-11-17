@@ -1,0 +1,9 @@
+{
+  "ambientocclusion": false,
+  "gui_light": "front",
+  "texture_size": [128, 128],
+  "textures": {
+    "particle": "ultimatebankingsystem:block/vending_machine"
+  },
+  "elements": []
+}

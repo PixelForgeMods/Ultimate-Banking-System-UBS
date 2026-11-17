@@ -73,7 +73,7 @@ public class SafetyDepositBoxRowRenderer implements BlockEntityRenderer<SafetyDe
 
         poseStack.pushPose();
         poseStack.translate(0.5D, 1.5D, 0.5D);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
 
         float[] progress = new float[SafetyDepositBoxRowBlockEntity.DOOR_COUNT];

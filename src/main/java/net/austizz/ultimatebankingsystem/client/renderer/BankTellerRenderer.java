@@ -3,6 +3,8 @@ package net.austizz.ultimatebankingsystem.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.austizz.ultimatebankingsystem.UltimateBankingSystem;
 import net.austizz.ultimatebankingsystem.entity.custom.BankTellerEntity;
+import net.austizz.ultimatebankingsystem.client.NpcSkinClientCache;
+import net.austizz.ultimatebankingsystem.npc.skin.NpcSkinTarget;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -30,9 +32,11 @@ public class BankTellerRenderer extends HumanoidMobRenderer<BankTellerEntity, Pl
     @Override
     public ResourceLocation getTextureLocation(BankTellerEntity entity) {
         if (entity.isCashier()) {
-            return CASHIER_TEXTURE;
+            return NpcSkinClientCache.textureFor(NpcSkinTarget.SHOP_CASHIER.id(), CASHIER_TEXTURE);
         }
-        return entity.getVariant() == BankTellerEntity.VARIANT_FEMALE ? FEMALE_TEXTURE : MALE_TEXTURE;
+        return entity.getVariant() == BankTellerEntity.VARIANT_FEMALE
+                ? NpcSkinClientCache.textureFor(NpcSkinTarget.BANK_TELLER_FEMALE.id(), FEMALE_TEXTURE)
+                : NpcSkinClientCache.textureFor(NpcSkinTarget.BANK_TELLER_MALE.id(), MALE_TEXTURE);
     }
 
     @Override
@@ -42,11 +46,11 @@ public class BankTellerRenderer extends HumanoidMobRenderer<BankTellerEntity, Pl
                        PoseStack poseStack,
                        net.minecraft.client.renderer.MultiBufferSource buffer,
                        int packedLight) {
-        if (entity.isCashier()) {
-            this.model = this.wideModel;
-        } else {
-            this.model = entity.getVariant() == BankTellerEntity.VARIANT_FEMALE ? this.slimModel : this.wideModel;
-        }
+        NpcSkinTarget target = entity.isCashier() ? NpcSkinTarget.SHOP_CASHIER
+                : entity.getVariant() == BankTellerEntity.VARIANT_FEMALE
+                ? NpcSkinTarget.BANK_TELLER_FEMALE : NpcSkinTarget.BANK_TELLER_MALE;
+        this.model = NpcSkinClientCache.usesSlimModel(target.id(), target.defaultSlimModel())
+                ? this.slimModel : this.wideModel;
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 

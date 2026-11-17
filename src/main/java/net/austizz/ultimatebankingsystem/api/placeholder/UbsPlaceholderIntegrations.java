@@ -17,7 +17,12 @@ public final class UbsPlaceholderIntegrations {
             "ubs_account_count", "ubs_has_account", "ubs_has_primary_account",
             "ubs_cash_balance", "ubs_cash_balance_raw", "ubs_account_status",
             "ubs_owned_bank_count", "ubs_owns_bank", "ubs_owned_shop_count", "ubs_owns_shop",
-            "ubs_server_bank_count", "ubs_server_shop_count"
+            "ubs_server_bank_count", "ubs_server_shop_count", "ubs_job", "ubs_job_id",
+            "ubs_job_level", "ubs_job_xp", "ubs_job_xp_to_next_level", "ubs_job_daily_earnings",
+            "ubs_job_daily_earnings_raw", "ubs_job_lifetime_earnings", "ubs_job_lifetime_earnings_raw",
+            "ubs_job_daily_units", "ubs_lumberjack_quote", "ubs_lumberjack_market_money_family",
+            "ubs_lumberjack_market_xp_family", "ubs_lumberjack_market_money_bonus",
+            "ubs_lumberjack_market_xp_bonus"
     );
 
     private UbsPlaceholderIntegrations() {

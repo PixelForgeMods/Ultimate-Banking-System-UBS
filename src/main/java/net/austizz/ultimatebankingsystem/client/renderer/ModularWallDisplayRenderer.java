@@ -195,6 +195,18 @@ public class ModularWallDisplayRenderer implements BlockEntityRenderer<ModularWa
             }
 
             poseStack.popPose();
+
+            Vec3 labelPos = itemPos
+                    .add(rotateByFacing(new Vec3(0.0D, 0.28D, 0.12D), facing))
+                    .subtract(Vec3.atLowerCornerOf(display.getBlockPos()));
+            ShelfPriceLabelRenderer.queue(
+                    display.getLevel(),
+                    display.getBlockPos(),
+                    slot,
+                    display.getSlotPrice(slot),
+                    display.isShopMode(),
+                    labelPos
+            );
         }
     }
 

@@ -78,6 +78,8 @@ public record OwnerPcBankDataPayload(
         List<OwnerPcVaultStorageClaimPayload> vaultStorageClaims
 ) implements CustomPacketPayload {
 
+    private static final int MAX_SAFE_BOX_ASSIGNMENTS = 2048;
+
     private static final StreamCodec<RegistryFriendlyByteBuf, UUID> UUID_CODEC =
             StreamCodec.of(
                     (buf, uuid) -> {
@@ -145,7 +147,8 @@ public record OwnerPcBankDataPayload(
                         ByteBufCodecs.STRING_UTF8.encode(buf, payload.safeRentPeriodTicks());
                         ByteBufCodecs.STRING_UTF8.encode(buf, payload.safeOverdueTicks());
                         ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).encode(buf, payload.safeAreaSummaries());
-                        ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).encode(buf, payload.safeBoxAssignments());
+                        ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(MAX_SAFE_BOX_ASSIGNMENTS))
+                                .encode(buf, payload.safeBoxAssignments());
                         ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).encode(buf, payload.safeLockedQueue());
                         OwnerPcPlayerEmployeePayload.STREAM_CODEC.apply(ByteBufCodecs.list(256))
                                 .encode(buf, payload.playerEmployees());
@@ -218,7 +221,7 @@ public record OwnerPcBankDataPayload(
                             ByteBufCodecs.STRING_UTF8.decode(buf),
                             ByteBufCodecs.STRING_UTF8.decode(buf),
                             ByteBufCodecs.STRING_UTF8.decode(buf),
-                            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).decode(buf),
+                            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(MAX_SAFE_BOX_ASSIGNMENTS)).decode(buf),
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).decode(buf),
                             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(512)).decode(buf),
                             OwnerPcPlayerEmployeePayload.STREAM_CODEC.apply(ByteBufCodecs.list(256)).decode(buf),

@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 public final class UltimateEconomyApiImpl implements UltimateEconomyApi {
-    private static final String API_VERSION = "2.1.1";
+    private static final String API_VERSION = "2.2.0";
     private static final Pattern IDEMPOTENCY_KEY = Pattern.compile("[A-Za-z0-9._:-]{8,160}");
     private static final UUID EXTERNAL_SYSTEM_ACCOUNT = UUID.nameUUIDFromBytes(
             "ultimatebankingsystem:economy-api-system".getBytes(StandardCharsets.UTF_8));

@@ -49,7 +49,7 @@ public class BankVaultDoorRenderer implements BlockEntityRenderer<BankVaultDoorB
 
         poseStack.pushPose();
         poseStack.translate(0.5D, MODEL_GROUND_ANCHOR_Y, 0.5D);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - facing.toYRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-facing.toYRot()));
         poseStack.mulPose(Axis.XP.rotationDegrees(180.0F));
         poseStack.scale(MODEL_WORLD_SCALE, MODEL_WORLD_SCALE, MODEL_WORLD_SCALE);
 

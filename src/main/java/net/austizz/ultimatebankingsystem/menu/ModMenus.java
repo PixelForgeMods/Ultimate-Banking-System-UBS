@@ -49,6 +49,9 @@ public final class ModMenus {
             MENUS.register("heist_duffel_item", () -> IMenuTypeExtension.create((id, inventory, data) ->
                     HeistDuffelMenu.forItem(id, inventory, data.readEnum(InteractionHand.class))));
 
+    public static final DeferredHolder<MenuType<?>, MenuType<VendingMachineStockMenu>> VENDING_MACHINE_STOCK =
+            MENUS.register("vending_machine_stock", () -> IMenuTypeExtension.create(VendingMachineStockMenu::fromNetwork));
+
     private ModMenus() {
     }
 

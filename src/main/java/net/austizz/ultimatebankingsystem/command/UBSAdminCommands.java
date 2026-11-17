@@ -37,6 +37,7 @@ import net.austizz.ultimatebankingsystem.network.OwnerPcPremiseActionPayload;
 import net.austizz.ultimatebankingsystem.network.OwnerPcPremisePayload;
 import net.austizz.ultimatebankingsystem.payments.ScheduledPayment;
 import net.austizz.ultimatebankingsystem.shop.ShopService;
+import net.austizz.ultimatebankingsystem.shelf.ShelfFillService;
 import net.austizz.ultimatebankingsystem.util.MoneyText;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.ChatFormatting;
@@ -207,7 +208,8 @@ public class UBSAdminCommands {
                         )
                 )
                 .then(buildGiveLiteral())
-                .then(buildAdminLiteral());
+                .then(buildAdminLiteral())
+                .then(buildVendingMachineCommand("vending"));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> buildGiveLiteral() {
@@ -898,6 +900,18 @@ public class UBSAdminCommands {
                         .then(buildAdminBankViewingRoomLiteral())
                 )
                 .then(Commands.literal("shop")
+                        .then(Commands.literal("shelves")
+                                .requires(source -> source.hasPermission(ADMIN_PERMISSION_LEVEL))
+                                .then(Commands.literal("fill")
+                                        .executes(context -> {
+                                            ShelfFillService.open(context.getSource().getPlayerOrException());
+                                            return 1;
+                                        }))
+                                .then(Commands.literal("done")
+                                        .executes(context -> {
+                                            ShelfFillService.finishSelection(context.getSource().getPlayerOrException());
+                                            return 1;
+                                        })))
                         .then(Commands.literal("view")
                                 .then(Commands.argument("player", EntityArgument.player())
                                         .executes(context -> adminShopViewPlayer(
@@ -942,6 +956,8 @@ public class UBSAdminCommands {
                                 )
                         )
                 )
+                .then(buildVendingMachineCommand("machine"))
+                .then(buildVendingMachineCommand("vending"))
                 .then(buildAdminHeistLiteral())
                 .then(Commands.literal("flags")
                         .executes(context -> adminListFlags(context.getSource()))
@@ -989,6 +1005,58 @@ public class UBSAdminCommands {
                         .then(Commands.argument("player", EntityArgument.player())
                                 .executes(context -> adminHeistSetInsiderBypass(
                                         context.getSource(), EntityArgument.getPlayer(context, "player"), false))));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> buildVendingMachineCommand(String rootLiteral) {
+        return Commands.literal(rootLiteral)
+                .then(Commands.literal("give")
+                        .then(buildVendingMachineVariantCommand("regular", false))
+                        .then(buildVendingMachineVariantCommand("creative", true))
+                );
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> buildVendingMachineVariantCommand(
+            String variantLiteral,
+            boolean creative
+    ) {
+        return Commands.literal(variantLiteral)
+                .executes(context -> adminGiveVendingMachine(context.getSource(), creative, null))
+                .then(Commands.argument("target", EntityArgument.player())
+                        .executes(context -> adminGiveVendingMachine(
+                                context.getSource(),
+                                creative,
+                                EntityArgument.getPlayer(context, "target")
+                        ))
+                );
+    }
+
+    private static int adminGiveVendingMachine(CommandSourceStack source, boolean creative, ServerPlayer target) {
+        if (!requireAdminPermission(source)) {
+            return 0;
+        }
+
+        ServerPlayer recipient = target != null ? target : source.getPlayer();
+        if (recipient == null) {
+            source.sendSystemMessage(moneyLiteral("§cSpecify a player when running this command from the console."));
+            return 0;
+        }
+
+        ItemStack machine = new ItemStack(
+                (creative ? ModBlocks.CREATIVE_VENDING_MACHINE.get() : ModBlocks.VENDING_MACHINE.get()).asItem()
+        );
+        if (!recipient.getInventory().add(machine)) {
+            recipient.drop(machine, false);
+        }
+
+        String variantName = creative ? "Creative Vending Machine" : "Vending Machine";
+        source.sendSystemMessage(moneyLiteral(
+                "§aGave §e" + variantName + "§a to §f" + recipient.getName().getString()
+                        + "§a (ID: §fultimatebankingsystem:" + (creative ? "creative_" : "") + "vending_machine§a)."
+        ));
+        if (target != null && target != source.getPlayer()) {
+            target.sendSystemMessage(moneyLiteral("§aAn administrator gave you §e" + variantName + "§a."));
+        }
+        return 1;
     }
 
     private static int adminHeistList(CommandSourceStack source) {

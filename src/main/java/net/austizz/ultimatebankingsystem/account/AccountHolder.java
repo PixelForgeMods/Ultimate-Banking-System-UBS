@@ -52,11 +52,14 @@ public class AccountHolder {
     private LocalDateTime DateOfCreation;
     private AccountTypes AccountType;
     private String pinCode;
+    private int atmPinFailures;
+    private long atmPinLockedUntil;
     private BigDecimal balance;
     private final UUID BankId;
     private boolean isPrimaryAccount;
     private ConcurrentHashMap<UUID, UserTransaction> transactions;
     private BigDecimal temporaryWithdrawalLimit;
+    private BigDecimal personalWithdrawalLimit, personalDailyWithdrawalLimit;
     private long temporaryWithdrawalLimitExpiresAtGameTime;
     private long temporaryWithdrawalLimitExpiresAtEpochMillis;
     private boolean frozen;
@@ -601,6 +604,14 @@ public class AccountHolder {
         BankManager.markDirty();
     }
 
+    public long atmPinLockedUntil() { return atmPinLockedUntil; }
+    public void recordAtmPinAttempt(boolean accepted, long now) {
+        if (now < atmPinLockedUntil) return;
+        if (accepted) { atmPinFailures = 0; atmPinLockedUntil = 0; }
+        else if (++atmPinFailures >= 3) { atmPinFailures = 0; atmPinLockedUntil = now + 60_000; }
+        BankManager.markDirty();
+    }
+
     public boolean hasPin() {
         return isFourDigitPin(this.pinCode);
     }
@@ -640,9 +651,30 @@ public class AccountHolder {
         };
     }
 
+    public BigDecimal getPersonalWithdrawalLimit() {
+        return personalWithdrawalLimit == null ? getConfiguredWithdrawalLimit() : personalWithdrawalLimit.min(getConfiguredWithdrawalLimit());
+    }
+    public BigDecimal getEffectiveDailyWithdrawalLimit() {
+        return personalDailyWithdrawalLimit == null ? getConfiguredDailyWithdrawalLimit() : personalDailyWithdrawalLimit.min(getConfiguredDailyWithdrawalLimit());
+    }
+    private static boolean validPersonalLimit(BigDecimal value, BigDecimal maximum) {
+        return value != null && value.signum() > 0 && value.stripTrailingZeros().scale() <= 0 && value.compareTo(maximum) <= 0;
+    }
+    public boolean setPersonalWithdrawalLimit(BigDecimal value) {
+        if (!validPersonalLimit(value, getConfiguredWithdrawalLimit())) return false;
+        personalWithdrawalLimit = value; clearTemporaryWithdrawalLimit(); BankManager.markDirty(); return true;
+    }
+    public boolean setPersonalDailyWithdrawalLimit(BigDecimal value) {
+        if (!validPersonalLimit(value, getConfiguredDailyWithdrawalLimit())) return false;
+        personalDailyWithdrawalLimit = value; BankManager.markDirty(); return true;
+    }
+    public void resetPersonalWithdrawalLimits() {
+        personalWithdrawalLimit = null; personalDailyWithdrawalLimit = null;
+        clearTemporaryWithdrawalLimit(); BankManager.markDirty();
+    }
     public BigDecimal getEffectiveWithdrawalLimit(long currentGameTime) {
         expireTemporaryWithdrawalLimitIfNeeded(currentGameTime);
-        return temporaryWithdrawalLimit != null ? temporaryWithdrawalLimit : getConfiguredWithdrawalLimit();
+        return (temporaryWithdrawalLimit != null ? temporaryWithdrawalLimit : getPersonalWithdrawalLimit()).min(getConfiguredWithdrawalLimit());
     }
 
     public BigDecimal getDailyWithdrawnAmount() {
@@ -651,16 +683,16 @@ public class AccountHolder {
     }
 
     public BigDecimal getRemainingDailyWithdrawalLimit() {
-        BigDecimal remaining = getConfiguredDailyWithdrawalLimit().subtract(getDailyWithdrawnAmount());
+        BigDecimal remaining = getEffectiveDailyWithdrawalLimit().subtract(getDailyWithdrawnAmount());
         return remaining.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : remaining;
     }
 
     public AccountReadSnapshot readOnlySnapshot(long currentGameTime) {
         long nowMillis = System.currentTimeMillis();
         return AccountReadSnapshot.capture(new AccountReadSnapshot.Raw(
-                        getConfiguredDailyWithdrawalLimit(), dailyWithdrawalWindowDay,
+                        getEffectiveDailyWithdrawalLimit(), dailyWithdrawalWindowDay,
                         dailyWithdrawnAmount, dailyWithdrawalResetEpochMillis,
-                        temporaryWithdrawalLimit, temporaryWithdrawalLimitExpiresAtGameTime,
+                        temporaryWithdrawalLimit == null ? null : temporaryWithdrawalLimit.min(getConfiguredWithdrawalLimit()), temporaryWithdrawalLimitExpiresAtGameTime,
                         temporaryWithdrawalLimitExpiresAtEpochMillis, certificateLocked,
                         certificateMaturityGameTime),
                 currentGameTime, nowMillis, currentEpochDay(), computeNextMidnightEpochMillis());
@@ -746,7 +778,7 @@ public class AccountHolder {
 
     public BigDecimal getTemporaryWithdrawalLimitIfActive(long currentGameTime) {
         expireTemporaryWithdrawalLimitIfNeeded(currentGameTime);
-        return temporaryWithdrawalLimit;
+        return temporaryWithdrawalLimit == null ? null : temporaryWithdrawalLimit.min(getConfiguredWithdrawalLimit());
     }
 
     public long getTemporaryWithdrawalLimitExpiresAtGameTime(long currentGameTime) {
@@ -765,9 +797,7 @@ public class AccountHolder {
     }
 
     public boolean setTemporaryWithdrawalLimitUntil(BigDecimal newLimit, long currentGameTime, long expiresAtEpochMillis) {
-        if (newLimit == null || newLimit.compareTo(BigDecimal.ZERO) <= 0) {
-            return false;
-        }
+        if (!validPersonalLimit(newLimit, getConfiguredWithdrawalLimit())) return false;
         if (newLimit.stripTrailingZeros().scale() > 0) {
             return false;
         }
@@ -937,6 +967,7 @@ public class AccountHolder {
         tag.putUUID("accountUUID", this.accountUUID);
         tag.putString("dateOfCreation", this.DateOfCreation.toString());
         tag.putString("pinCode", this.pinCode == null ? "" : this.pinCode);
+        tag.putInt("atmPinFailures", atmPinFailures); tag.putLong("atmPinLockedUntil", atmPinLockedUntil);
         tag.putUUID("playerUUID", this.playerUUID);
         tag.putBoolean("frozen", this.frozen);
         tag.putString("frozenReason", getFrozenReason());
@@ -958,6 +989,8 @@ public class AccountHolder {
                 this.dailyOutgoingTransactionAmount == null
                         ? BigDecimal.ZERO.toPlainString()
                         : this.dailyOutgoingTransactionAmount.toPlainString());
+        if (personalWithdrawalLimit != null) tag.putString("personalWithdrawalLimit", personalWithdrawalLimit.toPlainString());
+        if (personalDailyWithdrawalLimit != null) tag.putString("personalDailyWithdrawalLimit", personalDailyWithdrawalLimit.toPlainString());
         if (this.temporaryWithdrawalLimit != null) {
             tag.putString("temporaryWithdrawalLimit", this.temporaryWithdrawalLimit.toPlainString());
             tag.putLong("temporaryWithdrawalLimitExpiresAtGameTime", this.temporaryWithdrawalLimitExpiresAtGameTime);
@@ -1037,6 +1070,8 @@ public class AccountHolder {
         String principalId = tag.contains("principalId") ? tag.getString("principalId") : playerUUID.toString();
         AccountHolder account = new AccountHolder(
                 playerUUID, balance, accountType, pinCode, BankId, accountUUID, principalType, principalId);
+        account.atmPinFailures = Math.clamp(tag.getInt("atmPinFailures"), 0, 2);
+        account.atmPinLockedUntil = Math.max(0, tag.getLong("atmPinLockedUntil"));
         account.DateOfCreation = LocalDateTime.parse(tag.getString("dateOfCreation"));
         account.isPrimaryAccount = tag.getBoolean("isPrimaryAccount") && !account.isInstitutional();
         account.frozen = tag.getBoolean("frozen");
@@ -1075,6 +1110,12 @@ public class AccountHolder {
                 account.dailyOutgoingTransactionAmount = BigDecimal.ZERO;
             }
         }
+        try {
+            if (tag.contains("personalWithdrawalLimit")) { var value=new BigDecimal(tag.getString("personalWithdrawalLimit")); if(value.signum()>0 && value.stripTrailingZeros().scale()<=0) account.personalWithdrawalLimit=value; }
+        } catch(NumberFormatException ignored) { }
+        try {
+            if (tag.contains("personalDailyWithdrawalLimit")) { var value=new BigDecimal(tag.getString("personalDailyWithdrawalLimit")); if(value.signum()>0 && value.stripTrailingZeros().scale()<=0) account.personalDailyWithdrawalLimit=value; }
+        } catch(NumberFormatException ignored) { }
         if (tag.contains("temporaryWithdrawalLimit")) {
             try {
                 account.temporaryWithdrawalLimit = new BigDecimal(tag.getString("temporaryWithdrawalLimit"));

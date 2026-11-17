@@ -128,7 +128,6 @@ public class BankVaultDoorBlockEntity extends BlockEntity {
                 || vault.escortHolds.active();
         vault.targetOpen = shouldOpen;
 
-        float previousProgress = vault.animationProgress;
         float step = shouldOpen ? 1.0F / OPEN_ANIMATION_TICKS : 1.0F / CLOSE_ANIMATION_TICKS;
         float next = shouldOpen
                 ? Math.min(1.0F, vault.animationProgress + step)
@@ -138,7 +137,6 @@ public class BankVaultDoorBlockEntity extends BlockEntity {
         }
         vault.animationProgress = next;
         if (!level.isClientSide()) {
-            BankVaultDoorBlock.pushEntitiesForAnimatedDoor(level, pos, state, previousProgress, next);
             BankVaultDoorBlock.setOpenStateIfNeeded(level, pos, state, shouldOpen && next >= 1.0F);
             if (next == 0.0F || next == 1.0F) {
                 vault.setChanged();

@@ -31,9 +31,15 @@ sourceSets.main.resources {
 }
 
 repositories {
+    mavenCentral()
     // Add here additional repositories if required by some of the dependencies below.
     maven {
         url "https://libraries.minecraft.net"
+    }
+    // JourneyMap publishes its optional addon API separately from the client mod.
+    maven {
+        name = "JourneyMap Maven"
+        url = "https://maven.blamejared.com"
     }
 }
 
@@ -62,7 +68,7 @@ neoForge {
         client {
             client()
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            programArguments.addAll '--username', 'Dev1'
+            programArguments.addAll '--username', 'Dev2'
 
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
@@ -131,6 +137,20 @@ configurations {
 }
 
 dependencies {
+    // The guide is rendered from CommonMark ASTs; jar-in-jar keeps it available on client installs.
+    for (artifact in ['commonmark', 'commonmark-ext-gfm-tables', 'commonmark-ext-gfm-strikethrough']) {
+        jarJar(implementation("org.commonmark:${artifact}:0.30.0")) {
+            version {
+                strictly '[0.30.0,0.31.0)'
+                prefer '0.30.0'
+            }
+        }
+        additionalRuntimeClasspath "org.commonmark:${artifact}:0.30.0"
+    }
+    // Compile-only: JourneyMap discovers the annotated plugin only when its client is installed.
+    compileOnly group: 'info.journeymap', name: 'journeymap-api-neoforge',
+            version: project.journeymap_api_version, changing: true
+
     // Official NeoEssentials runtime for local leaderboard/placeholder development.
     // UBS keeps the integration optional through reflection.
     localRuntime files("libs/neoessentials-1.0.6-1.21.x+build.11-all.jar")

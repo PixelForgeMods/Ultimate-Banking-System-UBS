@@ -1,0 +1,251 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "Lower armored safe body",
+      "from": [
+        0,
+        0.15,
+        3.5
+      ],
+      "to": [
+        7.699999999999999,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.078125,
+            0.13824912765658248,
+            0.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            0.40739329268292684,
+            0.13824912765658248,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            0.5,
+            0.40739329268292684,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Safe front door seam",
+      "from": [
+        0,
+        0.45,
+        3.45
+      ],
+      "to": [
+        7.510000000000002,
+        16,
+        3.51
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            11.078125,
+            0.09493501474842585,
+            11.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            11.078125,
+            0.09493501474842585,
+            11.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            11.5,
+            0.09493501474842585,
+            11.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            11.5,
+            0.078125,
+            11.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Safe front silver door",
+      "from": [
+        0,
+        0.5,
+        3.4
+      ],
+      "to": [
+        7.460000000000001,
+        16,
+        3.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.078125,
+            0.09236579988075674,
+            0.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            0.078125,
+            0.09236579988075674,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            0.5,
+            0.09236579988075674,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            0.5,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    },
+    {
+      "name": "Safe bottom shadow line",
+      "from": [
+        0,
+        0,
+        3.6
+      ],
+      "to": [
+        7.600000000000001,
+        0.15,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            3.078125,
+            0.078125,
+            3.5,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            3.406480911330049,
+            0.078125,
+            3.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            3.5,
+            0.078125,
+            3.921875,
+            0.5935190886699508
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "down": {
+          "uv": [
+            3.5,
+            0.40648091133004915,
+            3.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      }
+    }
+  ]
+}

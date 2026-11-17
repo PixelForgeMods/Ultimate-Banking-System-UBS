@@ -5,6 +5,7 @@ import net.austizz.ultimatebankingsystem.api.ApiNotificationRequest;
 import net.austizz.ultimatebankingsystem.api.ApiNotificationType;
 import net.austizz.ultimatebankingsystem.client.ActionAlertClientState;
 import net.austizz.ultimatebankingsystem.client.ClaimModeClientState;
+import net.austizz.ultimatebankingsystem.client.CourierDeliveryClientState;
 import net.austizz.ultimatebankingsystem.client.DeliveryAlertClientState;
 import net.austizz.ultimatebankingsystem.client.DeliveryInfoBoardClientState;
 import net.austizz.ultimatebankingsystem.client.DeliveryPalletLabelsClientState;
@@ -22,6 +23,7 @@ import net.austizz.ultimatebankingsystem.client.ShopSetupObjectiveClientState;
 import net.austizz.ultimatebankingsystem.client.ShelfTransformPreviewClientState;
 import net.austizz.ultimatebankingsystem.client.SmartphoneClientState;
 import net.austizz.ultimatebankingsystem.client.StockroomLocateClientState;
+import net.austizz.ultimatebankingsystem.client.NpcSkinClientCache;
 import net.austizz.ultimatebankingsystem.gui.screens.ATMScreenHelper;
 import net.austizz.ultimatebankingsystem.gui.screens.AccessVerifierScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.BankScreen;
@@ -29,12 +31,17 @@ import net.austizz.ultimatebankingsystem.gui.screens.BankTellerScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.ClientATMData;
 import net.austizz.ultimatebankingsystem.gui.screens.ClientOwnerPcData;
 import net.austizz.ultimatebankingsystem.gui.screens.HandheldTerminalScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.JobScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.NpcSkinEditorScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.OwnerPcClientScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.OwnerPcScreenHelper;
 import net.austizz.ultimatebankingsystem.gui.screens.RfidScannerScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.SecureSafeAccessScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.ShelfScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.ShelfFillWizardScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.WikiScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.ShopTerminalScreen;
+import net.austizz.ultimatebankingsystem.gui.screens.VendingMachineScreen;
 import net.austizz.ultimatebankingsystem.gui.screens.layers.AccountSettingsLayer;
 import net.austizz.ultimatebankingsystem.gui.screens.layers.BalanceInquiryLayer;
 import net.austizz.ultimatebankingsystem.gui.screens.layers.CreatePayRequestLayer;
@@ -47,7 +54,26 @@ import net.austizz.ultimatebankingsystem.gui.screens.layers.WithdrawLayer;
 import net.minecraft.client.Minecraft;
 
 final class ClientPayloadHandlers {
+    public static void handleAtmDepositStock(AtmDepositStockPayload payload) {
+        net.austizz.ultimatebankingsystem.client.AtmCameraController.depositStock(payload);
+    }
+    public static void handleAtmViewResult(AtmViewResultPayload payload) {
+        net.austizz.ultimatebankingsystem.client.AtmCameraController.viewResult(payload);
+    }
+    public static void handleAtmActionResult(AtmActionResultPayload payload) {
+        net.austizz.ultimatebankingsystem.client.AtmCameraController.actionResult(payload);
+    }
+    public static void handleAtmPinResult(AtmPinResultPayload payload) {
+        net.austizz.ultimatebankingsystem.client.AtmCameraController.pinResult(payload);
+    }
+    public static void handleAtmCardResult(AtmCardResultPayload payload) {
+        net.austizz.ultimatebankingsystem.client.AtmCameraController.cardResult(payload);
+    }
     private ClientPayloadHandlers() {
+    }
+
+    static void handleWikiOpen(WikiOpenPayload payload) {
+        Minecraft.getInstance().setScreen(new WikiScreen());
     }
 
     static void handleHudState(HudStatePayload payload) {
@@ -261,6 +287,22 @@ final class ClientPayloadHandlers {
         Minecraft.getInstance().setScreen(new ShopTerminalScreen(payload));
     }
 
+    static void handleVendingMachineOpen(VendingMachineOpenPayload payload) {
+        if (Minecraft.getInstance().screen instanceof VendingMachineScreen vendingScreen
+                && vendingScreen.matches(payload)) {
+            vendingScreen.refresh(payload);
+            return;
+        }
+        Minecraft.getInstance().setScreen(new VendingMachineScreen(payload));
+    }
+
+    static void handleVendingMachineActionResponse(VendingMachineActionResponsePayload payload) {
+        if (Minecraft.getInstance().screen instanceof VendingMachineScreen vendingScreen) {
+            vendingScreen.handleActionResponse(payload);
+        }
+        pushActionAlert(payload.success(), payload.message(), "Vending Machine");
+    }
+
     static void handleShopTerminalSaveResponse(ShopTerminalSaveResponsePayload payload) {
         if (Minecraft.getInstance().screen instanceof ShopTerminalScreen terminalScreen) {
             terminalScreen.handleSaveResponse(payload);
@@ -305,6 +347,35 @@ final class ClientPayloadHandlers {
         Minecraft.getInstance().setScreen(new HandheldTerminalScreen(payload));
     }
 
+    static void handleJobOpen(JobOpenPayload payload) {
+        if (Minecraft.getInstance().screen instanceof JobScreen jobScreen
+                && jobScreen.matches(payload)) {
+            jobScreen.refresh(payload);
+            return;
+        }
+        Minecraft.getInstance().setScreen(new JobScreen(payload));
+    }
+
+    static void handleCourierDeliveryState(CourierDeliveryStatePayload payload) {
+        CourierDeliveryClientState.apply(payload);
+        if (Minecraft.getInstance().screen instanceof JobScreen jobScreen) {
+            jobScreen.applyCourierDeliveryState(payload);
+        }
+    }
+
+    static void handleNpcSkinEditor(NpcSkinEditorPayload payload) {
+        NpcSkinClientCache.applyEditor(payload);
+        if (Minecraft.getInstance().screen instanceof NpcSkinEditorScreen screen) {
+            screen.refresh(payload);
+            return;
+        }
+        Minecraft.getInstance().setScreen(new NpcSkinEditorScreen(payload));
+    }
+
+    static void handleNpcSkinSync(NpcSkinSyncPayload payload) {
+        NpcSkinClientCache.applySync(payload);
+    }
+
     static void handleHandheldTerminalSaveResponse(HandheldTerminalSaveResponsePayload payload) {
         if (Minecraft.getInstance().screen instanceof HandheldTerminalScreen terminalScreen) {
             terminalScreen.handleSaveResponse(payload);
@@ -328,6 +399,10 @@ final class ClientPayloadHandlers {
             return;
         }
         Minecraft.getInstance().setScreen(new ShelfScreen(payload));
+    }
+
+    static void handleShelfFillOpen(ShelfFillOpenPayload payload) {
+        ShelfFillWizardScreen.accept(payload);
     }
 
     static void handleShelfActionResponse(ShelfActionResponsePayload payload) {

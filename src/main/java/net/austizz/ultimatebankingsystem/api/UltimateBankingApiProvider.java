@@ -8,6 +8,10 @@ import net.austizz.ultimatebankingsystem.api.economy.UltimateEconomyApi;
 import net.austizz.ultimatebankingsystem.api.economy.UltimateEconomyApiImpl;
 import net.austizz.ultimatebankingsystem.api.heist.UltimateHeistApi;
 import net.austizz.ultimatebankingsystem.api.heist.UltimateHeistApiImpl;
+import net.austizz.ultimatebankingsystem.api.job.UltimateJobApi;
+import net.austizz.ultimatebankingsystem.api.job.UltimateJobApiImpl;
+import net.austizz.ultimatebankingsystem.api.organization.UltimateOrganizationApi;
+import net.austizz.ultimatebankingsystem.api.organization.UltimateOrganizationApiImpl;
 import net.austizz.ultimatebankingsystem.api.shop.UltimateShopManagementApi;
 import net.austizz.ultimatebankingsystem.api.shop.UltimateShopManagementApiImpl;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,6 +24,8 @@ public final class UltimateBankingApiProvider {
     private static final UltimateShopManagementApi SHOPS = new UltimateShopManagementApiImpl();
     private static final UltimateHeistApi HEISTS = new UltimateHeistApiImpl();
     private static final UltimateEconomyApi ECONOMY = new UltimateEconomyApiImpl();
+    private static final UltimateOrganizationApi ORGANIZATIONS = new UltimateOrganizationApiImpl();
+    private static final UltimateJobApi JOBS = new UltimateJobApiImpl();
 
     private UltimateBankingApiProvider() {}
 
@@ -50,5 +56,23 @@ public final class UltimateBankingApiProvider {
     @ApiStatus.AvailableSince("2.1.0")
     public static UltimateEconomyApi economy() {
         return ECONOMY;
+    }
+
+    @ApiStatus.AvailableSince("2.2.0")
+    public static UltimateOrganizationApi organizations() {
+        return ORGANIZATIONS;
+    }
+
+    /**
+     * Alias for integrations that prefer an explicit account-oriented name.
+     */
+    @ApiStatus.AvailableSince("2.2.0")
+    public static UltimateOrganizationApi organizationAccounts() {
+        return ORGANIZATIONS;
+    }
+
+    @ApiStatus.AvailableSince("2.1.2")
+    public static UltimateJobApi jobs() {
+        return JOBS;
     }
 }

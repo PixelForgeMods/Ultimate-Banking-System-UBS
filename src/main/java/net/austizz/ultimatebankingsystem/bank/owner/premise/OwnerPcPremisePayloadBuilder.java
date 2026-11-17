@@ -58,8 +58,7 @@ public final class OwnerPcPremisePayloadBuilder {
             List<SafeVaultReadinessResolver.RowReadiness> readiness,
             UUID bankId,
             Set<String> activeVaultIds) {
-        return buildProjected(metadata, snapshot,
-                SafetyDepositBoxService.applyStaffingReadiness(staffingMetadata, readiness),
+        return buildProjected(metadata, snapshot, readiness,
                 bankId, activeVaultIds, viewingRoomCounts(null, staffingMetadata, bankId));
     }
 

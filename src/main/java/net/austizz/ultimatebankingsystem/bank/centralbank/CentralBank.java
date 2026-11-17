@@ -47,6 +47,10 @@ public class CentralBank extends Bank{
     private ConcurrentHashMap<UUID, CompoundTag> pickpocketHistory;
     private ConcurrentHashMap<String, CompoundTag> economyOperations;
     private ConcurrentHashMap<String, CompoundTag> economyEscrows;
+    private ConcurrentHashMap<UUID, CompoundTag> organizationAccounts;
+    private ConcurrentHashMap<String, CompoundTag> organizationOperations;
+    private ConcurrentHashMap<UUID, CompoundTag> organizationTransactions;
+    private ConcurrentHashMap<UUID, CompoundTag> organizationEvents;
     private long economyRevision;
     private int nextBankTellerVariant;
 
@@ -72,6 +76,10 @@ public class CentralBank extends Bank{
         this.pickpocketHistory = new ConcurrentHashMap<>();
         this.economyOperations = new ConcurrentHashMap<>();
         this.economyEscrows = new ConcurrentHashMap<>();
+        this.organizationAccounts = new ConcurrentHashMap<>();
+        this.organizationOperations = new ConcurrentHashMap<>();
+        this.organizationTransactions = new ConcurrentHashMap<>();
+        this.organizationEvents = new ConcurrentHashMap<>();
         this.economyRevision = 0L;
         this.nextBankTellerVariant = TELLER_VARIANT_MALE;
     }
@@ -121,6 +129,34 @@ public class CentralBank extends Bank{
             economyEscrows = new ConcurrentHashMap<>();
         }
         return economyEscrows;
+    }
+
+    public ConcurrentHashMap<UUID, CompoundTag> getOrganizationAccounts() {
+        if (organizationAccounts == null) {
+            organizationAccounts = new ConcurrentHashMap<>();
+        }
+        return organizationAccounts;
+    }
+
+    public ConcurrentHashMap<String, CompoundTag> getOrganizationOperations() {
+        if (organizationOperations == null) {
+            organizationOperations = new ConcurrentHashMap<>();
+        }
+        return organizationOperations;
+    }
+
+    public ConcurrentHashMap<UUID, CompoundTag> getOrganizationTransactions() {
+        if (organizationTransactions == null) {
+            organizationTransactions = new ConcurrentHashMap<>();
+        }
+        return organizationTransactions;
+    }
+
+    public ConcurrentHashMap<UUID, CompoundTag> getOrganizationEvents() {
+        if (organizationEvents == null) {
+            organizationEvents = new ConcurrentHashMap<>();
+        }
+        return organizationEvents;
     }
 
     public synchronized long getEconomyRevision() {
@@ -790,6 +826,10 @@ public class CentralBank extends Bank{
         tag.put("pickpocket_opt_out", saveUuidBooleanMap(getPickpocketOptOut()));
         tag.put("economy_operations", saveStringTagMap(getEconomyOperations()));
         tag.put("economy_escrows", saveStringTagMap(getEconomyEscrows()));
+        tag.put("organization_accounts", saveTagMap(getOrganizationAccounts()));
+        tag.put("organization_operations", saveStringTagMap(getOrganizationOperations()));
+        tag.put("organization_transactions", saveTagMap(getOrganizationTransactions()));
+        tag.put("organization_events", saveTagMap(getOrganizationEvents()));
         tag.putLong("economy_revision", getEconomyRevision());
         tag.putInt("next_bank_teller_variant", this.nextBankTellerVariant);
 
@@ -871,6 +911,10 @@ public class CentralBank extends Bank{
         centralBank.pickpocketOptOut = loadUuidBooleanMap(tag.getList("pickpocket_opt_out", 10));
         centralBank.economyOperations = loadStringTagMap(tag.getList("economy_operations", 10));
         centralBank.economyEscrows = loadStringTagMap(tag.getList("economy_escrows", 10));
+        centralBank.organizationAccounts = loadTagMap(tag.getList("organization_accounts", 10));
+        centralBank.organizationOperations = loadStringTagMap(tag.getList("organization_operations", 10));
+        centralBank.organizationTransactions = loadTagMap(tag.getList("organization_transactions", 10));
+        centralBank.organizationEvents = loadTagMap(tag.getList("organization_events", 10));
         centralBank.economyRevision = tag.contains("economy_revision")
                 ? Math.max(0L, tag.getLong("economy_revision"))
                 : 0L;

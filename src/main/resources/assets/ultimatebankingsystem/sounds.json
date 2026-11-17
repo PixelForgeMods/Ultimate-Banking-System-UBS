@@ -10,5 +10,56 @@
     "sounds": [
       "ultimatebankingsystem:briefcase_close"
     ]
+  },
+  "atm_keypress": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_keypress",
+    "sounds": [
+      "ultimatebankingsystem:atm_keypress"
+    ]
+  },
+  "atm_card_mechanism": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_card_mechanism",
+    "sounds": [
+      {
+        "name": "ultimatebankingsystem:atm_card_mechanism",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "atm_cash_dispense": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_cash_dispense",
+    "sounds": [
+      {
+        "name": "ultimatebankingsystem:atm_cash_dispense",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "atm_cash_prepare": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_cash_dispense",
+    "sounds": [
+      {
+        "name": "ultimatebankingsystem:atm_cash_prepare",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "atm_receipt_print": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_receipt_print",
+    "sounds": [
+      {
+        "name": "ultimatebankingsystem:atm_receipt_print",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "atm_receipt_tear": {
+    "subtitle": "subtitles.ultimatebankingsystem.atm_receipt_tear",
+    "sounds": [
+      {
+        "name": "ultimatebankingsystem:atm_receipt_tear",
+        "attenuation_distance": 12
+      }
+    ]
   }
 }

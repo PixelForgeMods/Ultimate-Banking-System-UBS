@@ -191,25 +191,6 @@ public final class SafeVaultReadinessResolver {
                 summary, humanReasons(missing));
     }
 
-    public static RowReadiness withEligibleSafeAccessStaff(RowReadiness readiness,
-                                                           boolean eligibleSafeAccessStaff) {
-        if (readiness == null || readiness.summary() == null) {
-            return readiness;
-        }
-        List<SafeReadinessMissingReason> missing = new ArrayList<>(readiness.summary().missingReasons());
-        missing.remove(SafeReadinessMissingReason.SAFE_ACCESS_STAFF_MISSING);
-        if (!eligibleSafeAccessStaff) {
-            missing.add(SafeReadinessMissingReason.SAFE_ACCESS_STAFF_MISSING);
-        }
-        SafeVaultReadinessSummary summary = new SafeVaultReadinessSummary(
-                readiness.summary().vaultId(),
-                missing.isEmpty(),
-                missing
-        );
-        return new RowReadiness(readiness.mapped(), readiness.premise(), readiness.safeArea(), readiness.vault(),
-                summary, humanReasons(missing));
-    }
-
     public static List<String> humanReasons(List<SafeReadinessMissingReason> missingReasons) {
         List<String> reasons = new ArrayList<>();
         if (missingReasons == null) {
@@ -225,7 +206,6 @@ public final class SafeVaultReadinessResolver {
                 case ASSIGNABLE_ROW_MISSING -> "At least one fully assignable loaded safety deposit row is required.";
                 case TELLER_ROUTE_MISSING -> "Bank-bound teller outbound and return routes are missing.";
                 case VIEWING_ROOM_MISSING -> "At least one ready safety-box viewing room is required in this premise.";
-                case SAFE_ACCESS_STAFF_MISSING -> "At least one current bank employee must have Safe Access.";
             });
         }
         return reasons;

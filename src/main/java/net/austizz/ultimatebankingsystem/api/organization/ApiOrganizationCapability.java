@@ -1,0 +1,23 @@
+package net.austizz.ultimatebankingsystem.api.organization;
+
+import org.jetbrains.annotations.ApiStatus;
+
+@ApiStatus.AvailableSince("2.2.0")
+public enum ApiOrganizationCapability {
+    ORGANIZATION_ACCOUNTS,
+    NAMESPACED_EXTERNAL_OWNERS,
+    CUSTOM_ACCOUNT_TYPES,
+    SHARED_ACCESS,
+    FINE_GRAINED_PERMISSIONS,
+    ACCOUNT_LIFECYCLE,
+    LEADERSHIP_TRANSFER,
+    IDEMPOTENT_TRANSACTIONS,
+    UNIQUE_EXTERNAL_REFERENCES,
+    CANCELLABLE_OPERATIONS,
+    SOURCE_AND_SINK_OPERATIONS,
+    ATOMIC_TRANSFERS,
+    ORGANIZATION_LIMITS,
+    AUDIT_QUERIES,
+    PERSISTED_EVENTS,
+    BANK_STATUS_EVENTS
+}

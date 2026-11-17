@@ -1,0 +1,108 @@
+{
+  "ambientocclusion": false,
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "hyosung": "ultimatebankingsystem:block/atm_machine_hyosung_5te",
+    "copycat": "ultimatebankingsystem:block/atm_copycat_base",
+    "particle": "#hyosung"
+  },
+  "elements": [
+    {
+      "name": "PIN key row 3 column 0",
+      "from": [
+        12.94,
+        18.606099999999998,
+        0.86
+      ],
+      "to": [
+        13.81,
+        18.766099999999998,
+        1.43
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "east": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "south": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "west": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        },
+        "up": {
+          "uv": [
+            9.0,
+            5.0,
+            10.0,
+            5.655172421875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          },
+          "rotation": 180
+        },
+        "down": {
+          "uv": [
+            0.078125,
+            0.078125,
+            0.921875,
+            0.921875
+          ],
+          "texture": "#hyosung",
+          "neoforge_data": {
+            "ambient_occlusion": false
+          }
+        }
+      },
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          16,
+          18.266099999999998,
+          -0.1
+        ]
+      }
+    }
+  ]
+}
