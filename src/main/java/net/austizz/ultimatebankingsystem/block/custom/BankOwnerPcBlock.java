@@ -2,9 +2,10 @@ package net.austizz.ultimatebankingsystem.block.custom;
 
 import com.mojang.serialization.MapCodec;
 import net.austizz.ultimatebankingsystem.bank.owner.BankOwnerPcService;
-import net.austizz.ultimatebankingsystem.network.OpenBankOwnerPcPayload;
+import net.austizz.ultimatebankingsystem.gui.screens.OwnerPcScreenHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 public class BankOwnerPcBlock extends HorizontalDirectionalBlock {
@@ -48,12 +48,7 @@ public class BankOwnerPcBlock extends HorizontalDirectionalBlock {
                                  InteractionHand hand,
                                  BlockHitResult hitResult) {
         if (level.isClientSide()) {
-            PacketDistributor.sendToServer(new OpenBankOwnerPcPayload(
-                    level.dimension().location().toString(),
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ()
-            ));
+            OwnerPcScreenHelper.openDesktop(GlobalPos.of(level.dimension(), pos.immutable()));
         }
         return ItemInteractionResult.SUCCESS;
     }
@@ -61,12 +56,7 @@ public class BankOwnerPcBlock extends HorizontalDirectionalBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (level.isClientSide()) {
-            PacketDistributor.sendToServer(new OpenBankOwnerPcPayload(
-                    level.dimension().location().toString(),
-                    pos.getX(),
-                    pos.getY(),
-                    pos.getZ()
-            ));
+            OwnerPcScreenHelper.openDesktop(GlobalPos.of(level.dimension(), pos.immutable()));
         }
         return InteractionResult.SUCCESS;
     }

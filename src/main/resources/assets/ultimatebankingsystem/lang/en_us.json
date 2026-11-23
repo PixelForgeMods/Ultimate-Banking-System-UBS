@@ -11,7 +11,7 @@
   "message.ultimatebankingsystem.dallas_mask.missing": "You need a Dallas Mask in your inventory.",
   "message.ultimatebankingsystem.dallas_mask.head_occupied": "Remove the item in your head slot first.",
   "block.ultimatebankingsystem.atm_machine": "ATM Machine",
-  "block.ultimatebankingsystem.bank_owner_pc": "Business Manager PC",
+  "block.ultimatebankingsystem.bank_owner_pc": "PC",
   "block.ultimatebankingsystem.bank_vault_door": "Bank Vault Door",
   "block.ultimatebankingsystem.bank_safe_iron_bar_gate": "Bank Safe Iron Bar Gate",
   "block.ultimatebankingsystem.safety_deposit_box_row": "Safety Deposit Box Row",

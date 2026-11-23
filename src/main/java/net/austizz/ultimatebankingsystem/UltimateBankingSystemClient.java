@@ -94,6 +94,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.austizz.ultimatebankingsystem.gui.screens.OwnerPcScreenHelper;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Matrix4f;
@@ -401,6 +402,7 @@ public class UltimateBankingSystemClient {
 
     @SubscribeEvent
     static void onClientLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
+        OwnerPcScreenHelper.clearDesktopSessions();
         ClaimModeClientState.clear();
         ClaimModeOutlineRenderer.clearCache();
         SafeBoxEscortMarkerClientState.onClientDisconnect();

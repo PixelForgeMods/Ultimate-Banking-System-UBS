@@ -414,16 +414,15 @@ final class ClientPayloadHandlers {
 
     static void handleOwnerPcBootstrap(OwnerPcBootstrapPayload payload) {
         ClientOwnerPcData.setApps(payload.apps(), payload.ownedCount(), payload.maxBanks());
+        ClientOwnerPcData.consumeSuppressNextOwnerPcAutoOpen();
         OwnerPcClientScreen ownerScreen = currentOwnerPcScreen();
         if (ownerScreen != null) {
-            ClientOwnerPcData.consumeSuppressNextOwnerPcAutoOpen();
             ownerScreen.refreshFromNetwork();
-        } else {
-            if (ClientOwnerPcData.consumeSuppressNextOwnerPcAutoOpen()) {
-                return;
-            }
-            OwnerPcScreenHelper.openOwnerPcScreen();
         }
+    }
+
+    static void handlePcLogin(PcLoginPayload.Response payload) {
+        OwnerPcScreenHelper.acceptLogin(payload);
     }
 
     static void handleOwnerPcDesktopData(OwnerPcDesktopDataPayload payload) {

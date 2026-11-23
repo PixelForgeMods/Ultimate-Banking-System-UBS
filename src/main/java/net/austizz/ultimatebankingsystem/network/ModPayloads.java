@@ -43,6 +43,7 @@ import net.austizz.ultimatebankingsystem.heist.HeistService;
 import net.austizz.ultimatebankingsystem.menu.VendingMachineStockMenu;
 import net.austizz.ultimatebankingsystem.npc.BankTellerService;
 import net.austizz.ultimatebankingsystem.npc.ShopCashierInteractionManager;
+import net.austizz.ultimatebankingsystem.pc.PcLoginService;
 import net.austizz.ultimatebankingsystem.payments.CreditCardService;
 import net.austizz.ultimatebankingsystem.payments.SmartphonePaymentService;
 import net.austizz.ultimatebankingsystem.payments.WalletBankingCashService;
@@ -212,6 +213,11 @@ public final class ModPayloads {
         registrar.playToServer(HandheldTerminalSavePayload.TYPE, HandheldTerminalSavePayload.STREAM_CODEC, ModPayloads::handleHandheldTerminalSave);
         registrar.playToClient(HandheldTerminalSaveResponsePayload.TYPE, HandheldTerminalSaveResponsePayload.STREAM_CODEC, ModPayloads::handleHandheldTerminalSaveResponse);
         registrar.playToClient(OwnerPcBootstrapPayload.TYPE, OwnerPcBootstrapPayload.STREAM_CODEC, ModPayloads::handleOwnerPcBootstrap);
+        registrar.playToServer(PcLoginPayload.Request.TYPE, PcLoginPayload.Request.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() ->
+                        PcLoginService.handle((ServerPlayer) context.player(), payload)));
+        registrar.playToClient(PcLoginPayload.Response.TYPE, PcLoginPayload.Response.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloadInvoker.invoke("handlePcLogin", payload)));
         registrar.playToClient(OwnerPcDesktopDataPayload.TYPE, OwnerPcDesktopDataPayload.STREAM_CODEC, ModPayloads::handleOwnerPcDesktopData);
         registrar.playToServer(OwnerPcDesktopActionPayload.TYPE, OwnerPcDesktopActionPayload.STREAM_CODEC, ModPayloads::handleOwnerPcDesktopAction);
         registrar.playToClient(OwnerPcDesktopActionResponsePayload.TYPE, OwnerPcDesktopActionResponsePayload.STREAM_CODEC, ModPayloads::handleOwnerPcDesktopActionResponse);
