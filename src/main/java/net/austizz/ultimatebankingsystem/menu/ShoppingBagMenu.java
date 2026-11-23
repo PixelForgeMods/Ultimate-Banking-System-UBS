@@ -3,6 +3,7 @@ package net.austizz.ultimatebankingsystem.menu;
 import net.austizz.ultimatebankingsystem.block.ModBlocks;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagBlockEntity;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagDataKeys;
+import net.austizz.ultimatebankingsystem.storage.ShoppingBagInventory;
 import net.austizz.ultimatebankingsystem.util.ItemStackDataCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -11,6 +12,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -22,7 +24,7 @@ import java.util.UUID;
 public class ShoppingBagMenu extends AbstractContainerMenu {
     public static final int BAG_ROWS = 1;
     private static final int BAG_COLUMNS = 9;
-    public static final int BAG_SLOT_COUNT = BAG_ROWS * BAG_COLUMNS;
+    public static final int BAG_SLOT_COUNT = ShoppingBagInventory.SLOT_COUNT;
 
     private final ShoppingBagBlockEntity bagEntity;
     private final IItemHandler itemHandler;
@@ -44,7 +46,7 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
         this.openedHand = InteractionHand.MAIN_HAND;
         this.openedBagReference = null;
         this.registries = playerInventory.player.level().registryAccess();
-        this.itemHandler = bagEntity != null ? bagEntity.getItemHandler() : new ItemStackHandler(BAG_SLOT_COUNT);
+        this.itemHandler = bagEntity != null ? bagEntity.getItemHandler() : new ShoppingBagInventory();
         addSlots(playerInventory);
     }
 
@@ -63,8 +65,8 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
         this.registries = playerInventory.player.level().registryAccess();
 
         ItemStack openedStack = resolveBagStack(playerInventory, this.openedHand);
-        ItemStackHandler handler = new ItemStackHandler(BAG_SLOT_COUNT);
-        this.openedBagReference = ensureOpenReference(openedStack);
+        ItemStackHandler handler = new ShoppingBagInventory();
+        this.openedBagReference = playerInventory.player.level().isClientSide() ? null : ensureOpenReference(openedStack);
         loadFromBagItem(openedStack, handler);
         this.itemHandler = handler;
 
@@ -73,6 +75,17 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
 
     public ShoppingBagBlockEntity getBagEntity() {
         return bagEntity;
+    }
+
+    @Override
+    public void clicked(int slotId, int button, ClickType clickType, Player player) {
+        if (itemMode && slotId >= 0 && slotId < slots.size()
+                && (matchesOpenedBag(getSlot(slotId).getItem())
+                || (clickType == ClickType.SWAP && button >= 0 && (button < 9 || button == 40)
+                    && matchesOpenedBag(player.getInventory().getItem(button))))) {
+            return;
+        }
+        super.clicked(slotId, button, clickType, player);
     }
 
     @Override
@@ -89,7 +102,7 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
             if (!this.moveItemStackTo(original, BAG_SLOT_COUNT, this.slots.size(), true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (!this.moveItemStackTo(original, 0, BAG_SLOT_COUNT, false)) {
+        } else if (!ShoppingBagInventory.canStore(original) || !this.moveItemStackTo(original, 0, BAG_SLOT_COUNT, false)) {
             return ItemStack.EMPTY;
         }
 
@@ -231,9 +244,7 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
         if (stack == null || stack.isEmpty() || !stack.is(ModBlocks.SHOPPING_BAG.get().asItem())) {
             return false;
         }
-        if (openedBagReference == null) {
-            return true;
-        }
+        if (openedBagReference == null) return false;
         CompoundTag root = ItemStackDataCompat.getCustomData(stack);
         return root != null
                 && root.hasUUID(ShoppingBagDataKeys.BAG_OPEN_ID_KEY)
@@ -247,6 +258,7 @@ public class ShoppingBagMenu extends AbstractContainerMenu {
         CompoundTag root = ItemStackDataCompat.getCustomData(stack);
         if (!root.hasUUID(ShoppingBagDataKeys.BAG_OPEN_ID_KEY)) {
             root.putUUID(ShoppingBagDataKeys.BAG_OPEN_ID_KEY, UUID.randomUUID());
+            ItemStackDataCompat.setCustomData(stack, root);
         }
         return root.getUUID(ShoppingBagDataKeys.BAG_OPEN_ID_KEY);
     }

@@ -523,6 +523,9 @@ public class UltimateBankingSystemClient {
         if (screen instanceof net.austizz.ultimatebankingsystem.gui.screens.CardboardBoxScreen) {
             return false;
         }
+        if (screen instanceof net.austizz.ultimatebankingsystem.gui.screens.ShoppingBagScreen) {
+            return false;
+        }
         if (screen instanceof net.austizz.ultimatebankingsystem.gui.screens.HeistDuffelScreen) {
             return false;
         }

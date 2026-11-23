@@ -49,6 +49,12 @@ public class ShoppingBagItem extends BlockItem {
         if (stack == null || stack.isEmpty() || !stack.is(ModBlocks.SHOPPING_BAG.get().asItem())) {
             return;
         }
+        if (stack.getCount() > 1) {
+            serverPlayer.setItemInHand(hand, stack.split(1));
+            if (!serverPlayer.getInventory().add(stack)) {
+                serverPlayer.drop(stack, false);
+            }
+        }
 
         serverPlayer.openMenu(
                 new SimpleMenuProvider(

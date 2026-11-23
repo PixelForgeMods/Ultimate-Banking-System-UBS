@@ -3,6 +3,7 @@ package net.austizz.ultimatebankingsystem.block.entity.custom;
 import net.austizz.ultimatebankingsystem.util.ItemStackDataCompat;
 import net.austizz.ultimatebankingsystem.block.entity.ModBlockEntities;
 import net.austizz.ultimatebankingsystem.menu.ShoppingBagMenu;
+import net.austizz.ultimatebankingsystem.storage.ShoppingBagInventory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -16,15 +17,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ShoppingBagBlockEntity extends BlockEntity implements MenuProvider {
-    public static final int SLOT_COUNT = 9;
+    public static final int SLOT_COUNT = ShoppingBagInventory.SLOT_COUNT;
     private static final String STORAGE_KEY = "inventory";
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(SLOT_COUNT) {
+    private final ShoppingBagInventory itemHandler = new ShoppingBagInventory() {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();

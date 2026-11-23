@@ -6,7 +6,7 @@ import net.austizz.ultimatebankingsystem.bank.Bank;
 import net.austizz.ultimatebankingsystem.bank.centralbank.CentralBank;
 import net.austizz.ultimatebankingsystem.bank.handler.BankManager;
 import net.austizz.ultimatebankingsystem.block.ModBlocks;
-import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagBlockEntity;
+import net.austizz.ultimatebankingsystem.storage.ShoppingBagInventory;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShoppingBagDataKeys;
 import net.austizz.ultimatebankingsystem.command.UBSCommands;
 import net.austizz.ultimatebankingsystem.block.entity.custom.ShopTerminalBlockEntity;
@@ -253,7 +253,8 @@ public final class ShopCashierInteractionManager {
         }
         List<ShelfCartService.BasketEntryView> soldEntries = ShelfCartService.getEntries(basket);
         String fallbackShopName = resolveCashierShopName(cashier);
-        int requiredBagCount = estimateRequiredBagCount(soldEntries, fallbackShopName);
+        CheckoutBags checkoutBags = buildShoppingBagsForCheckout(soldEntries, fallbackShopName);
+        int requiredBagCount = checkoutBags.packed().size();
 
         var server = player.getServer();
         if (server == null) {
@@ -309,14 +310,13 @@ public final class ShopCashierInteractionManager {
 
         long totalCents = ShelfCartService.getTotalPriceDollars(basket);
         if (totalCents <= 0L) {
-            List<ItemStack> packedBags = buildShoppingBagsForCheckout(soldEntries, fallbackShopName);
             clearBasket(player);
             ShelfBasketSessionService.completeCheckout(player);
-            int droppedBags = deliverPackedBags(player, packedBags);
+            int droppedBags = deliverCheckoutBags(player, checkoutBags);
             String message = "Checkout complete. All items were free.";
             player.sendSystemMessage(Component.literal("§a" + message));
             pushCashierAlert(player, DeliveryAlertPayload.AlertTone.SUCCESS, message, 5000);
-            sendBagDeliverySummary(player, packedBags, droppedBags);
+            sendBagDeliverySummary(player, checkoutBags.packed(), droppedBags);
             return true;
         }
 
@@ -880,7 +880,8 @@ public final class ShopCashierInteractionManager {
         java.util.List<ShelfCartService.BasketEntryView> soldEntries = basket.isEmpty()
                 ? java.util.List.of()
                 : ShelfCartService.getEntries(basket);
-        List<ItemStack> packedBags = buildShoppingBagsForCheckout(soldEntries, session.shopName);
+        CheckoutBags checkoutBags = buildShoppingBagsForCheckout(soldEntries, session.shopName);
+        List<ItemStack> packedBags = checkoutBags.packed();
         int bagCount = packedBags.size();
         if (bagCount > session.reservedBagCount) {
             int extraNeeded = bagCount - session.reservedBagCount;
@@ -930,7 +931,7 @@ public final class ShopCashierInteractionManager {
                             + (returnedToWallet ? " to wallet" : ""),
                     4600);
         }
-        int droppedBags = deliverPackedBags(player, packedBags);
+        int droppedBags = deliverCheckoutBags(player, checkoutBags);
         SESSIONS.remove(player.getUUID());
 
         long wholeDollars = required / 100L;
@@ -1080,10 +1081,6 @@ public final class ShopCashierInteractionManager {
         }
     }
 
-    private static int estimateRequiredBagCount(List<ShelfCartService.BasketEntryView> soldEntries, String shopName) {
-        return Math.max(0, buildShoppingBagsForCheckout(soldEntries, shopName).size());
-    }
-
     private static ShopBagReservation reserveShoppingBagsForCheckout(MinecraftServer server,
                                                                      CentralBank centralBank,
                                                                      UUID shopOwnerId,
@@ -1180,15 +1177,19 @@ public final class ShopCashierInteractionManager {
         player.containerMenu.broadcastChanges();
     }
 
-    private static List<ItemStack> buildShoppingBagsForCheckout(List<ShelfCartService.BasketEntryView> soldEntries, String shopName) {
+    record CheckoutBags(List<ItemStack> packed, List<ItemStack> loose) {}
+
+    static CheckoutBags buildShoppingBagsForCheckout(List<ShelfCartService.BasketEntryView> soldEntries, String shopName) {
         List<ItemStack> soldStacks = expandSoldEntries(soldEntries);
         List<ItemStack> bags = new ArrayList<>();
-        if (soldStacks.isEmpty()) {
-            return bags;
-        }
+        List<ItemStack> loose = new ArrayList<>();
 
-        ItemStackHandler currentBag = new ItemStackHandler(ShoppingBagBlockEntity.SLOT_COUNT);
+        ShoppingBagInventory currentBag = new ShoppingBagInventory();
         for (ItemStack soldStack : soldStacks) {
+            if (!ShoppingBagInventory.canStore(soldStack)) {
+                loose.add(soldStack);
+                continue;
+            }
             ItemStack remaining = soldStack.copy();
             while (!remaining.isEmpty()) {
                 remaining = ItemHandlerHelper.insertItemStacked(currentBag, remaining, false);
@@ -1196,7 +1197,7 @@ public final class ShopCashierInteractionManager {
                     if (!isBagHandlerEmpty(currentBag)) {
                         bags.add(toShoppingBagItem(currentBag, shopName));
                     }
-                    currentBag = new ItemStackHandler(ShoppingBagBlockEntity.SLOT_COUNT);
+                    currentBag = new ShoppingBagInventory();
                 }
             }
         }
@@ -1204,7 +1205,7 @@ public final class ShopCashierInteractionManager {
         if (!isBagHandlerEmpty(currentBag)) {
             bags.add(toShoppingBagItem(currentBag, shopName));
         }
-        return bags;
+        return new CheckoutBags(bags, loose);
     }
 
     private static List<ItemStack> expandSoldEntries(List<ShelfCartService.BasketEntryView> soldEntries) {
@@ -1257,7 +1258,15 @@ public final class ShopCashierInteractionManager {
         return bag;
     }
 
-    private static int deliverPackedBags(ServerPlayer player, List<ItemStack> packedBags) {
+    private static int deliverCheckoutBags(ServerPlayer player, CheckoutBags checkoutBags) {
+        int droppedPacked = deliverBags(player, checkoutBags.packed());
+        if (deliverBags(player, checkoutBags.loose()) > 0) {
+            player.sendSystemMessage(Component.literal("Some purchased shopping bags were dropped because your inventory is full."));
+        }
+        return droppedPacked;
+    }
+
+    private static int deliverBags(ServerPlayer player, List<ItemStack> packedBags) {
         if (player == null || packedBags == null || packedBags.isEmpty()) {
             return 0;
         }

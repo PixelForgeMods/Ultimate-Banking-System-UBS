@@ -21,6 +21,7 @@ public final class ModCreativeTabs {
                     .displayItems((parameters, output) -> {
                         output.accept(ModBlocks.ATM_MACHINE.get());
                         output.accept(ModBlocks.IN_WALL_ATM.get());
+                        output.accept(ModBlocks.ATM_MACHINE_OLD.get());
                         output.accept(ModBlocks.BANK_OWNER_PC.get());
                         output.accept(ModItems.BANK_TELLER_SPAWN_EGG.get());
                         output.accept(ModItems.BANK_NOTE.get());

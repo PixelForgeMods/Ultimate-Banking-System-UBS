@@ -3,6 +3,7 @@ package net.austizz.ultimatebankingsystem.block;
 import net.austizz.ultimatebankingsystem.UltimateBankingSystem;
 import net.austizz.ultimatebankingsystem.block.custom.AccessVerifierBlock;
 import net.austizz.ultimatebankingsystem.block.custom.ATMBlock;
+import net.austizz.ultimatebankingsystem.block.custom.LegacyATMBlock;
 import net.austizz.ultimatebankingsystem.block.custom.BankOwnerPcBlock;
 import net.austizz.ultimatebankingsystem.block.custom.BankSafeIronBarGateBlock;
 import net.austizz.ultimatebankingsystem.block.custom.BankVaultDoorBlock;
@@ -63,6 +64,10 @@ public class ModBlocks {
 
 
             ));
+    public static final DeferredBlock<Block> ATM_MACHINE_OLD = registerBlock("atm_machine_old",
+            () -> new LegacyATMBlock(BlockBehaviour.Properties.of()
+                    .noOcclusion().strength(4f).sound(SoundType.METAL)));
+
     public static final DeferredBlock<Block> IN_WALL_ATM = registerBlock("in_wall_atm",
             () -> new net.austizz.ultimatebankingsystem.block.custom.InWallATMBlock(BlockBehaviour.Properties.of()
                     .noOcclusion().strength(4f).sound(SoundType.METAL)));

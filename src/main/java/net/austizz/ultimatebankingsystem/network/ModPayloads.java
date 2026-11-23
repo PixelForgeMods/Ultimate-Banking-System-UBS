@@ -184,7 +184,6 @@ public final class ModPayloads {
 
         // --- Register payloads below this line ---
         registrar.playToClient(WikiOpenPayload.TYPE, WikiOpenPayload.STREAM_CODEC, ModPayloads::handleWikiOpen);
-        registrar.playToServer(OpenATMPayload.TYPE, OpenATMPayload.STREAM_CODEC, ModPayloads::handleOpenATM);
         registrar.playToClient(AccountListPayload.TYPE, AccountListPayload.STREAM_CODEC, ModPayloads::handleAccountList);
         registrar.playToClient(BankTellerOpenPayload.TYPE, BankTellerOpenPayload.STREAM_CODEC, ModPayloads::handleBankTellerOpen);
         registrar.playToServer(BankTellerActionPayload.TYPE, BankTellerActionPayload.STREAM_CODEC, ModPayloads::handleBankTellerAction);
@@ -508,45 +507,42 @@ public final class ModPayloads {
 
     // ─── OpenATM ────────────────────────────────────────────────────────
 
-    private static void handleOpenATM(OpenATMPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            var player = (net.minecraft.server.level.ServerPlayer) context.player();
-            var server = player.getServer();
-            var centralBank = BankManager.getCentralBank(server);
-            if (centralBank == null) return;
-            long gameTime = currentOverworldGameTime(server);
+    public static void openLegacyAtmScreen(ServerPlayer player) {
+        var server = player.getServer();
+        var centralBank = BankManager.getCentralBank(server);
+        if (centralBank == null) return;
+        long gameTime = currentOverworldGameTime(server);
 
-            var playerAccounts = centralBank.SearchForAccount(player.getUUID());
-            List<AccountSummary> summaries = new ArrayList<>();
+        var playerAccounts = centralBank.SearchForAccount(player.getUUID());
+        List<AccountSummary> summaries = new ArrayList<>();
 
-            var cardLookup = CreditCardService.findHeldCard(centralBank, player);
-            if (cardLookup.hasCard()) {
-                if (!cardLookup.validation().valid()) {
-                    player.sendSystemMessage(moneyLiteral("§cCredit card rejected: "
-                            + cardLookup.validation().message()));
-                    return;
-                }
-
-                AccountHolder linked = centralBank.SearchForAccountByAccountId(cardLookup.validation().accountId());
-                if (linked == null || !player.getUUID().equals(linked.getPlayerUUID())) {
-                    player.sendSystemMessage(moneyLiteral("§cCredit card rejected: linked account is unavailable."));
-                    return;
-                }
-                summaries.add(buildAccountSummary(linked, centralBank, gameTime));
-                player.sendSystemMessage(moneyLiteral(
-                        "§bATM card mode active for account §f" + shortId(linked.getAccountUUID())
-                ));
-            } else {
-                for (var account : playerAccounts.values()) {
-                    summaries.add(buildAccountSummary(account, centralBank, gameTime));
-                }
+        var cardLookup = CreditCardService.findHeldCard(centralBank, player);
+        if (cardLookup.hasCard()) {
+            if (!cardLookup.validation().valid()) {
+                player.sendSystemMessage(moneyLiteral("§cCredit card rejected: "
+                        + cardLookup.validation().message()));
+                return;
             }
 
-            UltimateBankingSystem.LOGGER.info("[UBS] Sending {} accounts to player {}", summaries.size(), player.getName().getString());
-            PacketDistributor.sendToPlayer(player, new AccountListPayload(summaries));
+            AccountHolder linked = centralBank.SearchForAccountByAccountId(cardLookup.validation().accountId());
+            if (linked == null || !player.getUUID().equals(linked.getPlayerUUID())) {
+                player.sendSystemMessage(moneyLiteral("§cCredit card rejected: linked account is unavailable."));
+                return;
+            }
+            summaries.add(buildAccountSummary(linked, centralBank, gameTime));
+            player.sendSystemMessage(moneyLiteral(
+                    "§bATM card mode active for account §f" + shortId(linked.getAccountUUID())
+            ));
+        } else {
+            for (var account : playerAccounts.values()) {
+                summaries.add(buildAccountSummary(account, centralBank, gameTime));
+            }
+        }
 
-            PacketDistributor.sendToPlayer(player, UBSCommands.buildHudStatePayload(centralBank, player.getUUID()));
-        });
+        UltimateBankingSystem.LOGGER.info("[UBS] Sending {} accounts to player {}", summaries.size(), player.getName().getString());
+        PacketDistributor.sendToPlayer(player, new AccountListPayload(summaries));
+
+        PacketDistributor.sendToPlayer(player, UBSCommands.buildHudStatePayload(centralBank, player.getUUID()));
     }
 
     private static void handleAccountList(AccountListPayload payload, IPayloadContext context) {

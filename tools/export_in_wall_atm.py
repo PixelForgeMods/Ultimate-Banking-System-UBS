@@ -103,7 +103,14 @@ def export():
     for facing,rotation in [('north',0),('east',90),('south',180),('west',270)]:
         for part in range(12):variants[f'facing={facing},part={part}']={'model':f'ultimatebankingsystem:block/in_wall_atm_cell_{part}','y':rotation}
     write(ASSETS/'blockstates/in_wall_atm.json',{'variants':variants})
-    write(ASSETS/'models/item/in_wall_atm.json',{'parent':'ultimatebankingsystem:block/in_wall_atm_body','display':{'gui':{'rotation':[30,225,0],'translation':[-3,-4,0],'scale':[.35,.35,.35]}}})
+    write(ASSETS/'models/item/in_wall_atm.json',{
+        'parent':'ultimatebankingsystem:block/in_wall_atm_body',
+        'display':{'gui':{
+            'rotation':[-168,27,-180],
+            'translation':[1.25,-2.65,0],
+            'scale':[.35,.35,.35],
+        }},
+    })
     for t in project['textures']:
         name='atm_copycat_base.png' if t['name']=='copycat_base.png' else t['name']
         (ASSETS/'textures/block'/name).write_bytes(base64.b64decode(t['source'].split(',')[1]))

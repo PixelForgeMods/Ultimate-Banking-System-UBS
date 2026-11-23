@@ -6,10 +6,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -17,6 +20,30 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class ATMBlockGameTests {
     private ATMBlockGameTests() {
+    }
+
+    @GameTest(template = "empty3x3x3")
+    public static void legacyAtmDropsOneItemFromEitherHalf(GameTestHelper helper) {
+        var level = helper.getLevel();
+        var pos = helper.absolutePos(new BlockPos(1, 1, 1));
+        var block = ModBlocks.ATM_MACHINE_OLD.get();
+        var lower = block.defaultBlockState().setValue(LegacyATMBlock.FACING, Direction.EAST);
+        var upper = lower.setValue(LegacyATMBlock.HALF, DoubleBlockHalf.UPPER);
+
+        for (var brokenPos : new BlockPos[]{pos, pos.above()}) {
+            level.setBlock(pos, lower, Block.UPDATE_ALL);
+            block.setPlacedBy(level, pos, lower, null, new ItemStack(block));
+            helper.assertTrue(level.getBlockState(pos.above()) == upper, "Legacy ATM must place a matching upper half");
+            level.destroyBlock(brokenPos, true);
+            helper.assertTrue(level.isEmptyBlock(pos) && level.isEmptyBlock(pos.above()),
+                    "Breaking either half must remove the entire legacy ATM");
+            var drops = level.getEntitiesOfClass(ItemEntity.class, new AABB(pos).expandTowards(0, 1, 0),
+                    item -> item.getItem().is(block.asItem()));
+            helper.assertTrue(drops.stream().mapToInt(item -> item.getItem().getCount()).sum() == 1,
+                    "The legacy ATM must drop exactly one item");
+            drops.forEach(ItemEntity::discard);
+        }
+        helper.succeed();
     }
 
     @GameTest(template = "empty3x3x3")
